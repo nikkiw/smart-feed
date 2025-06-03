@@ -82,7 +82,7 @@ smart-feed/
 
 ## 7. API спецификация
 
-Полное описание API представлено в файле [content_delta_sync_spec_rus.md](docs/content_delta_sync_spec_rus.md).
+Полное описание API представлено в файле [content_delta_sync_spec_rus.md](/docs/content_delta_sync_spec_rus.md).
 
 
 ## 8. Экраны и пользовательский поток
