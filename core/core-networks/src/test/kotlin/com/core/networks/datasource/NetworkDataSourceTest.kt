@@ -26,10 +26,9 @@ class NetworkDataSourceTest {
         // Given
         val since = "2024-01-01T00:00:00Z"
         val limit = 50
-        val start = 0
 
         // When
-        val result = networkDataSource.getUpdates(since, limit, start)
+        val result = networkDataSource.getUpdates(since, limit)
 
         // Then
         assertTrue("Result should be success", result.isSuccess)
@@ -58,10 +57,9 @@ class NetworkDataSourceTest {
         // Given
         val since = "invalid-date"
         val limit = 100
-        val start = 0
 
         // When
-        val result = networkDataSource.getUpdates(since, limit, start)
+        val result = networkDataSource.getUpdates(since, limit)
 
         // Then
         assertTrue("Result should be failure", result.isFailure)
