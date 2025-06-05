@@ -1,13 +1,8 @@
 plugins {
-    id("ndev-android-library-with-hilt-convention")
+    alias(libs.plugins.smart.feed.android.library)
+    alias(libs.plugins.smart.feed.android.library.jacoco)
 }
 
 android {
     namespace = "com.core.core"
-
-}
-
-
-dependencies {
-
 }

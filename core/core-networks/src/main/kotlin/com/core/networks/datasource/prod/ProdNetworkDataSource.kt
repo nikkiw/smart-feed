@@ -7,6 +7,7 @@ import com.core.di.IoDispatcher
 import com.core.networks.datasource.NetworkDataSource
 import com.core.networks.models.ContentUpdate
 import com.core.networks.models.UpdatesResponse
+import com.core.runSuspendCatching
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -28,14 +29,14 @@ class ProdNetworkDataSource @Inject constructor(
         since: String,
         limit: Int,
     ): Result<UpdatesResponse> = withContext(ioDispatcher) {
-        runCatching {
+        runSuspendCatching {
             api.getUpdates(since = since, limit = limit)
         }
     }
 
     override suspend fun getContentById(type: String, id: String): Result<ContentUpdate> =
         withContext(ioDispatcher) {
-            runCatching { api.getContentById(type = type, id = id) }
+            runSuspendCatching { api.getContentById(type = type, id = id) }
         }
 
     override fun getAccessToken(): String? {

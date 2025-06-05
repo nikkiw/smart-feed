@@ -189,7 +189,7 @@ class NetworkDataSourceTest {
     @Test
     fun `getUpdates should handle network timeout gracefully`() = runTest {
         // Given
-        val since = "2024-01-01T00:00:00Z"
+        "2024-01-01T00:00:00Z"
 
         // When & Then
         // Тест для проверки обработки таймаута сети

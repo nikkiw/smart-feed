@@ -28,10 +28,10 @@ class ContentUpdateDeserializerTest {
           "action": "upsert",
           "updatedAt": "2025-06-01T12:00:00Z",
           "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
+          "tags": ["tag1", "tag2"],
           "attributes": {
             "title": "Test Article",
-            "content": "This is a test.",
-            "tags": ["tag1", "tag2"]
+            "content": "This is a test."
           }
         }
         """.trimIndent()
@@ -42,12 +42,12 @@ class ContentUpdateDeserializerTest {
         Assert.assertEquals("article", update.type)
         Assert.assertEquals("upsert", update.action)
         Assert.assertEquals("2025-06-01T12:00:00Z", update.updatedAt)
+        Assert.assertEquals(listOf("tag1", "tag2"), update.tags)
         Assert.assertTrue(update.attributes is ContentAttributes.Article)
 
         val attributes = update.attributes as ContentAttributes.Article
         Assert.assertEquals("Test Article", attributes.title)
         Assert.assertEquals("This is a test.", attributes.content)
-        Assert.assertEquals(listOf("tag1", "tag2"), attributes.tags)
     }
 
     @Test
@@ -59,6 +59,7 @@ class ContentUpdateDeserializerTest {
           "action": "upsert",
           "updatedAt": "2025-06-01T13:00:00Z",
           "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
+          "tags": ["tag1", "tag2"],
           "attributes": {
             "questions": ["Q1", "Q2", "Q3"]
           }
@@ -71,6 +72,7 @@ class ContentUpdateDeserializerTest {
         Assert.assertEquals("quiz", update.type)
         Assert.assertEquals("upsert", update.action)
         Assert.assertEquals("2025-06-01T13:00:00Z", update.updatedAt)
+        Assert.assertEquals(listOf("tag1", "tag2"), update.tags)
         Assert.assertTrue(update.attributes is ContentAttributes.Quiz)
 
         val attributes = update.attributes as ContentAttributes.Quiz
@@ -86,6 +88,7 @@ class ContentUpdateDeserializerTest {
           "action": "delete",
           "updatedAt": "2025-06-01T14:00:00Z",
           "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
+          "tags": ["tag1", "tag2"],
           "attributes": {
             "someField": "someValue"
           }
@@ -112,6 +115,7 @@ class ContentUpdateDeserializerTest {
               "action": "upsert",
               "updatedAt": "2025-06-01T12:00:00Z",
               "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
+              "tags": ["tag1", "tag2"],
               "attributes": {
                 "title": "Test Article",
                 "content": "This is a test.",
@@ -124,6 +128,7 @@ class ContentUpdateDeserializerTest {
               "action": "upsert",
               "updatedAt": "2025-06-01T13:00:00Z",
               "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
+              "tags": ["tag1", "tag2"],
               "attributes": {
                 "questions": ["Q1", "Q2"]
               }

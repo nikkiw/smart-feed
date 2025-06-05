@@ -32,7 +32,7 @@ class DevNetworkDataSource : NetworkDataSource {
         limit: Int
     ): Result<UpdatesResponse> {
         // Эмулируем небольшую задержку, как будто идёт запрос по сети
-        delay(200)
+//        delay(200)
 
         // Находим индекс первого элемента, у которого updatedAt > since
         val filtered = dummyData.filter { it.updatedAt > since }
@@ -108,8 +108,7 @@ class DevNetworkDataSource : NetworkDataSource {
             val attributes: ContentAttributes = if (type == "article") {
                 ContentAttributes.Article(
                     title = "Заголовок статьи №$i",
-                    content = "Содержимое статьи №$i. Здесь может быть любой текст.",
-                    tags = listOf("тег1", "тег2", "пример")
+                    content = "Содержимое статьи №$i. Здесь может быть любой текст."
                 )
             } else {
                 ContentAttributes.Quiz(
@@ -126,7 +125,8 @@ class DevNetworkDataSource : NetworkDataSource {
                 type = type,
                 action = action,
                 updatedAt = updatedAt,
-                url = url,
+                mainImageUrl = url,
+                tags = listOf("тег1", "тег2", "пример"),
                 attributes = attributes
             )
         }

@@ -24,8 +24,7 @@ sealed class ContentAttributes {
     @SerialName("article")
     data class Article(
         @SerialName("title") val title: String,
-        @SerialName("content") val content: String,
-        @SerialName("tags") val tags: List<String>
+        @SerialName("content") val content: String
     ) : ContentAttributes()
 
     @Serializable
@@ -42,6 +41,7 @@ data class ContentUpdate(
     @SerialName("action") val action: String, // "upsert" или "delete"
     @SerialName("updatedAt") val updatedAt: String,
     @SerialName("mainImageUrl") val mainImageUrl: String,
+    @SerialName("tags") val tags: List<String>,
     @SerialName("attributes") val attributes: ContentAttributes? = null
 )
 
@@ -88,8 +88,7 @@ object DummyData {
                     if (type == "article") {
                         ContentAttributes.Article(
                             title = "Article title №$i",
-                            content = "Content of article №$i. This can be any text.",
-                            tags = listOf("tag1", "tag2", "example")
+                            content = "Content of article №$i. This can be any text."
                         )
                     } else {
                         ContentAttributes.Quiz(
@@ -110,6 +109,7 @@ object DummyData {
                 action = action,
                 updatedAt = updatedAt,
                 mainImageUrl = mainImageUrl,
+                tags = listOf("tag1", "tag2", "example"),
                 attributes = attributes
             )
         }

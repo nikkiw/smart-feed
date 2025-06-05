@@ -11,8 +11,7 @@ sealed class ContentAttributes {
     @Keep
     data class Article(
         @SerializedName("title") val title: String,
-        @SerializedName("content") val content: String,
-        @SerializedName("tags") val tags: List<String>
+        @SerializedName("content") val content: String
     ) : ContentAttributes()
 
     @Keep
@@ -29,7 +28,8 @@ data class ContentUpdate(
     @SerializedName("type") val type: String,
     @SerializedName("action") val action: String, // "upsert" или "delete"
     @SerializedName("updatedAt") val updatedAt: String,
-    @SerializedName("mainImageUrl") val url: String,
+    @SerializedName("mainImageUrl") val mainImageUrl: String,
+    @SerializedName("tags") val tags: List<String>,
     @SerializedName("attributes") val attributes: ContentAttributes? // теперь полиморфный тип
 )
 
@@ -54,6 +54,7 @@ val contentUpdateDeserializer = JsonDeserializer { json: JsonElement, typeOfT, c
     val action = obj.get("action").asString
     val updatedAt = obj.get("updatedAt").asString
     val mainImageUrl = obj.get("mainImageUrl").asString
+    val tags = obj.getAsJsonArray("tags").map { it.asString }
     val attributesElement = if (obj.has("attributes") && !obj.get("attributes").isJsonNull)
         obj.get("attributes") else null
 
@@ -61,11 +62,13 @@ val contentUpdateDeserializer = JsonDeserializer { json: JsonElement, typeOfT, c
         "article" -> attributesElement?.let {
             context.deserialize(it, ContentAttributes.Article::class.java)
         }
+
         "quiz" -> attributesElement?.let {
             context.deserialize(it, ContentAttributes.Quiz::class.java)
         }
+
         else -> null
     }
 
-    ContentUpdate(id, type, action, updatedAt, mainImageUrl, attributes)
+    ContentUpdate(id, type, action, updatedAt, mainImageUrl, tags, attributes)
 }

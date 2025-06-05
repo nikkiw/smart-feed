@@ -1,5 +1,6 @@
 plugins {
-    id("ndev-android-application-with-hilt-convention")
+    alias(libs.plugins.smart.feed.android.application)
+    alias(libs.plugins.smart.feed.android.application.jacoco)
 }
 
 android {
