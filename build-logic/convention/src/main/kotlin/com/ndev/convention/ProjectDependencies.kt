@@ -10,7 +10,6 @@ internal fun Project.configureDependenciesHilt() {
         .named("libs")
 
     dependencies {
-        // Hilt core и компилятор
         add("implementation", libs.findLibrary("hilt.android.core").get())
         add("ksp", libs.findLibrary("hilt.compiler").get())
     }
@@ -23,6 +22,7 @@ internal fun Project.configureDependenciesUnitTests() {
 
     dependencies {
         add("testImplementation", libs.findLibrary("junit4").get())
+        add("testImplementation", libs.findLibrary("kotlin.test").get())
         add("testImplementation", libs.findLibrary("kotlin.coroutines.test").get())
         add("testImplementation", libs.findLibrary("mockk").get())
     }
@@ -35,5 +35,20 @@ internal fun Project.configureDependenciesAndroidTests() {
 
     dependencies {
         add("androidTestImplementation", libs.findLibrary("androidx.junit").get())
+        add("androidTestImplementation", libs.findLibrary("androidx.espresso.core").get())
+        add("androidTestImplementation", libs.findLibrary("kotlin.test").get())
+        add("androidTestImplementation", libs.findLibrary("kotlin.coroutines.test").get())
     }
 }
+
+internal fun Project.configureDependenciesCoreLibraryDesugaring() {
+    val libs = extensions
+        .getByType(VersionCatalogsExtension::class.java)
+        .named("libs")
+
+    dependencies {
+        add("coreLibraryDesugaring", libs.findLibrary("desugar.jdk.libs").get())
+    }
+}
+
+

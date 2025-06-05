@@ -4,9 +4,8 @@ import com.android.build.gradle.LibraryExtension
 import com.ndev.convention.common.Config
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.dependencies
 
 class AndroidLibraryWithHiltConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -20,9 +19,14 @@ class AndroidLibraryWithHiltConventionPlugin : Plugin<Project> {
                 configureAndroidLibrary(target)
             }
 
+            tasks.withType(Test::class.java).configureEach {
+                jvmArgs("-XX:+EnableDynamicAgentLoading")
+            }
+
             configureDependenciesHilt()
             configureDependenciesUnitTests()
             configureDependenciesAndroidTests()
+            configureDependenciesCoreLibraryDesugaring()
         }
     }
 
@@ -40,45 +44,26 @@ class AndroidLibraryWithHiltConventionPlugin : Plugin<Project> {
         productFlavors {
             create("dev") {
                 dimension = "environment"
-                // Всё, что специфично для dev
                 buildConfigField("String", "BUILD_ENV", "\"dev\"")
-                // при необходимости: applicationIdSuffix = ".dev"  — для application-плагина,
-                // но в library-плагине его обычно не ставят.
             }
             create("prod") {
                 dimension = "environment"
-                // Всё, что специфично для prod
                 buildConfigField("String", "BUILD_ENV", "\"prod\"")
-            }
-        }
-
-        buildTypes {
-            getByName("debug") {
-                isMinifyEnabled = false
-                // Здесь можно добавить общие debug-поля, если нужно
-                buildConfigField("String", "BUILD_VARIANT", "\"debug\"")
-            }
-
-            getByName("release") {
-                isMinifyEnabled = true
-                proguardFiles(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "proguard-rules.pro"
-                )
-                buildConfigField("String", "BUILD_VARIANT", "\"release\"")
             }
         }
 
         compileOptions {
             sourceCompatibility = Config.COMPILE_JAVA_VERSION
             targetCompatibility = Config.COMPILE_JAVA_VERSION
+            isCoreLibraryDesugaringEnabled = true
         }
+
 
         buildFeatures {
             buildConfig = true
         }
 
-        // Конфигурация Kotlin
+        // Configuration Kotlin
         project.configureKotlin()
     }
 }

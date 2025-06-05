@@ -22,20 +22,25 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        register("androidLibraryWithHilt") {
-            // ID, по которому вы будете подключать плагин в модулях
-            id = "ndev-android-library-with-hilt-convention"
+        register("androidApplicationWithHilt") {
+            id = libs.plugins.smart.feed.android.application.asProvider().get().pluginId
+            implementationClass = "com.ndev.convention.AndroidApplicationWithHiltConventionPlugin"
+        }
 
-            // полное имя класса с пакетом, где лежит ваш Plugin<Project>
+        register("androidApplicationJacoco") {
+            id = libs.plugins.smart.feed.android.application.jacoco.get().pluginId
+            implementationClass = "com.ndev.convention.AndroidApplicationJacocoConventionPlugin"
+        }
+
+
+        register("androidLibraryWithHilt") {
+            id = libs.plugins.smart.feed.android.library.asProvider().get().pluginId
             implementationClass = "com.ndev.convention.AndroidLibraryWithHiltConventionPlugin"
         }
 
-        register("androidApplicationWithHilt") {
-            // ID, по которому вы будете подключать плагин в модулях
-            id = "ndev-android-application-with-hilt-convention"
-
-            // полное имя класса с пакетом, где лежит ваш Plugin<Project>
-            implementationClass = "com.ndev.convention.AndroidApplicationWithHiltConventionPlugin"
+        register("androidLibraryJacoco") {
+            id = libs.plugins.smart.feed.android.library.jacoco.get().pluginId
+            implementationClass = "com.ndev.convention.AndroidLibraryJacocoConventionPlugin"
         }
     }
 }

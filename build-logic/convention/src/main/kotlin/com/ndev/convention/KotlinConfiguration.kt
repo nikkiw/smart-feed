@@ -10,7 +10,7 @@ internal fun Project.configureKotlin() {
         kotlinOptions {
             jvmTarget = "17"
 
-            // Дополнительные опции компилятора
+            // Optional compiler option
 //            freeCompilerArgs = freeCompilerArgs + listOf(
 //                "-opt-in=kotlin.RequiresOptIn",
 //                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"

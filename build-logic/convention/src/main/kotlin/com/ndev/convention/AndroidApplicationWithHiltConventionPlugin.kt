@@ -33,6 +33,7 @@ class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
             configureDependenciesHilt()
             configureDependenciesUnitTests()
             configureDependenciesAndroidTests()
+            configureDependenciesCoreLibraryDesugaring()
         }
     }
 
@@ -87,17 +88,16 @@ class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
             compileOptions {
                 sourceCompatibility = Config.COMPILE_JAVA_VERSION
                 targetCompatibility = Config.COMPILE_JAVA_VERSION
+                isCoreLibraryDesugaringEnabled = true
             }
 
             buildFeatures {
                 buildConfig = true
             }
 
-            // Если нужен ViewBinding или DataBinding, раскомментируйте, например:
             // viewBinding { isEnabled = true }
             // dataBinding { isEnabled = true }
 
-            // Конфигурация Kotlin (если у вас есть какой-то обобщённый метод configureKotlin)
             project.configureKotlin()
         }
     }
