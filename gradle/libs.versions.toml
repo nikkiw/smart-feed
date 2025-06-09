@@ -3,17 +3,22 @@ agp = "8.10.1"
 kotlin = "2.1.10"
 coreKtx = "1.16.0"
 
-appcompat = "1.7.0"
+appcompat = "1.7.1"
 kotlinTestJunit = "2.1.10"
 kotlinxCoroutinesCore = "1.10.2"
+
+# UI
 material = "1.12.0"
+swiperefreshlayout="1.1.0"
 
 # Core Library Desugaring
 desugarJdkLibs="2.1.5"
 
 # Base component
 gson = "2.11.0"
+kotlinxSerializationJson="1.8.1"
 decompose = "3.3.0"
+essentyLifecycleCoroutines="2.5.0"
 
 # Database
 sqlite = "2.5.1"
@@ -27,6 +32,10 @@ hilt = "2.55"
 # Networking
 retrofit = "2.11.0"
 okhttp = "4.12.0"
+
+# Image
+glide = "4.16.0"
+
 
 # Tests
 junit4 = "4.13.2"
@@ -51,22 +60,30 @@ kotlinStdlib = "2.1.20"
 kotlinTest = "2.1.10"
 core = "1.6.1"
 
+# Quality
+leakcanary = "3.0-alpha-8"
+anrwatchdog = "1.4.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlinTestJunit" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+
+# UI
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+swiperefreshlayout = { group = "androidx.swiperefreshlayout", name ="swiperefreshlayout", version.ref="swiperefreshlayout"}
 
 # Core Library Desugaring
 desugar-jdk-libs = { group = "com.android.tools", name="desugar_jdk_libs", version.ref="desugarJdkLibs"}
 
-
 # Base component
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name="kotlinx-serialization-json", version.ref="kotlinxSerializationJson"}
 
 # Decompose
 decompose = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decompose" }
+essenty-lifecycle-coroutines = { group="com.arkivanov.essenty", name="lifecycle-coroutines", version.ref="essentyLifecycleCoroutines"}
 decompose-extensions-android = { group = "com.arkivanov.decompose", name = "extensions-android", version.ref = "decompose" }
 
 # DI
@@ -91,6 +108,13 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = 
 retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+
+# Image
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+glide-ksp = { group = "com.github.bumptech.glide", name = "ksp", version.ref = "glide" }
+#glide-cronet = { group = "com.github.bumptech.glide", name = "cronet-integration", version.ref = "glide" }
+glide-okhttp = { group = "com.github.bumptech.glide", name = "okhttp3-integration", version.ref = "glide" }
+glide-recyclerview = { group = "com.github.bumptech.glide", name = "recyclerview-integration", version.ref = "glide" }
 
 # Tests
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
@@ -125,6 +149,10 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", versio
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlinTest" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 
+# Quality
+leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
+anrwatchdog = { group = "com.github.anrwatchdog", name = "anrwatchdog", version.ref = "anrwatchdog" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -132,6 +160,7 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 benchmark = { id = "androidx.benchmark", version.ref = "benchmark" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+android-test = { id = "com.android.test", version.ref = "agp" }
 
 # Mock server
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -145,9 +174,10 @@ smart-feed-android-application = { id = "smart.feed.android.application" }
 smart-feed-android-application-jacoco = { id = "smart.feed.android.application.jacoco" }
 smart-feed-android-library = { id = "smart.feed.android.library" }
 smart-feed-android-library-jacoco = { id = "smart.feed.android.library.jacoco" }
-#smart-feed-android-feature = { id = "smart.feed.android.feature" }
+smart-feed-android-feature = { id = "smart.feed.android.feature" }
 
 
 
 [bundles]
-decompose-libs = ["decompose", "decompose-extensions-android"]
+decompose-libs = ["decompose", "decompose-extensions-android", "essenty-lifecycle-coroutines"]
+glide = ["glide", "glide-okhttp", "glide-recyclerview"]

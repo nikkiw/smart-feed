@@ -29,10 +29,19 @@ android {
 }
 
 dependencies {
+    debugImplementation(libs.leakcanary)
+
+    implementation(projects.core.core)
+    implementation(projects.core.coreNetworks)
+    implementation(projects.core.coreDatabase)
+    implementation(projects.core.coreData)
+    implementation(projects.core.coreDomain)
+    implementation(projects.core.imageGlide)
+    implementation(projects.feature.feed)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-
     implementation(libs.bundles.decompose.libs)
 
     testImplementation(libs.junit4)

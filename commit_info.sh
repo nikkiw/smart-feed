@@ -10,16 +10,16 @@ if git rev-parse --verify HEAD >/dev/null 2>&1; then
   git diff --name-status HEAD              >> $OUT
   echo -e "\n=== Staged diff ==="           >> $OUT
   git diff --cached                        >> $OUT
-  echo -e "\n=== Unstaged diff ==="         >> $OUT
-  git diff                                 >> $OUT
+  # echo -e "\n=== Unstaged diff ==="         >> $OUT
+  # git diff                                 >> $OUT
 else
   # HEAD нет (первый коммит), считаем все файлы как новые (status A)
   echo "=== New repository: listing all tracked files as 'A' ===" > $OUT
   git ls-files | sed 's/^/A\t/'            >> $OUT
   echo -e "\n=== Staged diff ==="           >> $OUT
   git diff --cached                        >> $OUT
-  echo -e "\n=== Unstaged diff ==="         >> $OUT
-  git diff                                 >> $OUT
+  # echo -e "\n=== Unstaged diff ==="         >> $OUT
+  # git diff                                 >> $OUT
 fi
 
-echo "Saved all changes to $OUT"
+echo "Saved commit changes to $OUT"

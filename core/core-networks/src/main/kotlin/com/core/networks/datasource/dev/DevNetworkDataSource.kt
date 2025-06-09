@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.collections.plusAssign
 import kotlin.random.Random
 
 /**
@@ -22,6 +21,13 @@ class DevNetworkDataSource : NetworkDataSource {
     // Хранение токена и последнего синка в памяти
     private val accessTokenRef = AtomicReference<String?>(null)
     private val lastSyncAtRef = AtomicReference<String>("1970-01-01T00:00:00Z")
+    private val allTags = listOf(
+        "technology",
+        "health",
+        "finance",
+        "education",
+        "environment"
+    )
 
     // Генерация «базы» из 100+ элементов при инициализации
     private val dummyData: List<ContentUpdate> by lazy { generateDummyUpdates(150) }
@@ -36,7 +42,7 @@ class DevNetworkDataSource : NetworkDataSource {
 
         // Находим индекс первого элемента, у которого updatedAt > since
         val filtered = dummyData.filter { it.updatedAt > since }
-            .sortedBy{ it.updatedAt}
+            .sortedBy { it.updatedAt }
 
         // Берём нужный кусок, начиная с позиции start, размером limit (как минимум 100)
         val slice = filtered.take(limit.coerceAtLeast(100))
@@ -103,7 +109,7 @@ class DevNetworkDataSource : NetworkDataSource {
             val action = if (Random.Default.nextBoolean()) "upsert" else "delete"
             // Форматируем updatedAt как ISO-строку (примерно)
             val updatedAt = isoTimestamp(now - i * 60_000L) // каждую минуту назад
-            val url = "https://example.com/images/$type/$i.jpg"
+            val url = "https://picsum.photos/200"
 
             val attributes: ContentAttributes = if (type == "article") {
                 ContentAttributes.Article(
@@ -120,13 +126,16 @@ class DevNetworkDataSource : NetworkDataSource {
                 )
             }
 
+            val tagCount = (1..allTags.size).random()        // случайное число от 1 до 5
+            val randomTags = allTags.shuffled().take(tagCount)
+
             list += ContentUpdate(
                 id = id,
                 type = type,
                 action = action,
                 updatedAt = updatedAt,
                 mainImageUrl = url,
-                tags = listOf("тег1", "тег2", "пример"),
+                tags = randomTags,
                 attributes = attributes
             )
         }

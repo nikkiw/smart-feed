@@ -22,6 +22,13 @@ interface ContentDao {
     )
     fun getContent(query: RoomRawQuery): PagingSource<Int, ContentUpdateWithDetails>
 
+    @Query("SELECT count(*)>0 FROM content_updates")
+    suspend fun isNotEmpty(): Boolean
+
+    @Transaction
+    @Query("SELECT * FROM content_updates WHERE id=:id")
+    suspend fun getContentById(id: String): ContentUpdateWithDetails
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertContentUpdate(contentUpdate: ContentUpdateEntity)
 

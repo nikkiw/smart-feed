@@ -15,6 +15,7 @@ import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemsSortedType
 import com.core.domain.repository.Query
 import com.core.utils.DateTimeConvertors
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -74,7 +75,7 @@ class ContentItemDaoInstrumentedTest {
         db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
         db.contentDao().insertContentUpdateWithDetails(entity2, attr2)
 
-        val tags = db.contentTagsDao().allTags()
+        val tags = db.contentTagsDao().allTags().first()
         val expectedTags = listOf("news", "tech", "science")
         assertEquals(expectedTags.toSet(), tags.toSet())
 

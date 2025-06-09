@@ -52,3 +52,33 @@ internal fun Project.configureDependenciesCoreLibraryDesugaring() {
 }
 
 
+
+internal fun Project.configureDependenciesFeature() {
+    val libs = extensions
+        .getByType(VersionCatalogsExtension::class.java)
+        .named("libs")
+
+    dependencies {
+        add("implementation", libs.findLibrary("kotlinx.coroutines.core").get())
+
+        add("implementation", libs.findBundle("decompose.libs").get())
+        add("implementation", libs.findLibrary("material").get())
+        add("implementation", libs.findLibrary("swiperefreshlayout").get())
+
+    }
+}
+
+
+internal fun Project.configureDependenciesKotlinxSerialization() {
+    val libs = extensions
+        .getByType(VersionCatalogsExtension::class.java)
+        .named("libs")
+
+    dependencies {
+        add("implementation", libs.findLibrary("kotlinx.serialization.json").get())
+    }
+}
+
+
+
+

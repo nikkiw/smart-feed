@@ -42,5 +42,12 @@ gradlePlugin {
             id = libs.plugins.smart.feed.android.library.jacoco.get().pluginId
             implementationClass = "com.ndev.convention.AndroidLibraryJacocoConventionPlugin"
         }
+
+
+        register("androidFeature") {
+            id = libs.plugins.smart.feed.android.feature.get().pluginId
+            implementationClass = "com.ndev.convention.AndroidFeatureConventionPlugin"
+        }
+
     }
 }

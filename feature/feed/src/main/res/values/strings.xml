@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="item_article_image_content_description">"Main image for article"</string>
+    <string name="article_state_is_loaded">"Loaded…"</string>
+
+</resources>
