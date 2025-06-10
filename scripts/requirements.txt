@@ -1,0 +1,4 @@
+sentence-transformers
+transformers
+numpy<2          # зафиксируем NumPy в версии 1.x для совместимости
+pybind11>=2.12   # добавляем для возможного перекомпилирования модулей
