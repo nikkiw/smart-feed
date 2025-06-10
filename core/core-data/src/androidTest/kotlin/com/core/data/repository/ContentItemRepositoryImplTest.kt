@@ -28,6 +28,7 @@ import kotlin.test.assertEquals
 @RunWith(AndroidJUnit4::class)
 class ContentItemRepositoryImplTest {
 
+    private lateinit var networkDataSource: DevNetworkDataSource
     private lateinit var db: ContentDatabase
     private lateinit var contentDao: ContentDao
     private lateinit var repo: ContentItemRepository
@@ -36,13 +37,14 @@ class ContentItemRepositoryImplTest {
     @Before
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
+        networkDataSource = DevNetworkDataSource()
         db = ContentDatabase.Companion.getTestDatabase(context)
         contentDao = db.contentDao()
         repo = ContentItemRepositoryImpl(
             contentDao = contentDao,
             contentTagsDao = db.contentTagsDao(),
             updatesMetaDao = db.updatesMetaDao(),
-            networkDataSource = DevNetworkDataSource(),
+            networkDataSource = networkDataSource,
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -112,80 +114,33 @@ class ContentItemRepositoryImplTest {
         // Assert: проверьте, что результат успешен
         Assert.assertTrue(result.isSuccess)
 
+        val tags = networkDataSource.allTags.subList(0, 1)
+
         // Query by type ARTICLE and tag "тег1", sort by name ASC
         val query = Query(
             types = listOf(ContentItemType.ARTICLE),
-            tags = Tags(listOf("тег1")),
+            tags = Tags(tags),
             sortedBy = ContentItemsSortedType.ByNameAsc
         )
 
 
-        val expectedOrder = setOf(
-            "article-100",
-            "article-101",
-            "article-103",
-            "article-104",
-            "article-106",
-            "article-107",
-            "article-109",
-            "article-110",
-            "article-112",
-            "article-113",
-            "article-115",
-            "article-116",
-            "article-118",
-            "article-119",
-            "article-121",
-            "article-122",
-            "article-124",
-            "article-125",
-            "article-127",
-            "article-128",
-            "article-130",
-            "article-131",
-            "article-133",
-            "article-134",
-            "article-136",
-            "article-137",
-            "article-139",
-            "article-140",
-            "article-142",
-            "article-143",
-            "article-145",
-            "article-146",
-            "article-148",
-            "article-149",
-            "article-52",
-            "article-53",
-            "article-55",
-            "article-56",
-            "article-58",
-            "article-59",
-            "article-61",
-            "article-62",
-            "article-64",
-            "article-65",
-            "article-67",
-            "article-68",
-            "article-70",
-            "article-71",
-            "article-73",
-            "article-74",
-            "article-76",
-            "article-77",
-            "article-79",
-            "article-80",
-            "article-82",
-            "article-83",
-            "article-85",
-            "article-86",
-            "article-88",
-            "article-89"
-        )
+        val expectedOrder = networkDataSource.dummyData
+            .filter { content ->
+                content.type == ContentItemType.ARTICLE.toString()
+                        && content.action != "delete"
+                        && content.tags.any { it in tags }
+            }.map { it.id }
+            .sorted()
+            .toSet()
 
         val actualOrder = repo.flowContent(query)
-            .asSnapshot()
+            .asSnapshot {
+                scrollTo(index = Int.MAX_VALUE)
+            }
             .map { it.id.value }
+            .sorted()
+            .toSet()
+
         assertEquals(expectedOrder, actualOrder.toSet())
     }
 }

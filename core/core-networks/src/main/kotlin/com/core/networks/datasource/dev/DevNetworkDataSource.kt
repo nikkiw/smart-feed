@@ -21,7 +21,7 @@ class DevNetworkDataSource : NetworkDataSource {
     // Хранение токена и последнего синка в памяти
     private val accessTokenRef = AtomicReference<String?>(null)
     private val lastSyncAtRef = AtomicReference<String>("1970-01-01T00:00:00Z")
-    private val allTags = listOf(
+    val allTags = listOf(
         "technology",
         "health",
         "finance",
@@ -30,7 +30,7 @@ class DevNetworkDataSource : NetworkDataSource {
     )
 
     // Генерация «базы» из 100+ элементов при инициализации
-    private val dummyData: List<ContentUpdate> by lazy { generateDummyUpdates(150) }
+    val dummyData: List<ContentUpdate> by lazy { generateDummyUpdates(150) }
     // Здесь мы генерируем 150, чтобы явно быть больше 100
 
     override suspend fun getUpdates(

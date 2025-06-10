@@ -22,6 +22,7 @@ fun contentItemPagingSource(
           ON  content_updates.id = content_update_tags.contentUpdateId
         LEFT JOIN article_attributes
           ON content_updates.id = article_attributes.contentUpdateId
+        WHERE content_updates.action <> 'delete'
     """.trimIndent()
     )
 
@@ -45,7 +46,8 @@ fun contentItemPagingSource(
 
     // Собираем WHERE, если есть условия
     if (whereClauses.isNotEmpty()) {
-        sqlBuilder.append("\nWHERE ")
+//        sqlBuilder.append("\nWHERE ")
+        sqlBuilder.append("\nAND ")
         sqlBuilder.append(whereClauses.joinToString(" AND "))
     }
 
