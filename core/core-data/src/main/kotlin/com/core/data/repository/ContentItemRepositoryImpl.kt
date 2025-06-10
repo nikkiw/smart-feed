@@ -15,7 +15,6 @@ import com.core.database.content.contentItemPagingSource
 import com.core.di.IoDispatcher
 import com.core.domain.model.ContentItem
 import com.core.domain.model.ContentItemId
-import com.core.domain.model.ContentItemType
 import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemRepository
 import com.core.domain.repository.Query
@@ -87,47 +86,51 @@ class ContentItemRepositoryImpl @Inject constructor(
         return runSuspendCatching {
             withContext(ioDispatcher) {
                 mutex.withLock {
-                    val lastSyncAt = updatesMetaDao.getMeta()?.lastSyncAt ?: "1970-01-01T00:00:00Z"
-                    val networkResult = networkDataSource.getUpdates(since = lastSyncAt)
-                    if (networkResult.isSuccess) {
-                        val updates = networkResult.getOrThrow().data
-                        // Save updates in DB
+                    var since = updatesMetaDao.getMeta()?.lastSyncAt ?: "1970-01-01T00:00:00Z"
+                    do {
+                        // Запрос очередной страницы
+                        val networkResult = networkDataSource.getUpdates(since = since)
+                        if (networkResult.isFailure) {
+                            val error =
+                                networkResult.exceptionOrNull() ?: Exception("Unknown error")
+                            throw error
+                        }
+                        val response = networkResult.getOrThrow()
+                        val updates = response.data
+
+                        // Сохраняем данные в БД
                         updates.forEach { update ->
-                            val type = update.type
                             val entity = ContentUpdateEntity(
                                 id = update.id,
-                                type = type,
+                                type = update.type,
                                 action = update.action,
                                 updatedAt = DateTimeConvertors.parseIsoToLongMs(update.updatedAt),
                                 mainImageUrl = update.mainImageUrl,
                                 tags = update.tags
                             )
-                            val articleEntity = when (ContentItemType.fromString(type)) {
-                                ContentItemType.ARTICLE -> (update.attributes as? ContentAttributes.Article)?.let {
+                            // Пример маппинга статьи
+                            val articleEntity =
+                                (update.attributes as? ContentAttributes.Article)?.let {
                                     ArticleAttributesEntity(
                                         contentUpdateId = update.id,
                                         title = it.title,
                                         content = it.content
                                     )
                                 }
-
-                                else -> null
-                            }
-                            // You can add quiz mapping here if needed
                             contentDao.insertContentUpdateWithDetails(
                                 contentUpdate = entity,
                                 article = articleEntity
                             )
                         }
-                        // Save new lastSyncAt
-                        val maxUpdatedAt = updates.maxOfOrNull { it.updatedAt } ?: lastSyncAt
-                        updatesMetaDao.saveMeta(UpdatesMetaEntity(lastSyncAt = maxUpdatedAt))
-                        Result.success(Unit)
-                    } else {
-                        Result.failure(
-                            networkResult.exceptionOrNull() ?: Exception("Unknown error")
-                        )
-                    }
+
+                        // Обновляем since для следующей итерации
+                        since = response.meta.nextSince
+                        // Цикл повторится, пока сервер говорит, что есть ещё
+                    } while (response.meta.hasMore)
+
+                    // После загрузки всех страниц сохраняем новую точку синка
+                    updatesMetaDao.saveMeta(UpdatesMetaEntity(lastSyncAt = since))
+                    Result.success(Unit)
                 }
             }
         }
