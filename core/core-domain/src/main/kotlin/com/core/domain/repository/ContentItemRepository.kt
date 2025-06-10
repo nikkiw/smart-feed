@@ -4,6 +4,7 @@ package com.core.domain.repository
 import androidx.paging.PagingData
 import com.core.domain.model.ContentItem
 import com.core.domain.model.ContentItemId
+import com.core.domain.model.ContentItemPreview
 import com.core.domain.model.ContentItemType
 import com.core.domain.model.Tags
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +30,7 @@ interface ContentItemRepository {
     /**
      * Возвращает Flow контент-обновлений (с деталями) с поддержкой Paging.
      */
-    fun flowContent(query: Query): Flow<PagingData<ContentItem>>
+    fun flowContent(query: Query): Flow<PagingData<ContentItemPreview>>
 
     /**
      * Возвращает Result<ContentItem> для указанного itemId

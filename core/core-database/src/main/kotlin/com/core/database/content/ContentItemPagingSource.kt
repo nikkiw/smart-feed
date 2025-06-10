@@ -9,7 +9,7 @@ import com.core.domain.repository.Query
 fun contentItemPagingSource(
     query: Query,
     contentDao: ContentDao
-): PagingSource<Int, ContentUpdateWithDetails> {
+): PagingSource<Int, ContentPreviewWithDetails> {
     val sqlBuilder = StringBuilder()
     val args = mutableListOf<Any>()
 

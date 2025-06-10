@@ -10,6 +10,7 @@ kotlinxCoroutinesCore = "1.10.2"
 # UI
 material = "1.12.0"
 swiperefreshlayout="1.1.0"
+markwon = "4.6.2"
 
 # Core Library Desugaring
 desugarJdkLibs="2.1.5"
@@ -73,6 +74,7 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 # UI
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 swiperefreshlayout = { group = "androidx.swiperefreshlayout", name ="swiperefreshlayout", version.ref="swiperefreshlayout"}
+markwon-core = { group = "io.noties.markwon", name = "core", version.ref = "markwon" }
 
 # Core Library Desugaring
 desugar-jdk-libs = { group = "com.android.tools", name="desugar_jdk_libs", version.ref="desugarJdkLibs"}

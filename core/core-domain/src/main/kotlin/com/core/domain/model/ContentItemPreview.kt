@@ -1,34 +1,31 @@
 package com.core.domain.model
 
 
-sealed class ContentItem {
+sealed class ContentItemPreview {
     abstract val id: ContentItemId
     abstract val type: ContentItemType
     abstract val updatedAt: UpdatedAt
     abstract val mainImageUrl: ImageUrl
     abstract val tags: Tags
 
-
-    data class Article(
+    data class ArticlePreview(
         override val id: ContentItemId,
         override val updatedAt: UpdatedAt,
         override val mainImageUrl: ImageUrl,
         override val tags: Tags,
         val title: Title,
-        val short: ShortDescription,
-        val content: Content,
-        val embeddings: Embeddings,
-    ) : ContentItem() {
+        val short: ShortDescription
+    ) : ContentItemPreview() {
         override val type: ContentItemType = ContentItemType.ARTICLE
     }
 
-    data class Unknown(
+    data class UnknownPreview(
         override val id: ContentItemId,
         override val updatedAt: UpdatedAt,
         override val mainImageUrl: ImageUrl,
         override val tags: Tags,
         val rawType: String
-    ) : ContentItem() {
+    ) : ContentItemPreview() {
         override val type: ContentItemType = ContentItemType.UNKNOWN
     }
 }

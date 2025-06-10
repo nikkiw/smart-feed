@@ -3,6 +3,7 @@ package com.core.networks.datasource.dev
 import com.core.networks.datasource.NetworkDataSource
 import com.core.networks.models.ContentAttributes
 import com.core.networks.models.ContentUpdate
+import com.core.networks.models.Embeddings
 import com.core.networks.models.UpdatesMeta
 import com.core.networks.models.UpdatesResponse
 import kotlinx.coroutines.delay
@@ -114,7 +115,13 @@ class DevNetworkDataSource : NetworkDataSource {
             val attributes: ContentAttributes = if (type == "article") {
                 ContentAttributes.Article(
                     title = "Заголовок статьи №$i",
-                    content = "Содержимое статьи №$i. Здесь может быть любой текст."
+                    shortDescription = "Краткое содержимое статьи №$i",
+                    content = "Содержимое статьи №$i. Здесь может быть любой текст.",
+                    embeddings = Embeddings(
+                        typeName = "test",
+                        size = 20,
+                        data = List(20){Random.nextDouble(-1.0, 1.0)}
+                    )
                 )
             } else {
                 ContentAttributes.Quiz(

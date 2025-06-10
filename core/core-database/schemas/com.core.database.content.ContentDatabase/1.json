@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c8abb877526bb1f662ea58ac198bb038",
+    "identityHash": "a2d7dca09e82cc081d30f965fe33eafc",
     "entities": [
       {
         "tableName": "content_updates",
@@ -74,7 +74,7 @@
       },
       {
         "tableName": "article_attributes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`contentUpdateId` TEXT NOT NULL, `title` TEXT NOT NULL, `content` TEXT NOT NULL, PRIMARY KEY(`contentUpdateId`), FOREIGN KEY(`contentUpdateId`) REFERENCES `content_updates`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`contentUpdateId` TEXT NOT NULL, `title` TEXT NOT NULL, `content` TEXT NOT NULL, `shortDescription` TEXT NOT NULL, `embeddings` BLOB NOT NULL, PRIMARY KEY(`contentUpdateId`), FOREIGN KEY(`contentUpdateId`) REFERENCES `content_updates`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "contentUpdateId",
@@ -92,6 +92,18 @@
             "fieldPath": "content",
             "columnName": "content",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shortDescription",
+            "columnName": "shortDescription",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "embeddings",
+            "columnName": "embeddings",
+            "affinity": "BLOB",
             "notNull": true
           }
         ],
@@ -200,7 +212,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c8abb877526bb1f662ea58ac198bb038')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a2d7dca09e82cc081d30f965fe33eafc')"
     ]
   }
 }

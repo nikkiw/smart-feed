@@ -5,6 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.core.data.dto.toContentItem
+import com.core.data.dto.toContentPreview
 import com.core.database.content.ArticleAttributesEntity
 import com.core.database.content.ContentDao
 import com.core.database.content.ContentTagsDao
@@ -15,6 +16,7 @@ import com.core.database.content.contentItemPagingSource
 import com.core.di.IoDispatcher
 import com.core.domain.model.ContentItem
 import com.core.domain.model.ContentItemId
+import com.core.domain.model.ContentItemPreview
 import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemRepository
 import com.core.domain.repository.Query
@@ -45,7 +47,7 @@ class ContentItemRepositoryImpl @Inject constructor(
 
     private val mutex = Mutex()
 
-    override fun flowContent(query: Query): Flow<PagingData<ContentItem>> {
+    override fun flowContent(query: Query): Flow<PagingData<ContentItemPreview>> {
         // Pager config can be tuned as needed
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
@@ -58,7 +60,7 @@ class ContentItemRepositoryImpl @Inject constructor(
         )
             .flow
             .mapNotNull { pagingData ->
-                pagingData.map { it.toContentItem() }
+                pagingData.map { it.toContentPreview() }
             }
             .flowOn(ioDispatcher)
     }
@@ -114,7 +116,10 @@ class ContentItemRepositoryImpl @Inject constructor(
                                     ArticleAttributesEntity(
                                         contentUpdateId = update.id,
                                         title = it.title,
-                                        content = it.content
+                                        shortDescription = it.shortDescription,
+                                        content = it.content,
+                                        embeddings = it.embeddings.data.map { it.toFloat() }
+                                            .toFloatArray()
                                     )
                                 }
                             contentDao.insertContentUpdateWithDetails(

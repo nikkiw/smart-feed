@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.TestReport
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -108,3 +110,22 @@ plugins {
 //        csv.required.set(false)
 //    }
 //}
+
+val devDebugCombinedReport by tasks.registering(TestReport::class) {
+    // Куда складывать готовый HTML
+    destinationDirectory.set(layout.buildDirectory.dir("reports/devDebugCombined"))
+
+    // Откуда брать XML с результатами
+    reportOn(
+        // unit-тесты
+        fileTree("$buildDir/test-results/testDevDebugUnitTest"),
+        // androidTest результаты
+        fileTree("$buildDir/outputs/androidTest-results/connected")
+    )
+
+    // Чтобы агрегатор запускался только после тестов
+    dependsOn(
+//        tasks.named("testDevDebugUnitTest"),
+        tasks.named("connectedDevDebugAndroidTest")
+    )
+}

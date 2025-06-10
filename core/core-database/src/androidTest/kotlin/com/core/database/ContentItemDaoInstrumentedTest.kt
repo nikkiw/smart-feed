@@ -6,7 +6,6 @@ import androidx.paging.PagingSource
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.core.database.content.ArticleAttributesEntity
-import com.core.database.content.ContentDao
 import com.core.database.content.ContentDatabase
 import com.core.database.content.ContentUpdateEntity
 import com.core.database.content.contentItemPagingSource
@@ -21,19 +20,18 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.random.Random
 import kotlin.test.assertEquals
 
 @RunWith(AndroidJUnit4::class)
 class ContentItemDaoInstrumentedTest {
 
     private lateinit var db: ContentDatabase
-    private lateinit var contentDao: ContentDao
 
     @Before
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = ContentDatabase.getTestDatabase(context)
-        contentDao = db.contentDao()
     }
 
     @After
@@ -65,12 +63,16 @@ class ContentItemDaoInstrumentedTest {
         val attr1 = ArticleAttributesEntity(
             contentUpdateId = "id1",
             title = "Alpha Title",
-            content = "Alpha Content"
+            content = "Alpha Content",
+            shortDescription = "Short desc",
+            embeddings = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() }
         )
         val attr2 = ArticleAttributesEntity(
             contentUpdateId = "id2",
             title = "Beta Title",
-            content = "Beta Content"
+            content = "Beta Content",
+            shortDescription = "Short desc",
+            embeddings = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() }
         )
         db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
         db.contentDao().insertContentUpdateWithDetails(entity2, attr2)
@@ -86,7 +88,7 @@ class ContentItemDaoInstrumentedTest {
             sortedBy = ContentItemsSortedType.ByNameAsc
         )
 
-        val pagingSource = contentItemPagingSource(query, contentDao)
+        val pagingSource = contentItemPagingSource(query, db.contentDao())
         val loadResult = pagingSource.load(
             PagingSource.LoadParams.Refresh(
                 key = null,
@@ -126,12 +128,16 @@ class ContentItemDaoInstrumentedTest {
         val attr1 = ArticleAttributesEntity(
             contentUpdateId = "id1",
             title = "Alpha Title",
-            content = "Alpha Content"
+            content = "Alpha Content",
+            shortDescription = "Short desc",
+            embeddings = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() }
         )
         val attr2 = ArticleAttributesEntity(
             contentUpdateId = "id2",
             title = "Beta Title",
-            content = "Beta Content"
+            content = "Beta Content",
+            shortDescription = "Short desc",
+            embeddings = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() }
         )
 
         db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
@@ -145,7 +151,7 @@ class ContentItemDaoInstrumentedTest {
             sortedBy = ContentItemsSortedType.ByDateNewestFirst
         )
 
-        val pagingSource = contentItemPagingSource(query, contentDao)
+        val pagingSource = contentItemPagingSource(query, db.contentDao())
         val loadResult = pagingSource.load(
             PagingSource.LoadParams.Refresh(
                 key = null,
@@ -161,5 +167,42 @@ class ContentItemDaoInstrumentedTest {
             else -> emptyList()
         }
         assertEquals(expectedOrder, actualOrder)
+    }
+
+    @Test
+    fun testFlowContent_check_embeddings_convertors() = runTest {
+        // Prepare data
+        val entity1 = ContentUpdateEntity(
+            id = "id1",
+            type = ContentItemType.ARTICLE.toString(),
+            action = "created",
+            updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
+            mainImageUrl = "url1",
+            tags = listOf("news", "science")
+        )
+
+        val attr1 = ArticleAttributesEntity(
+            contentUpdateId = "id1",
+            title = "Alpha Title",
+            shortDescription = "Short desc",
+            content = "Alpha Content",
+            embeddings = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() }
+        )
+        db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
+
+
+        // Query by type ARTICLE and tag "news", sort by name ASC
+        val query = Query(
+            types = listOf(ContentItemType.ARTICLE),
+            tags = Tags(),
+            sortedBy = ContentItemsSortedType.ByNameAsc
+        )
+
+
+        // We expect 2 results in sorted order by title ("Alpha Title", "Beta Title")
+        val expectedEmbeddings = attr1.embeddings.toList()
+        val actualEmbeddings =
+            db.contentDao().getContentById(entity1.id).article?.embeddings?.toList()
+        assertEquals(expectedEmbeddings, actualEmbeddings)
     }
 }

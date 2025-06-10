@@ -7,11 +7,20 @@ import com.google.gson.annotations.SerializedName
 
 
 @Keep
+data class Embeddings(
+    @SerializedName("typeName") val typeName: String,
+    @SerializedName("size") val size: Int,
+    @SerializedName("data") val data: List<Double>
+)
+
+@Keep
 sealed class ContentAttributes {
     @Keep
     data class Article(
         @SerializedName("title") val title: String,
-        @SerializedName("content") val content: String
+        @SerializedName("shortDescription") val shortDescription: String,
+        @SerializedName("content") val content: String,
+        @SerializedName("embeddings") val embeddings: Embeddings
     ) : ContentAttributes()
 
     @Keep

@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.core.di.ImageLoaderEntryPoint
-import com.core.domain.model.ContentItem
+import com.core.domain.model.ContentItemPreview
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
 import com.core.image.ImageSource
@@ -21,7 +21,7 @@ import dagger.hilt.android.EntryPointAccessors
  */
 class ArticleViewHolder private constructor(
     itemView: View,
-    private val onClick: (ContentItem.Article) -> Unit,
+    private val onClick: (ContentItemPreview.ArticlePreview) -> Unit,
     private val imageLoader: ImageLoader
 ) : RecyclerView.ViewHolder(itemView) {
 
@@ -31,7 +31,7 @@ class ArticleViewHolder private constructor(
     private val date: TextView = itemView.findViewById(R.id.articleDate)
     private val tagGroup: ChipGroup = itemView.findViewById(R.id.articleTags)
 
-    private var currentArticle: ContentItem.Article? = null
+    private var currentArticle: ContentItemPreview.ArticlePreview? = null
 
     init {
         itemView.setOnClickListener {
@@ -39,7 +39,7 @@ class ArticleViewHolder private constructor(
         }
     }
 
-    fun bind(article: ContentItem.Article) {
+    fun bind(article: ContentItemPreview.ArticlePreview) {
         currentArticle = article
         // Uploading an image using the ImageLoader abstraction
         if (article.mainImageUrl.value.isNotEmpty()) {
@@ -55,7 +55,7 @@ class ArticleViewHolder private constructor(
             image.setImageDrawable(null)
         }
         title.text = article.title.value
-        content.text = article.content.value
+        content.text = article.short.value
         date.text = article.updatedAt.toString()
 
         // Теги
@@ -74,7 +74,10 @@ class ArticleViewHolder private constructor(
          * Creates an ArticleViewHolder. Use this method in the onCreateViewHolder of the adapter.
          * Gets ImageLoader via Hilt EntryPoint.
          */
-        fun create(parent: ViewGroup, onClick: (ContentItem.Article) -> Unit): ArticleViewHolder {
+        fun create(
+            parent: ViewGroup,
+            onClick: (ContentItemPreview.ArticlePreview) -> Unit
+        ): ArticleViewHolder {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_article, parent, false)
             // Getting ImageLoader via Hilt EntryPoint

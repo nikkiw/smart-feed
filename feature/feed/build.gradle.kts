@@ -22,9 +22,8 @@ dependencies {
 
     // Pagging
     implementation(libs.androidx.pagging.ktx)
-//
-//    implementation(libs.gson)
-//
-//    // Testing dependencies
-//    androidTestImplementation(libs.room.testing)
+
+    // Markdown
+    implementation(libs.markwon.core)
+
 }

@@ -15,12 +15,14 @@ import com.feature.feed.R
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import io.noties.markwon.Markwon
 
 
 @OptIn(ExperimentalDecomposeApi::class)
 fun ViewContext.ArticleItemView(
     component: ArticleItemComponent,
-    imageLoader: ImageLoader
+    imageLoader: ImageLoader,
+    markwon: Markwon
 ): View {
     val view = layoutInflater.inflate(R.layout.item_article_component, parent, false)
     val toolbar = view.findViewById<MaterialToolbar>(R.id.articleToolbar)
@@ -72,7 +74,7 @@ fun ViewContext.ArticleItemView(
                     }
 
                     content.apply {
-                        text = model.content.value
+                        text = markwon.toMarkdown(model.content.value)
                         visibility = View.VISIBLE
                     }
 

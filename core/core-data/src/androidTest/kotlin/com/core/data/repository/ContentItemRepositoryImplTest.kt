@@ -23,6 +23,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.random.Random
 import kotlin.test.assertEquals
 
 @RunWith(AndroidJUnit4::class)
@@ -78,12 +79,16 @@ class ContentItemRepositoryImplTest {
         val attr1 = ArticleAttributesEntity(
             contentUpdateId = "id1",
             title = "Alpha Title",
-            content = "Alpha Content"
+            shortDescription = "Short desc",
+            content = "Alpha Content",
+            embeddings = FloatArray(10){ Random.nextDouble(-1.0,1.0).toFloat() }
         )
         val attr2 = ArticleAttributesEntity(
             contentUpdateId = "id2",
             title = "Beta Title",
-            content = "Beta Content"
+            shortDescription = "Short desc",
+            content = "Beta Content",
+            embeddings = FloatArray(10){ Random.nextDouble(-1.0,1.0).toFloat() }
         )
         db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
         db.contentDao().insertContentUpdateWithDetails(entity2, attr2)
@@ -104,6 +109,7 @@ class ContentItemRepositoryImplTest {
             .map { it.id.value }
         assertEquals(expectedOrder, actualOrder)
     }
+
 
     @Test
     fun testSyncContentAll_queryByTagOnly_andSortedByDateDesc() = runTest {

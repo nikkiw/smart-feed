@@ -130,3 +130,7 @@ smart-feed/
 * **Новые типы контента:** видео, аудио, опросы
 * **Аналитика:** дашборд метрик вовлечённости
 
+./gradlew connectedDevDebugAndroidTest
+./gradlew testDevDebugUnitTest
+
+createDevDebugCombinedCoverageReport

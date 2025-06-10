@@ -5,8 +5,11 @@ import androidx.paging.PagingData
 import com.core.domain.model.Content
 import com.core.domain.model.ContentItem
 import com.core.domain.model.ContentItemId
+import com.core.domain.model.ContentItemPreview
 import com.core.domain.model.ContentItemType
+import com.core.domain.model.Embeddings
 import com.core.domain.model.ImageUrl
+import com.core.domain.model.ShortDescription
 import com.core.domain.model.Tags
 import com.core.domain.model.Title
 import com.core.domain.model.UpdatedAt
@@ -26,6 +29,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.random.Random
 import kotlin.test.assertEquals
 
 
@@ -57,14 +61,14 @@ class GetContentUseCaseTest {
         )
         val expected = flowOf(
             PagingData.from(
-                listOf<ContentItem>(
-                    ContentItem.Article(
+                listOf<ContentItemPreview>(
+                    ContentItemPreview.ArticlePreview(
                         id = ContentItemId("1"),
                         updatedAt = UpdatedAt.parse("2023-01-01T10:00:00Z"),
                         mainImageUrl = ImageUrl("https://example.com/img.jpg"),
                         tags = Tags(listOf("tag1", "tag2")),
                         title = Title("Example Article"),
-                        content = Content("Content ccccxcdsf af dsf adfds fadf adsf fasf af")
+                        short = ShortDescription("short desc")
                     )
                 )
             )

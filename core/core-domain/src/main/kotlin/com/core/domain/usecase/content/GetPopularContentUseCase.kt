@@ -2,6 +2,7 @@ package com.core.domain.usecase.content
 
 import androidx.paging.PagingData
 import com.core.domain.model.ContentItem
+import com.core.domain.model.ContentItemPreview
 import com.core.domain.model.ContentItemType
 import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemsSortedType
@@ -16,7 +17,7 @@ import javax.inject.Singleton
 class GetPopularContentUseCase(
     private val getContentUseCase: GetContentUseCase
 ) {
-    operator fun invoke(): Flow<PagingData<ContentItem>> {
+    operator fun invoke(): Flow<PagingData<ContentItemPreview>> {
         val popularQuery = Query(
             types = ContentItemType.entries,
             tags = Tags(),

@@ -20,7 +20,7 @@ interface ContentDao {
             ArticleAttributesEntity::class
         ]
     )
-    fun getContent(query: RoomRawQuery): PagingSource<Int, ContentUpdateWithDetails>
+    fun getContent(query: RoomRawQuery): PagingSource<Int, ContentPreviewWithDetails>
 
     @Query("SELECT count(*)>0 FROM content_updates")
     suspend fun isNotEmpty(): Boolean

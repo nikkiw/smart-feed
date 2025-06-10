@@ -10,6 +10,7 @@ import com.feature.feed.R
 import com.feature.feed.article.ArticleItemView
 import com.feature.feed.master.FeedMasterView
 import dagger.hilt.android.EntryPointAccessors
+import io.noties.markwon.Markwon
 
 
 @OptIn(ExperimentalDecomposeApi::class)
@@ -21,6 +22,9 @@ fun ViewContext.FeedRootComponentView(component: FeedRootComponent): View {
         parent.context.applicationContext
     ).imageLoader()
 
+    val markwon = Markwon.builder( parent.context.applicationContext)
+//            .usePlugin(HtmlPlugin.create())
+        .build()
     routerView.children(
         stack = component.childStack,
         lifecycle = lifecycle,
@@ -28,7 +32,8 @@ fun ViewContext.FeedRootComponentView(component: FeedRootComponent): View {
             when (child) {
                 is FeedRootComponent.Child.ArticleScreen -> ArticleItemView(
                     child.component,
-                    imageLoader
+                    imageLoader,
+                    markwon
                 )
 
                 is FeedRootComponent.Child.FeedScreen -> FeedMasterView(child.component)

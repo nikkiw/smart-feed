@@ -1,7 +1,7 @@
 package com.core.domain.usecase.content
 
 import androidx.paging.PagingData
-import com.core.domain.model.ContentItem
+import com.core.domain.model.ContentItemPreview
 import com.core.domain.model.ContentItemType
 import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemsSortedType
@@ -19,7 +19,7 @@ class SearchContentByTagsUseCase(
     operator fun invoke(
         tags: Tags,
         sortedBy: ContentItemsSortedType = ContentItemsSortedType.ByDateNewestFirst
-    ): Flow<PagingData<ContentItem>> {
+    ): Flow<PagingData<ContentItemPreview>> {
         val searchQuery = Query(
             types = ContentItemType.entries,
             tags = tags,

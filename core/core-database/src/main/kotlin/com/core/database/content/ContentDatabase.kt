@@ -19,7 +19,7 @@ import kotlinx.coroutines.runBlocking
         UpdatesMetaEntity::class],
     version = 1
 )
-@TypeConverters(TagsConverter::class)
+@TypeConverters(Converter::class)
 abstract class ContentDatabase : RoomDatabase() {
     abstract fun contentDao(): ContentDao
     abstract fun updatesMetaDao(): UpdatesMetaDao

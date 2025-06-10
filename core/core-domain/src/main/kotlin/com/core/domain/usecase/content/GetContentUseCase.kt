@@ -2,6 +2,7 @@ package com.core.domain.usecase.content
 
 import androidx.paging.PagingData
 import com.core.domain.model.ContentItem
+import com.core.domain.model.ContentItemPreview
 import com.core.domain.repository.ContentItemRepository
 import com.core.domain.repository.Query
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +16,7 @@ import javax.inject.Singleton
 class GetContentUseCase @Inject constructor(
     private val contentItemRepository: ContentItemRepository
 ) {
-    operator fun invoke(query: Query): Flow<PagingData<ContentItem>> {
+    operator fun invoke(query: Query): Flow<PagingData<ContentItemPreview>> {
         return contentItemRepository.flowContent(query)
     }
 }
