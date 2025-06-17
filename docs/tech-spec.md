@@ -69,7 +69,7 @@ smart-feed/
 
 ## 6. API Specification
 
-The full API description is available in the file [content\_delta\_sync\_spec\_rus.md](/docs/content_delta_sync_spec_rus.md).
+The full API description is available in the file [content\_delta\_sync\_spec.md](/docs/content_delta_sync_spec.md).
 
 ## 7. Screens & User Flow
 
