@@ -2,8 +2,10 @@ package com.feature.feed.list
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.paging.LoadState
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +16,7 @@ import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.extensions.android.layoutInflater
 import com.core.domain.model.ContentItemPreview
 import com.feature.feed.R
+import com.ndev.android.ui.shimmer.ShimmerView
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -26,7 +29,9 @@ fun ViewContext.FeedListView(
 ): View {
     val view = layoutInflater.inflate(R.layout.feed_list, parent, false)
 
+    val shimmerView = view.findViewById<ShimmerView>(R.id.shimmerView)
     val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+    val errorContainer = view.findViewById<LinearLayout>(R.id.errorContainer)
     val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFeed)
     val textError = view.findViewById<TextView>(R.id.textError)
 
@@ -49,6 +54,36 @@ fun ViewContext.FeedListView(
                 }
             }
         }
+    }
+    // Более правильный способ через LoadState
+    adapter.addLoadStateListener { loadState ->
+        val isEmpty = loadState.refresh is LoadState.NotLoading
+                && loadState.append.endOfPaginationReached
+                && adapter.itemCount == 0
+        if ( loadState.refresh is LoadState.Loading){
+            swipeRefreshLayout.visibility = View.GONE
+            errorContainer.visibility = View.GONE
+        }
+        else if (isEmpty) {
+            swipeRefreshLayout.visibility = View.GONE
+            if (component.isOnline) {
+                errorContainer.visibility = View.GONE
+            } else {
+                errorContainer.visibility = View.VISIBLE
+                shimmerView.apply {
+                    stopShimmer()
+                    visibility = View.GONE
+                }
+            }
+        } else {
+            errorContainer.visibility = View.GONE
+            swipeRefreshLayout.visibility = View.VISIBLE
+            shimmerView.apply {
+                stopShimmer()
+                visibility = View.GONE
+            }
+        }
+
     }
     recyclerView.adapter = adapter
 
@@ -96,7 +131,7 @@ fun ViewContext.FeedListView(
         textError.apply {
             if (isRefreshing is FeedListComponent.State.ErrorRefresh) {
                 text = isRefreshing.errorMessage
-                visibility =  View.VISIBLE
+                visibility = View.VISIBLE
                 alpha = 1f
 
                 // Убираем предыдущие отложенные действия, если они были
@@ -105,7 +140,7 @@ fun ViewContext.FeedListView(
                 // Планируем скрытие через 5 секунд с анимацией
                 postDelayed(hideRunnable, 5_000)
             } else {
-                visibility =  View.GONE
+                visibility = View.GONE
                 alpha = 1f
                 removeCallbacks(hideRunnable)
             }

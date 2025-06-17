@@ -6,29 +6,36 @@ coreKtx = "1.16.0"
 appcompat = "1.7.1"
 kotlinTestJunit = "2.1.10"
 kotlinxCoroutinesCore = "1.10.2"
+concurrentFutures = "1.2.0"
+
+# Lifecycle and Architecture
+androidxLifecycle = "2.9.1"
 
 # UI
 material = "1.12.0"
-swiperefreshlayout="1.1.0"
+swiperefreshlayout = "1.1.0"
 markwon = "4.6.2"
+nikkiwAndroidUiComponents = "v0.0.1"
 
 # Core Library Desugaring
-desugarJdkLibs="2.1.5"
+desugarJdkLibs = "2.1.5"
 
 # Base component
 gson = "2.11.0"
-kotlinxSerializationJson="1.8.1"
+kotlinxSerializationJson = "1.8.1"
 decompose = "3.3.0"
-essentyLifecycleCoroutines="2.5.0"
+essentyLifecycleCoroutines = "2.5.0"
 
 # Database
 sqlite = "2.5.1"
 room = "2.7.1"
 pagging = "3.3.6"
 
+
 # KSP, Hilt and Dependency Injection
 ksp = "2.1.10-1.0.30"
-hilt = "2.55"
+hilt = "2.56.2"
+hiltCompilerAndroidx="1.2.0"
 
 # Networking
 retrofit = "2.11.0"
@@ -37,6 +44,9 @@ okhttp = "4.12.0"
 # Image
 glide = "4.16.0"
 
+# Works
+workVersion = "2.10.1"
+hiltWork = "1.2.0"
 
 # Tests
 junit4 = "4.13.2"
@@ -52,6 +62,8 @@ testCoreKtx = "1.6.1"
 testKotlinCoroutines = "1.10.2"
 mockk = "1.14.2"
 jacoco = "0.8.12"
+googleTruth="1.1.5"
+androidxWorkTesting="2.10.1"
 
 # Mock server
 ktor = "2.3.4"
@@ -65,35 +77,45 @@ core = "1.6.1"
 leakcanary = "3.0-alpha-8"
 anrwatchdog = "1.4.0"
 
+
+# Plugins
+dokka="2.0.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlinTestJunit" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+concurrent-futures-ktx = { group = "androidx.concurrent", name = "concurrent-futures-ktx", version.ref = "concurrentFutures" }
+
+# Lifecycle and Architecture
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "androidxLifecycle" }
 
 # UI
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name ="swiperefreshlayout", version.ref="swiperefreshlayout"}
+swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 markwon-core = { group = "io.noties.markwon", name = "core", version.ref = "markwon" }
+nikkiw-android-ui-components = { group = "com.github.nikkiw", name="android-ui-components", version.ref="nikkiwAndroidUiComponents"}
 
 # Core Library Desugaring
-desugar-jdk-libs = { group = "com.android.tools", name="desugar_jdk_libs", version.ref="desugarJdkLibs"}
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 
 # Base component
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name="kotlinx-serialization-json", version.ref="kotlinxSerializationJson"}
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 # Decompose
 decompose = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decompose" }
-essenty-lifecycle-coroutines = { group="com.arkivanov.essenty", name="lifecycle-coroutines", version.ref="essentyLifecycleCoroutines"}
+essenty-lifecycle-coroutines = { group = "com.arkivanov.essenty", name = "lifecycle-coroutines", version.ref = "essentyLifecycleCoroutines" }
 decompose-extensions-android = { group = "com.arkivanov.decompose", name = "extensions-android", version.ref = "decompose" }
 
 # DI
 hilt-android-core = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+hilt-compiler-androidx = { group = "androidx.hilt", name ="hilt-compiler", version.ref ="hiltCompilerAndroidx"}
 
 # Database
-sqlite-ktx={ group = "androidx.sqlite", name = "sqlite-ktx",  version.ref = "sqlite"}
+sqlite-ktx = { group = "androidx.sqlite", name = "sqlite-ktx", version.ref = "sqlite" }
 sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
@@ -118,6 +140,11 @@ glide-ksp = { group = "com.github.bumptech.glide", name = "ksp", version.ref = "
 glide-okhttp = { group = "com.github.bumptech.glide", name = "okhttp3-integration", version.ref = "glide" }
 glide-recyclerview = { group = "com.github.bumptech.glide", name = "recyclerview-integration", version.ref = "glide" }
 
+# Works
+work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workVersion" }
+hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWork" }
+
+
 # Tests
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -126,6 +153,9 @@ androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "
 androidx-test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "testCoreKtx" }
 kotlin-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "testKotlinCoroutines" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+google-truth = { group = "com.google.truth", name = "truth", version.ref = "googleTruth"}
+androidx-work-testing = { group = "androidx.work", name ="work-testing", version.ref = "androidxWorkTesting"}
+hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref="hilt" }
 
 
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
@@ -163,6 +193,8 @@ benchmark = { id = "androidx.benchmark", version.ref = "benchmark" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 android-test = { id = "com.android.test", version.ref = "agp" }
+dokka = { id ="org.jetbrains.dokka", version.ref ="dokka"}
+
 
 # Mock server
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

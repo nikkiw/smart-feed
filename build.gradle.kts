@@ -13,10 +13,14 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.android.kotlin.multiplatform.library) apply false
     alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.dokka)
 //    jacoco
 }
 
 
+subprojects {
+    apply(plugin = "org.jetbrains.dokka")
+}
 //jacoco {
 //    toolVersion = libs.versions.jacoco.get()
 //}

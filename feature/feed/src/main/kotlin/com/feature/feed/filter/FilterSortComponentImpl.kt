@@ -23,7 +23,7 @@ class FilterSortComponentImpl(
     private val onSortTypeChanged: (ContentItemsSortedType) -> Unit,
 ) : FilterSortComponent, ComponentContext by componentContext {
 
-    private val scope = coroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+//    private val scope = coroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
     private val _state = MutableValue(
         FilterSortComponent.State(
@@ -37,7 +37,7 @@ class FilterSortComponentImpl(
 
     init {
         // Subscribe to flowAllTags() and update availableTags in _state with each new list of Tags
-        scope.launch {
+        coroutineScope().launch {
             contentItemRepository.flowAllTags().collect { tagsObj ->
                 // Обновляем состояние, сохраняя остальные поля как есть
                 _state.value = _state.value.copy(

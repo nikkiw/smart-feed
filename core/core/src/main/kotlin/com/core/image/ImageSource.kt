@@ -3,11 +3,43 @@ package com.core.image
 import android.net.Uri
 import androidx.annotation.DrawableRes
 
-// 1. Description of the wrapper for different image sources
+/**
+ * Wrapper for different sources from which an image can be loaded.
+ *
+ * Represents various origins of an image, such as external URLs, drawable resources,
+ * local files, URIs from content providers, or an empty placeholder source.
+ */
 sealed class ImageSource {
-    data class Url(val url: String) : ImageSource()               // external URL (http/https)
-    data class Resource(@DrawableRes val resId: Int) : ImageSource() // resource from drawable or mipmap
-    data class FilePath(val path: String) : ImageSource()         // local file path
-    data class UriSource(val uri: Uri) : ImageSource()            // Uri (e.g., from gallery)
-    object Empty : ImageSource()                                  // empty source (can show a placeholder)
+    /**
+     * External URL source (http or https).
+     *
+     * @property url The web address of the image to load.
+     */
+    data class Url(val url: String) : ImageSource()
+
+    /**
+     * Drawable or mipmap resource from the app's resources.
+     *
+     * @property resId The resource ID of the drawable to load.
+     */
+    data class Resource(@DrawableRes val resId: Int) : ImageSource()
+
+    /**
+     * Local file path on device storage.
+     *
+     * @property path The filesystem path to the image file.
+     */
+    data class FilePath(val path: String) : ImageSource()
+
+    /**
+     * Content URI, e.g., from gallery or other content provider.
+     *
+     * @property uri The URI referencing the image content.
+     */
+    data class UriSource(val uri: Uri) : ImageSource()
+
+    /**
+     * Represents an empty image source, commonly used to display a placeholder.
+     */
+    object Empty : ImageSource()
 }

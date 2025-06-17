@@ -2,8 +2,7 @@ package com.feature.feed.list
 
 import androidx.paging.PagingData
 import com.arkivanov.decompose.value.Value
-import com.core.domain.model.ContentItem
-import com.core.domain.model.ContentItemId
+import com.core.domain.model.ContentId
 import com.core.domain.model.ContentItemPreview
 
 /**
@@ -30,8 +29,10 @@ interface FeedListComponent {
     /**
      *The event when the user clicked on an item in the list
      */
-    fun onListItemClick(itemId: ContentItemId)
+    fun onListItemClick(itemId: ContentId)
 
+
+    val isOnline: Boolean
 
     sealed class State {
         data object IsRefreshing : State()

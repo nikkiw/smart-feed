@@ -4,9 +4,10 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.value.Value
 import com.feature.feed.article.ArticleItemComponent
+import com.feature.feed.bottombar.BottomBarComponent
 import com.feature.feed.master.FeedMasterComponent
+import com.feature.feed.recommendation.RecommendationListComponent
 import kotlinx.serialization.Serializable
-
 
 
 /**
@@ -15,6 +16,9 @@ import kotlinx.serialization.Serializable
 interface FeedRootComponent {
 
     val childStack: Value<ChildStack<*, Child>>
+
+    val bottomBar: BottomBarComponent
+
 
     fun pop(onComplete: (Boolean) -> Unit)
 
@@ -25,14 +29,19 @@ interface FeedRootComponent {
 
         @Serializable
         data class ArticleScreenConfig(val itemId: String) : Config()
+
+        @Serializable
+        data object RecommendationScreenConfig : Config()
     }
 
     sealed class Child {
         data class FeedScreen(val component: FeedMasterComponent) : Child()
         data class ArticleScreen(val component: ArticleItemComponent) : Child()
+        data class RecommendationScreen(val component: RecommendationListComponent) : Child()
     }
 
     fun interface Factory {
         operator fun invoke(componentContext: ComponentContext): FeedRootComponent
     }
+
 }

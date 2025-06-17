@@ -1,17 +1,27 @@
 package com.core.domain.usecase.sync
 
-import com.core.domain.repository.ContentItemRepository
-import javax.inject.Inject
-import javax.inject.Singleton
-
 /**
- * Use case для синхронизации контента из сети
+ * Use case interface for synchronizing content from a remote source (e.g., API) to local storage.
+ *
+ * This interface abstracts the process of fetching and persisting updates in the background,
+ * typically used when manually triggering sync or during app startup.
+ *
+ * ### Example usage:
+ * ```kotlin
+ * val result = syncContentUseCase()
+ * if (result.isSuccess) {
+ *     showSuccessMessage()
+ * } else {
+ *     showErrorMessage(result.exceptionOrNull())
+ * }
+ * ```
  */
-@Singleton
-class SyncContentUseCase @Inject constructor(
-    private val contentItemRepository: ContentItemRepository
-) {
-    suspend operator fun invoke(): Result<Unit> {
-        return contentItemRepository.syncContent()
-    }
+interface SyncContentUseCase {
+
+    /**
+     * Synchronizes content from a remote source into the app's local data store.
+     *
+     * @return A [Result] indicating success or failure of the synchronization operation.
+     */
+    suspend operator fun invoke(): Result<Unit>
 }

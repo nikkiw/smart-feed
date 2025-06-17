@@ -4,9 +4,7 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.ndev.convention.common.Config
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.dependencies
 
 /**
  * Плагин-конвенция для Android Application с Hilt.
@@ -21,14 +19,12 @@ class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
             pluginManager.apply("org.jetbrains.kotlin.android")
             pluginManager.apply("com.google.devtools.ksp")
             pluginManager.apply("com.google.dagger.hilt.android")
-
             // 2) Конфигурируем Android Application Extension
             //    Для AGP 7 и выше: BaseAppModuleExtension
             //    Для более старых AGP: AppExtension
             extensions.configure<BaseAppModuleExtension> {
                 configureAndroidApplication(this, target)
             }
-
             // 3) Дополнительные зависимости (Hilt, тесты и т.д.)
             configureDependenciesHilt()
             configureDependenciesUnitTests()
@@ -43,16 +39,24 @@ class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
     ) {
         extension.apply {
             compileSdkVersion(Config.COMPILE_SDK)
-
             defaultConfig {
                 minSdk = Config.MIN_SDK
                 targetSdk = Config.TARGET_SDK
-
                 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             }
 
-            flavorDimensions += "environment"
+            // Конфигурация подписи
+//            signingConfigs {
+//                create("debug") {
+////                    storeFile = project.file("debug.keystore")
+//                    storeFile = project.file("${System.getProperty("user.home")}/.android/debug.keystore")
+//                    storePassword = "android"
+//                    keyAlias = "androiddebugkey"
+//                    keyPassword = "android"
+//                }
+//            }
 
+            flavorDimensions += "environment"
             productFlavors {
                 create("dev") {
                     dimension = "environment"
@@ -67,14 +71,13 @@ class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
                     buildConfigField("String", "BUILD_ENV", "\"prod\"")
                 }
             }
-
             buildTypes {
                 getByName("debug") {
                     isMinifyEnabled = false
                     // Здесь можно добавить общие debug-поля, если нужно
                     buildConfigField("String", "BUILD_VARIANT", "\"debug\"")
+                    signingConfig = signingConfigs.getByName("debug")
                 }
-
                 getByName("release") {
                     isMinifyEnabled = true
                     proguardFiles(
@@ -82,25 +85,21 @@ class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
                         "proguard-rules.pro"
                     )
                     buildConfigField("String", "BUILD_VARIANT", "\"release\"")
+                    // Для dev release тоже используем debug ключ
+                    signingConfig = signingConfigs.getByName("debug")
                 }
             }
-
             compileOptions {
                 sourceCompatibility = Config.COMPILE_JAVA_VERSION
                 targetCompatibility = Config.COMPILE_JAVA_VERSION
                 isCoreLibraryDesugaringEnabled = true
             }
-
             buildFeatures {
                 buildConfig = true
             }
-
             // viewBinding { isEnabled = true }
             // dataBinding { isEnabled = true }
-
             project.configureKotlin()
         }
     }
-
-
 }

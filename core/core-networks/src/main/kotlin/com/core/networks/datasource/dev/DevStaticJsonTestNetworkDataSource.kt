@@ -11,6 +11,16 @@ import java.io.IOException
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicReference
 
+/**
+ * Test implementation of [NetworkDataSource] that loads a static JSON file from assets
+ * instead of generating dummy data.
+ *
+ * Reads the `"articles.json"` file from the app’s assets via `readJsonFromAssets("articles.json")`
+ * and parses it into the appropriate response objects.
+ *
+ * @constructor Creates an instance of [DevStaticJsonTestNetworkDataSource].
+ * @param context The [Context] used to access the assets directory.
+ */
 class DevStaticJsonTestNetworkDataSource(
     private val context: Context
 ) : NetworkDataSource {

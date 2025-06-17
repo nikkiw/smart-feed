@@ -10,6 +10,11 @@ android {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
 
+    defaultConfig {
+        testInstrumentationRunner = "com.core.database.HiltCustomTestRunner"
+    }
+
+
     packaging {
         resources {
             excludes += setOf("DebugProbesKt.bin", "META-INF/LICENSE", "META-INF/NOTICE")
@@ -42,4 +47,5 @@ dependencies {
 
     // Testing dependencies
     androidTestImplementation(libs.room.testing)
+    androidTestImplementation(libs.google.truth)
 }

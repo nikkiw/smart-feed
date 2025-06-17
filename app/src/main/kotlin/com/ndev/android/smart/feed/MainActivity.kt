@@ -21,6 +21,9 @@ import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.android.DefaultViewContext
 import com.arkivanov.essenty.lifecycle.essentyLifecycle
 import com.core.domain.repository.ContentItemRepository
+import com.core.domain.service.Recommender
+import com.core.domain.usecase.sync.ContentFetchScheduleUseCase
+import com.core.domain.usecase.sync.SyncContentUseCase
 import com.feature.feed.root.FeedRootComponent
 import com.feature.feed.root.FeedRootComponentImpl.FeedRootComponentFactory
 import com.feature.feed.root.FeedRootComponentView
@@ -35,7 +38,16 @@ class MainActivity : AppCompatActivity() {
     lateinit var contentItemRepository: ContentItemRepository
 
     @Inject
+    lateinit var syncContentUseCase: SyncContentUseCase
+
+    @Inject
     lateinit var rootFactory: FeedRootComponentFactory
+
+    @Inject
+    lateinit var contentFetchScheduleUseCase: ContentFetchScheduleUseCase
+
+    @Inject
+    lateinit var recommender: Recommender
 
     private lateinit var feedRootComponent: FeedRootComponent
 
@@ -67,11 +79,16 @@ class MainActivity : AppCompatActivity() {
         container.addView(rootView)
 
         lifecycleScope.launch {
-
-            contentItemRepository.apply {
-                if (isEmpty()) {
-                    syncContent()
+            launch {
+                contentItemRepository.apply {
+                    if (isEmpty()) {
+                        syncContentUseCase()
+                    }
+                    recommender.updateRecommendationsForUser()
                 }
+            }
+            launch {
+                contentFetchScheduleUseCase.schedule()
             }
         }
     }

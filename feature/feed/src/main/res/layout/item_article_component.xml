@@ -21,11 +21,13 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
+        android:id="@+id/articleScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/allContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="12dp"
@@ -88,6 +90,11 @@
                     android:scrollbars="vertical"
                     android:scrollHorizontally="false"
                     android:textIsSelectable="true"/>
+
+                <FrameLayout
+                    android:id="@+id/articleRecommendations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

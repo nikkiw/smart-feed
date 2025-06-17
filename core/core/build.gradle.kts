@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.core.core"
 }
+
+dependencies {
+    implementation(libs.androidx.lifecycle.process)
+}

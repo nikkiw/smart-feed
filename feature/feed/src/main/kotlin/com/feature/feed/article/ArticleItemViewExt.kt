@@ -1,17 +1,23 @@
 package com.feature.feed.article
 
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.android.ViewContext
+import com.arkivanov.decompose.extensions.android.child
 import com.arkivanov.decompose.extensions.android.layoutInflater
 import com.arkivanov.decompose.value.subscribe
+import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.core.domain.model.ContentItem
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
 import com.core.image.ImageSource
 import com.feature.feed.R
+import com.feature.feed.article_recommendation.ArticleRecommendationsView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -34,11 +40,33 @@ fun ViewContext.ArticleItemView(
     }
 
 
+    child(view.findViewById(R.id.articleRecommendations)) {
+        ArticleRecommendationsView(
+            component.articleRecommendationsComponent,
+            imageLoader
+        )
+    }
+
+    val scrollView = view.findViewById<ScrollView>(R.id.articleScrollView)
+    val allContent = view.findViewById<CardView>(R.id.allContent)
     val image = view.findViewById<ImageView>(R.id.articleImage)
     val title = view.findViewById<TextView>(R.id.articleTitle)
     val content = view.findViewById<TextView>(R.id.articleContent)
     val date = view.findViewById<TextView>(R.id.articleDate)
     val tagGroup = view.findViewById<ChipGroup>(R.id.articleTags)
+
+
+    component.registerOnCloseListener {
+        val contentHeight = allContent.height
+        val scrollViewHeight = scrollView.height
+        val percentSeen =
+            ((scrollView.scrollY + scrollViewHeight).toFloat() / contentHeight).coerceIn(
+                0f,
+                1f
+            )
+
+        component.logPercentRead(percentSeen)
+    }
 
     component.model.subscribe(lifecycle) { state ->
         when (state) {
@@ -101,6 +129,17 @@ fun ViewContext.ArticleItemView(
                         chip.isCheckable = false
                         chip.isClickable = false
                         tagGroup.addView(chip)
+                    }
+                    scrollView.setOnScrollChangeListener { v: View, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
+                        val contentHeight = allContent.height
+                        val scrollViewHeight = scrollView.height
+                        val percentSeen =
+                            ((scrollY + scrollViewHeight).toFloat() / contentHeight).coerceIn(
+                                0f,
+                                1f
+                            )
+
+                        component.logPercentRead(percentSeen)
                     }
                 }
             }

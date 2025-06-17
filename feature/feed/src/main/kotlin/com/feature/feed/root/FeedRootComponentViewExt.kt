@@ -3,12 +3,15 @@ package com.feature.feed.root
 import android.view.View
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.android.ViewContext
+import com.arkivanov.decompose.extensions.android.child
 import com.arkivanov.decompose.extensions.android.layoutInflater
 import com.arkivanov.decompose.extensions.android.stack.StackRouterView
 import com.core.di.ImageLoaderEntryPoint
 import com.feature.feed.R
 import com.feature.feed.article.ArticleItemView
+import com.feature.feed.bottombar.BottomBarView
 import com.feature.feed.master.FeedMasterView
+import com.feature.feed.recommendation.RecommendationListView
 import dagger.hilt.android.EntryPointAccessors
 import io.noties.markwon.Markwon
 
@@ -22,7 +25,12 @@ fun ViewContext.FeedRootComponentView(component: FeedRootComponent): View {
         parent.context.applicationContext
     ).imageLoader()
 
-    val markwon = Markwon.builder( parent.context.applicationContext)
+    // Контейнеры во View
+    child(layout.findViewById(R.id.bottom_menu_view)) {
+        BottomBarView(component.bottomBar)
+    }
+
+    val markwon = Markwon.builder(parent.context.applicationContext)
 //            .usePlugin(HtmlPlugin.create())
         .build()
     routerView.children(
@@ -37,6 +45,9 @@ fun ViewContext.FeedRootComponentView(component: FeedRootComponent): View {
                 )
 
                 is FeedRootComponent.Child.FeedScreen -> FeedMasterView(child.component)
+                is FeedRootComponent.Child.RecommendationScreen -> RecommendationListView(
+                    child.component
+                )
             }
         },
     )

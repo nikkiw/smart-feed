@@ -26,7 +26,7 @@ internal fun <C : Any, T : Any> viewSwitcher(
                 parent = parent,
                 newView = newView,
                 oldView = oldView,
-                isForward = newStack.items.size > oldStack.items.size,
+                isForward = newStack.items.size >= oldStack.items.size,
             )
         }
 

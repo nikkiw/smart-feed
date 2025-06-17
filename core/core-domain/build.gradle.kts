@@ -23,6 +23,4 @@ dependencies {
 
     implementation(libs.gson)
 
-    // Testing dependencies
-    androidTestImplementation(libs.room.testing)
 }

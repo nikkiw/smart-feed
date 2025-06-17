@@ -44,6 +44,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.bundles.decompose.libs)
 
+    // Worker
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.hilt.work)
+
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

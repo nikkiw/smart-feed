@@ -2,10 +2,46 @@ package com.core.database.content
 
 import androidx.paging.PagingSource
 import androidx.room.RoomRawQuery
+import com.core.database.content.entity.ContentPreviewWithDetails
 import com.core.domain.repository.ContentItemsSortedType
 import com.core.domain.repository.Query
 
 
+/**
+ * Builds a dynamic SQL query and returns a [PagingSource] for paginated content previews.
+ *
+ * This function dynamically constructs a SQL query based on the given [query] parameters,
+ * including filtering by content types and tags, and applies the specified sort order.
+ * The results are paginated and returned via a [PagingSource] that emits [ContentPreviewWithDetails] objects.
+ *
+ * It joins the `content` table with `article_attributes` and `content_tags` for filtering and projection,
+ * while explicitly excluding records where `action = 'delete'`.
+ *
+ * @param query Encapsulates filters and sorting options for the content list.
+ * @param contentDao DAO interface for accessing the content and related tables via a raw query.
+ *
+ * @return A [PagingSource] that emits paginated [ContentPreviewWithDetails] objects matching the query.
+ *
+ * ### SQL Query Construction Summary:
+ * - Joins:
+ *   - LEFT JOIN `content_tags` ON content.id = content_tags.contentId
+ *   - LEFT JOIN `article_attributes` ON content.id = article_attributes.contentId
+ * - Filters:
+ *   - `content.action <> 'delete'`
+ *   - Optional `content.type IN (...)` if `query.types` is not empty
+ *   - Optional `content_tags.tagName IN (...)` if `query.tags.value` is not empty
+ * - Sorting:
+ *   - By article title (asc/desc)
+ *   - Or by content update timestamp (asc/desc)
+ *
+ * ### Example Use Case:
+ * ```
+ * val pagingSource = contentItemPagingSource(
+ *     query = Query(types = listOf("article"), tags = listOf("nutrition"), sortedBy = ByDateNewestFirst),
+ *     contentDao = myDao
+ * )
+ * ```
+ */
 fun contentItemPagingSource(
     query: Query,
     contentDao: ContentDao
@@ -13,49 +49,46 @@ fun contentItemPagingSource(
     val sqlBuilder = StringBuilder()
     val args = mutableListOf<Any>()
 
-    // Начало запроса: выбираем из основной таблицы и присоединяем атрибуты статьи
     sqlBuilder.append(
         """
-        SELECT DISTINCT content_updates.*
-        FROM content_updates
-        LEFT JOIN content_update_tags 
-          ON  content_updates.id = content_update_tags.contentUpdateId
+        SELECT DISTINCT content.*
+        FROM content
+        LEFT JOIN content_tags 
+          ON  content.id = content_tags.contentId
         LEFT JOIN article_attributes
-          ON content_updates.id = article_attributes.contentUpdateId
-        WHERE content_updates.action <> 'delete'
+          ON content.id = article_attributes.contentId
+        WHERE content.action <> 'delete'
     """.trimIndent()
     )
 
-    // Условия WHERE
+    // WHERE clauses
     val whereClauses = mutableListOf<String>()
 
-    // Фильтр по типам (если список непустой)
+    // Filter by type (if the list is non-empty)
     if (query.types.isNotEmpty()) {
-        // Для каждого типа генерируем "?"
+        // For each type, we generate “?”
         val placeholders = query.types.joinToString(separator = ",") { "?" }
-        whereClauses += "content_updates.type IN ($placeholders)"
+        whereClauses += "content.type IN ($placeholders)"
         args.addAll(query.types.map { it.toString() })
     }
 
-    // Фильтр по тэгам (если список непустой)
+    // Filter by tags (if the list is non-empty)
     if (query.tags.value.isNotEmpty()) {
         val placeholders = query.tags.value.joinToString(separator = ",") { "?" }
-        whereClauses += "content_update_tags.tagName IN ($placeholders)"
+        whereClauses += "content_tags.tagName IN ($placeholders)"
         args.addAll(query.tags.value.map { it })
     }
 
-    // Собираем WHERE, если есть условия
+    // Collect WHERE if there are conditions
     if (whereClauses.isNotEmpty()) {
-//        sqlBuilder.append("\nWHERE ")
         sqlBuilder.append("\nAND ")
         sqlBuilder.append(whereClauses.joinToString(" AND "))
     }
 
-    // ORDER BY в зависимости от варианта сортировки
+    // ORDER BY depending on the sorting option
     sqlBuilder.append("\nORDER BY ")
     when (query.sortedBy) {
         ContentItemsSortedType.ByNameAsc -> {
-            // Сортируем по названию статьи по возрастанию
             sqlBuilder.append("article_attributes.title ASC")
         }
 
@@ -64,16 +97,14 @@ fun contentItemPagingSource(
         }
 
         ContentItemsSortedType.ByDateNewestFirst -> {
-            // Сортируем по дате обновления по убыванию (новые сверху)
-            sqlBuilder.append("content_updates.updatedAt DESC")
+            sqlBuilder.append("content.updatedAt DESC")
         }
 
         ContentItemsSortedType.ByDateOldestFirst -> {
-            sqlBuilder.append("content_updates.updatedAt ASC")
+            sqlBuilder.append("content.updatedAt ASC")
         }
     }
 
-    // Создаем объект запроса Room
     val rawQuery = RoomRawQuery(
         sql = sqlBuilder.toString(),
         onBindStatement = { bind ->
@@ -93,6 +124,5 @@ fun contentItemPagingSource(
     )
 
 
-    // Возвращаем PagingSource, полученный из DAO
     return contentDao.getContent(rawQuery)
 }

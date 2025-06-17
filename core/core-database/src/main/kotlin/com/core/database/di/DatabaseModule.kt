@@ -3,11 +3,8 @@ package com.core.database.di
 import android.content.Context
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import com.core.database.content.ContentDao
-import com.core.database.content.ContentDatabase
-import com.core.database.content.ContentDatabase.Companion.createTrigger
-import com.core.database.content.ContentTagsDao
-import com.core.database.content.UpdatesMetaDao
+import com.core.database.AppDatabase
+import com.core.database.AppDatabase.Companion.createTrigger
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,12 +22,12 @@ object DatabaseModule {
     @Provides
     fun provideDatabase(
         @ApplicationContext context: Context
-    ): ContentDatabase {
+    ): AppDatabase {
         val dbName = "app_database"
 
         val db = Room.databaseBuilder(
             context.applicationContext,
-            ContentDatabase::class.java,
+            AppDatabase::class.java,
             dbName
         )
             .setDriver(BundledSQLiteDriver())
@@ -40,29 +37,5 @@ object DatabaseModule {
             createTrigger(db)
         }
         return db
-    }
-
-    @Singleton
-    @Provides
-    fun provideContentDao(
-        db: ContentDatabase
-    ): ContentDao {
-        return db.contentDao()
-    }
-
-    @Singleton
-    @Provides
-    fun provideUpdatesMetaDao(
-        db: ContentDatabase
-    ): UpdatesMetaDao {
-        return db.updatesMetaDao()
-    }
-
-    @Singleton
-    @Provides
-    fun provideContentTagsDao(
-        db: ContentDatabase
-    ): ContentTagsDao {
-        return db.contentTagsDao()
     }
 }

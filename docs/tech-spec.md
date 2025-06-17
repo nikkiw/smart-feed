@@ -1,130 +1,117 @@
 # Technical Specification for MVP `smart-feed`
 
-## 1. General Description
+## 1. General Overview
 
 **Project Name:** smart-feed
-**Description:** MVP Android application with an article feed and a built-in on-device recommendation system.
-**Tech Stack:** Kotlin, Android MVVM, Coroutines, Room, WorkManager, Hilt, Retrofit, Decompose (for navigation and component lifecycle on multiplatform), TensorFlow Lite (optional for embeddings), GitHub Actions CI.
+**Description:** A demo Android application featuring an article feed with an on-device recommendation system.
+**Technology Stack:** Kotlin, Android MVVM, Coroutines, Room, WorkManager, Hilt, Retrofit, Decompose (for BLoC-style screen composition and navigation), GitHub Actions CI.
 
-## 2. Goals
+## 2. Objectives
 
-* Implement a Minimum Viable Product (MVP) featuring a dynamic feed and personalized recommendations computed locally.
-* Provide a modular architecture supporting both static and dynamic content modules.
+* Implement a dynamic feed with personalized recommendations computed locally.
+* Provide a modular architecture with support for dynamic content modules.
 * Maintain high code quality, test coverage, and CI/CD integration.
-* Prepare clear documentation and a license for portfolio inclusion.
+* Deliver clear documentation and licensing suitable for portfolio inclusion.
 
 ## 3. Functional Requirements
 
-1. **Static Article Feed**
+1. **Dynamic Feed from Server**
 
-   * Display preloaded articles by category.
-   * View article details, add to bookmarks, and share.
+   * Fetch articles via REST API.
+   * Store articles in Room with synchronization timestamp.
+   * Support pull-to-refresh and periodic sync using WorkManager.
 
-2. **Dynamic Server-Fetched Feed**
+2. **Recommendation System (On-Device)**
 
-   * Retrieve articles via REST API.
-   * Store articles in Room with a synchronization timestamp.
-   * Support manual pull-to-refresh and periodic synchronization via WorkManager.
+   * Build a user profile by weighting embeddings of read articles.
+   * Generate “Recommended Reading” suggestions for each article.
 
-3. **Recommendation System (On-Device)**
+3. **User Interaction Events**
 
-   * Calculate embeddings for all articles.
-   * Build a user profile by averaging embeddings of read articles.
-   * Compute cosine similarity and select the top-N unread articles.
-   * Display a horizontal “Recommended For You” list in the feed.
+   * Log events: `read` (content ID, read count, read percentage, and read time).
+   * Save events in the `event_logs` table for analytics and aggregate into `content_interaction_stats`.
 
-4. **User Interaction Events**
+4. **UI/UX**
 
-   * Log events: `view_article`, `bookmark`, `share`, `complete_test`, `read_time`.
-   * Store events in the `event_logs` table for analytics.
+   * Bottom navigation: Feed | Recommendations.
+   * Pull-to-refresh and infinite scroll.
+   * Periodic content updates.
 
-5. **UI/UX**
+5. **Testing and CI**
 
-   * Segmented control: All | Articles | Tests | Recommended.
-   * “New” or “For You” badges on cards.
-   * Pull-to-refresh and infinite scrolling.
-
-6. **Testing and CI**
-
-   * Unit tests for ViewModel, UseCase, and DAO.
-   * GitHub Actions to run lint, build, and tests.
+   * Android instrumented tests for SQLite and other platform-specific logic.
+   * Unit tests for ViewModels, UseCases, and DAOs.
+   * GitHub Actions for linting, building, and test execution.
 
 ## 4. Non-Functional Requirements
 
-* **Performance:** Feed rendering—≤ 300 ms; recommendation computation—≤ 200 ms on a midrange device.
-* **Scalability:** Modular structure allowing addition of video, podcasts, and server-side CF.
-* **Security:** Input sanitization, HTTPS.
-* **Maintainability:** Follow Kotlin style guide, comment code, documentation in `docs/`.
+* **Scalability:** Modular structure allowing future support for video, podcasts, and server-side collaborative filtering.
+* **Maintainability:** Kotlin style guide compliance, code comments, and documentation in the `docs/` directory.
 * **Compatibility:** Android SDK 23+, minimum JDK 17.
 
 ## 5. Architecture and Modules
 
 ```plaintext
 smart-feed/
-├── app/             # Application module: UI, navigation, ViewModel, DI (via Decompose)
+├── app/             # App module: UI, navigation, ViewModels, DI (via Decompose)
 ├── build-logic/     # Custom Gradle conventions and plugins
 ├── buildSrc/        # App configuration and global constants
-├── core/            # Shared models and utilities used throughout the project
+├── core/            # Shared models and utilities used across the project
 ├── docs/            # Documentation in Markdown
-└── mock-server/     # Mock server for local development and testing
+├── feature/         # Decompose components and UI features
+├── mock-server/     # Mock server for local development and testing
+└── scripts/         # Python scripts for test data generation
 ```
 
-* **Navigation and State Management:** Uses Decompose instead of Android Navigation Component—handles lifecycle, state, and multiplatform support.
-* **Modularity:** Each module provides its components through Decompose.
-* **Dependency Injection:** Pass `ComponentContext` from Hilt into ViewModel and UseCase.
+* **Navigation & State Management:** Decompose replaces Android Navigation Component for lifecycle management, state handling, and multiplatform support.
+* **Modularity:** Each module exposes its components via Decompose.
+* **Dependency Injection:** Hilt provides components to ViewModels and UseCases.
 
-## 6. Data Models
+## 6. API Specification
 
-* **Article:** `id`, `title`, `summary`, `content`, `imageUrl`, `category`, `createdAt`
-* **RemoteArticle:** inherits from `Article`, adds `fetchedAt` and `isRead`
-* **Recommendation:** `articleId`, `score`, `generatedAt`
-* **EventLog:** `eventId`, `userId`, `type`, `payload` (JSON), `timestamp`
+The full API description is available in the file [content\_delta\_sync\_spec\_rus.md](/docs/content_delta_sync_spec_rus.md).
 
-## 7. API Specification
+## 7. Screens & User Flow
 
-Full API description is provided in the file [content_delta_sync_spec.md](/docs/content_delta_sync_spec.md).
+1. **FeedRoot**
 
-## 8. Screens and User Flow
+   * Displays either FeedScreen or RecommendationScreen based on app state.
+   * BottomBar enables switching between FeedScreen and RecommendationScreen.
 
-1. **FeedFragment**
+2. **FeedScreen**
 
-   * Title bar and search icon.
-   * Segmented control.
-   * Vertical RecyclerView with cards of various types.
+   * FilterSortScreen allows sorting and filtering by tags.
+   * Vertical RecyclerView with multiple card types.
 
-2. **ArticleDetailFragment**
+3. **ArticleDetailScreen**
 
-   * Title, banner, full article text.
-   * “Bookmark” and “Share” buttons.
+   * Header, banner, full article text.
+   * Recommended Reading list.
 
-3. **TestFragment**
+4. **RecommendationScreen**
 
-   * List of mini-tests.
-   * Progress and results display.
+   * Displays a list of recommended content (Recommended Reading).
 
 ## 9. WorkManager Configuration
 
-* **SyncWorker:** periodic task (e.g., every 6 hours)—fetch new articles and update recommendations.
-* **Constraints:** `NetworkType.CONNECTED`, device idle—optional.
+* **ContentFetchScheduler:** Configures schedule and execution constraints for `ContentFetchWorker`.
+* **ContentFetchWorker:** Periodic task that fetches new articles and updates recommendations.
+* **Constraints:** Requires `NetworkType.CONNECTED`; `deviceIdle` is optional.
 
 ## 10. Dependency Injection
 
-* Provided via Hilt:
-
-   * Singleton `RoomDatabase`
-   * Retrofit instance `FeedApiService`
-   * DAOs: `RemoteArticleDao`, `RecommendationDao`, `EventLogDao`
-   * UseCase and Repository bindings
+* Implemented via Hilt.
 
 ## 11. Testing Strategy
 
-* **Unit Tests:** JUnit + Mockito (or MockK) for ViewModel and UseCase
-* **Instrumented Tests:** Room behavior
-* **CI:** GitHub Actions `.github/workflows/android-ci.yml`, triggered on push and PR
+* **Unit Tests:** JUnit + MockK for ViewModels and UseCases.
+* **Instrumented Tests:** Room, SQLite behavior, and Worker testing.
+* **CI:** GitHub Actions (`.github/workflows/android-ci.yml`) triggered on push and pull requests.
 
-## 12. Roadmap and Improvements
+## 12. Roadmap & Future Enhancements
 
-* **Server-Side Collaborative Filtering**
-* **Hybrid Recommendations:** CF + content-based
-* **New Content Types:** video, audio, polls
-* **Analytics:** engagement metrics dashboard
+* Build and publish project documentation.
+* Aggregate and report test coverage.
+* Support for various screen sizes.
+* New content types: video, audio, polls.
+* Analytics: engagement metrics dashboard.

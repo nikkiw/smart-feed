@@ -4,14 +4,15 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
-import com.core.domain.model.ContentItemId
-import com.core.domain.model.ContentItemType
+import com.core.domain.model.ContentId
+import com.core.domain.model.ContentType
 import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemRepository
 import com.core.domain.repository.ContentItemsSortedType
 import com.core.domain.repository.Query
 import com.core.domain.usecase.content.GetContentUseCase
 import com.core.domain.usecase.sync.SyncContentUseCase
+import com.core.observers.ConnectivityRepository
 import com.feature.feed.filter.FilterSortComponent
 import com.feature.feed.filter.FilterSortComponentImpl
 import com.feature.feed.list.FeedListComponent
@@ -26,7 +27,8 @@ class FeedMasterComponentImpl(
     private val contentItemRepository: ContentItemRepository,
     private val getContentUseCase: GetContentUseCase,
     private val syncContentUseCase: SyncContentUseCase,
-    onListItemClick: (ContentItemId) -> Unit,
+    private val connectivityRepository: ConnectivityRepository,
+    onListItemClick: (ContentId) -> Unit,
     initialSortType: ContentItemsSortedType = ContentItemsSortedType.ByDateNewestFirst,
     initialTags: Tags = Tags()
 ) : FeedMasterComponent, ComponentContext by componentContext {
@@ -60,7 +62,7 @@ class FeedMasterComponentImpl(
         )
 
         val initialQuery = Query(
-            types = listOf(ContentItemType.ARTICLE),
+            types = listOf(ContentType.ARTICLE),
             tags = initialTags,
             sortedBy = initialSortType
         )
@@ -69,6 +71,7 @@ class FeedMasterComponentImpl(
             componentContext = componentContext,
             getContentUseCase = getContentUseCase,
             syncContentUseCase = syncContentUseCase,
+            connectivityRepository = connectivityRepository,
             initialQuery = initialQuery,
             onItemClick = { itemId ->
                 onListItemClick(itemId)
@@ -90,7 +93,7 @@ class FeedMasterComponentImpl(
 
     private fun updateFeedQuery() {
         val query = Query(
-            types = listOf(ContentItemType.ARTICLE),
+            types = listOf(ContentType.ARTICLE),
             tags = _state.value.selectedTags,
             sortedBy = _state.value.selectedSortType
         )

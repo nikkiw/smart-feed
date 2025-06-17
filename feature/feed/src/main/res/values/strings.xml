@@ -3,4 +3,15 @@
     <string name="item_article_image_content_description">"Main image for article"</string>
     <string name="article_state_is_loaded">"Loaded…"</string>
 
+    <string name="bottom_list">"Feed"</string>
+    <string name="bottom_recommendation">"Recommendations"</string>
+
+    <!-- Content description for the error icon -->
+    <string name="error_icon">"Error icon"</string>
+
+    <!-- Full-screen loading error message -->
+    <string name="error_loading_data">"Internet access is required to retrieve data. Please check your connection and try again."</string>
+
+    <string name="recommended_reading">"Recommended reading"</string>
+    <string name="sorted_by">"Sorted by:"</string>
 </resources>

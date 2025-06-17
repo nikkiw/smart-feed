@@ -6,16 +6,17 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.core.data.dto.toContentItem
 import com.core.data.dto.toContentPreview
-import com.core.database.content.ArticleAttributesEntity
+import com.core.data.embedding.EmbeddingIndex
+import com.core.database.content.entity.ArticleAttributesEntity
 import com.core.database.content.ContentDao
 import com.core.database.content.ContentTagsDao
-import com.core.database.content.ContentUpdateEntity
+import com.core.database.content.entity.ContentEntity
 import com.core.database.content.UpdatesMetaDao
-import com.core.database.content.UpdatesMetaEntity
+import com.core.database.content.entity.UpdatesMetaEntity
 import com.core.database.content.contentItemPagingSource
 import com.core.di.IoDispatcher
 import com.core.domain.model.ContentItem
-import com.core.domain.model.ContentItemId
+import com.core.domain.model.ContentId
 import com.core.domain.model.ContentItemPreview
 import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemRepository
@@ -33,10 +34,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Singleton
 
 
-@Singleton
 class ContentItemRepositoryImpl @Inject constructor(
     private val contentDao: ContentDao,
     private val contentTagsDao: ContentTagsDao,
@@ -65,7 +64,7 @@ class ContentItemRepositoryImpl @Inject constructor(
             .flowOn(ioDispatcher)
     }
 
-    override suspend fun getContentById(itemId: ContentItemId): Result<ContentItem> =
+    override suspend fun getContentById(itemId: ContentId): Result<ContentItem> =
         withContext(ioDispatcher) {
             runCatching {
                 contentDao.getContentById(itemId.value).toContentItem()
@@ -102,7 +101,7 @@ class ContentItemRepositoryImpl @Inject constructor(
 
                         // Сохраняем данные в БД
                         updates.forEach { update ->
-                            val entity = ContentUpdateEntity(
+                            val entity = ContentEntity(
                                 id = update.id,
                                 type = update.type,
                                 action = update.action,
@@ -110,16 +109,18 @@ class ContentItemRepositoryImpl @Inject constructor(
                                 mainImageUrl = update.mainImageUrl,
                                 tags = update.tags
                             )
-                            // Пример маппинга статьи
+
                             val articleEntity =
                                 (update.attributes as? ContentAttributes.Article)?.let {
                                     ArticleAttributesEntity(
-                                        contentUpdateId = update.id,
+                                        contentId = update.id,
                                         title = it.title,
                                         shortDescription = it.shortDescription,
                                         content = it.content,
-                                        embeddings = it.embeddings.data.map { it.toFloat() }
+                                        unitEmbedding = EmbeddingIndex.normalize(
+                                            it.embeddings.data.map { it.toFloat() }
                                             .toFloatArray()
+                                        )
                                     )
                                 }
                             contentDao.insertContentUpdateWithDetails(

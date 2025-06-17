@@ -25,5 +25,11 @@ dependencies {
 
     // Markdown
     implementation(libs.markwon.core)
+    implementation(libs.nikkiw.android.ui.components)
+
+
+    // Unit test
+    testImplementation(libs.google.truth)
+
 
 }

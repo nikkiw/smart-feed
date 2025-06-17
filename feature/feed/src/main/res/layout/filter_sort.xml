@@ -2,25 +2,50 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="8dp">
 
-    <!-- Chips for tags -->
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chipGroupTags"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+    <!-- Horizontal scrollable chips -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:singleSelection="false"
-        app:selectionRequired="false"
-        app:chipSpacing="4dp"/>
+        android:fillViewport="true"
+        android:scrollbars="none">
 
-    <!-- Dropdown for sort types -->
-    <Spinner
-        android:id="@+id/spinnerSortType"
-        android:layout_width="wrap_content"
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupTags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleSelection="false"
+            app:selectionRequired="false"
+            app:chipSpacing="4dp"
+            app:singleLine="true"
+            android:orientation="horizontal" />
+
+    </HorizontalScrollView>
+
+    <!-- Spinner with label below chips -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"/>
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sorted_by"
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerSortType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
 </LinearLayout>

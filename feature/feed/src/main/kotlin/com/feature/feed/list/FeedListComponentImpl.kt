@@ -6,14 +6,13 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
-import com.core.domain.model.ContentItemId
+import com.core.domain.model.ContentId
 import com.core.domain.model.ContentItemPreview
 import com.core.domain.repository.Query
 import com.core.domain.usecase.content.GetContentUseCase
 import com.core.domain.usecase.sync.SyncContentUseCase
-import kotlinx.coroutines.Dispatchers
+import com.core.observers.ConnectivityRepository
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -24,8 +23,9 @@ class FeedListComponentImpl(
     componentContext: ComponentContext,
     private val getContentUseCase: GetContentUseCase,
     private val syncContentUseCase: SyncContentUseCase,
+    private val connectivityRepository: ConnectivityRepository,
     initialQuery: Query,
-    private val onItemClick: (ContentItemId) -> Unit
+    private val onItemClick: (ContentId) -> Unit
 ) : FeedListComponent, ComponentContext by componentContext {
 
     private val _pagingItems = MutableValue<PagingData<ContentItemPreview>>(PagingData.empty())
@@ -37,10 +37,13 @@ class FeedListComponentImpl(
 
     private var currentQuery: Query = initialQuery
 
-    private val scope = coroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+//    private val scope = coroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
     private var pagingJob: Job? = null
     private var refreshJob: Job? = null
+
+    override val isOnline: Boolean
+        get() = connectivityRepository.isInternetAvailable()
 
     init {
         loadContent(currentQuery)
@@ -48,30 +51,32 @@ class FeedListComponentImpl(
 
     private fun loadContent(query: Query) {
         pagingJob?.cancel()
-        pagingJob = scope.launch {
-            getContentUseCase(query)
-                .cachedIn(this)
-                .collectLatest {
-                    _pagingItems.value = it
-                }
-        }
+        pagingJob = coroutineScope()
+            .launch {
+                getContentUseCase(query)
+                    .cachedIn(this)
+                    .collectLatest {
+                        _pagingItems.value = it
+                    }
+            }
     }
 
     override fun onRefresh() {
         refreshJob?.cancel()
-        refreshJob = scope.launch {
-            _isRefreshing.value = FeedListComponent.State.IsRefreshing
-            syncContentUseCase.invoke().onFailure {
-                _isRefreshing.value = FeedListComponent.State.ErrorRefresh(
-                    it.message ?: "Failed refresh data (unknown error)"
-                )
-            }.onSuccess {
-                _isRefreshing.value = FeedListComponent.State.RefreshSuccess
+        refreshJob = coroutineScope()
+            .launch {
+                _isRefreshing.value = FeedListComponent.State.IsRefreshing
+                syncContentUseCase.invoke().onFailure {
+                    _isRefreshing.value = FeedListComponent.State.ErrorRefresh(
+                        it.message ?: "Failed refresh data (unknown error)"
+                    )
+                }.onSuccess {
+                    _isRefreshing.value = FeedListComponent.State.RefreshSuccess
+                }
             }
-        }
     }
 
-    override fun onListItemClick(itemId: ContentItemId) {
+    override fun onListItemClick(itemId: ContentId) {
         onItemClick(itemId)
     }
 

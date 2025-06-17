@@ -4,11 +4,11 @@ import android.content.Context
 import androidx.paging.testing.asSnapshot
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.core.database.content.ArticleAttributesEntity
+import com.core.database.content.entity.ArticleAttributesEntity
 import com.core.database.content.ContentDao
-import com.core.database.content.ContentDatabase
-import com.core.database.content.ContentUpdateEntity
-import com.core.domain.model.ContentItemType
+import com.core.database.AppDatabase
+import com.core.database.content.entity.ContentEntity
+import com.core.domain.model.ContentType
 import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemRepository
 import com.core.domain.repository.ContentItemsSortedType
@@ -30,7 +30,7 @@ import kotlin.test.assertEquals
 class ContentItemRepositoryImplTest {
 
     private lateinit var networkDataSource: DevNetworkDataSource
-    private lateinit var db: ContentDatabase
+    private lateinit var db: AppDatabase
     private lateinit var contentDao: ContentDao
     private lateinit var repo: ContentItemRepository
 
@@ -39,7 +39,7 @@ class ContentItemRepositoryImplTest {
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         networkDataSource = DevNetworkDataSource()
-        db = ContentDatabase.Companion.getTestDatabase(context)
+        db = AppDatabase.Companion.getTestDatabase(context)
         contentDao = db.contentDao()
         repo = ContentItemRepositoryImpl(
             contentDao = contentDao,
@@ -59,17 +59,17 @@ class ContentItemRepositoryImplTest {
     @Test
     fun testFlowContent_queryByTypeAndTag_andSortedByNameAsc() = runTest {
         // Prepare data
-        val entity1 = ContentUpdateEntity(
+        val entity1 = ContentEntity(
             id = "id1",
-            type = ContentItemType.ARTICLE.toString(),
+            type = ContentType.ARTICLE.toString(),
             action = "created",
             updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
             mainImageUrl = "url1",
             tags = listOf("news", "science")
         )
-        val entity2 = ContentUpdateEntity(
+        val entity2 = ContentEntity(
             id = "id2",
-            type = ContentItemType.ARTICLE.toString(),
+            type = ContentType.ARTICLE.toString(),
             action = "created",
             updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-02T10:00:00"),
             mainImageUrl = "url2",
@@ -77,18 +77,18 @@ class ContentItemRepositoryImplTest {
         )
 
         val attr1 = ArticleAttributesEntity(
-            contentUpdateId = "id1",
+            contentId = "id1",
             title = "Alpha Title",
             shortDescription = "Short desc",
             content = "Alpha Content",
-            embeddings = FloatArray(10){ Random.nextDouble(-1.0,1.0).toFloat() }
+            unitEmbedding = FloatArray(10){ Random.nextDouble(-1.0,1.0).toFloat() }
         )
         val attr2 = ArticleAttributesEntity(
-            contentUpdateId = "id2",
+            contentId = "id2",
             title = "Beta Title",
             shortDescription = "Short desc",
             content = "Beta Content",
-            embeddings = FloatArray(10){ Random.nextDouble(-1.0,1.0).toFloat() }
+            unitEmbedding = FloatArray(10){ Random.nextDouble(-1.0,1.0).toFloat() }
         )
         db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
         db.contentDao().insertContentUpdateWithDetails(entity2, attr2)
@@ -96,7 +96,7 @@ class ContentItemRepositoryImplTest {
 
         // Query by type ARTICLE and tag "news", sort by name ASC
         val query = Query(
-            types = listOf(ContentItemType.ARTICLE),
+            types = listOf(ContentType.ARTICLE),
             tags = Tags(listOf("news")),
             sortedBy = ContentItemsSortedType.ByNameAsc
         )
@@ -124,7 +124,7 @@ class ContentItemRepositoryImplTest {
 
         // Query by type ARTICLE and tag "тег1", sort by name ASC
         val query = Query(
-            types = listOf(ContentItemType.ARTICLE),
+            types = listOf(ContentType.ARTICLE),
             tags = Tags(tags),
             sortedBy = ContentItemsSortedType.ByNameAsc
         )
@@ -132,7 +132,7 @@ class ContentItemRepositoryImplTest {
 
         val expectedOrder = networkDataSource.dummyData
             .filter { content ->
-                content.type == ContentItemType.ARTICLE.toString()
+                content.type == ContentType.ARTICLE.toString()
                         && content.action != "delete"
                         && content.tags.any { it in tags }
             }.map { it.id }

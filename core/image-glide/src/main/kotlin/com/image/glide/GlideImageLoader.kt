@@ -9,10 +9,25 @@ import com.core.image.ImageOptions
 import com.core.image.ImageSource
 
 /**
- * Glide-based implementation of ImageLoader.
+ * Glide‑based implementation of [ImageLoader], responsible for loading and preloading images
+ * into [ImageView]s using the Glide library.
  */
 class GlideImageLoader : ImageLoader {
 
+    /**
+     * Loads an image into the given [ImageView], applying the specified [ImageOptions].
+     *
+     * Selects the appropriate Glide model based on [ImageSource], builds
+     * [RequestOptions] via [buildRequestOptions], and then invokes `into(imageView)`.
+     *
+     * If [ImageSource.Empty] is provided, will display the placeholder if available
+     * or clear the view otherwise.
+     *
+     * @param context     The Android [Context] for Glide.
+     * @param imageSource The source of the image (URL, resource ID, file path, URI, or empty).
+     * @param imageView   The target [ImageView] to load the image into.
+     * @param options     Configuration options for placeholder, error, transformations, etc.
+     */
     override fun load(
         context: Context,
         imageSource: ImageSource,
@@ -49,6 +64,16 @@ class GlideImageLoader : ImageLoader {
             .into(imageView)
     }
 
+    /**
+     * Preloads an image into Glide’s cache without displaying it,
+     * using the specified [ImageOptions].
+     *
+     * Chooses the Glide model based on [ImageSource] and calls `preload()`.
+     *
+     * @param context     The Android [Context] for Glide.
+     * @param imageSource The source of the image to preload.
+     * @param options     Configuration options for caching (placeholder, transformations, etc.).
+     */
     override fun preload(
         context: Context,
         imageSource: ImageSource,
@@ -91,8 +116,15 @@ class GlideImageLoader : ImageLoader {
         }
     }
 
+
     /**
-     * Helper to build Glide RequestOptions from our ImageOptions.
+     * Builds Glide [RequestOptions] based on our custom [ImageOptions].
+     *
+     * Supports placeholders, error drawables, basic transformations
+     * (circleCrop, centerCrop, centerInside, fitCenter), and optional size override.
+     *
+     * @param options The [ImageOptions] specifying how the image should be loaded.
+     * @return Configured Glide [RequestOptions].
      */
     private fun buildRequestOptions(options: ImageOptions): RequestOptions {
         var ro = RequestOptions()

@@ -25,6 +25,11 @@ internal fun Project.configureDependenciesUnitTests() {
         add("testImplementation", libs.findLibrary("kotlin.test").get())
         add("testImplementation", libs.findLibrary("kotlin.coroutines.test").get())
         add("testImplementation", libs.findLibrary("mockk").get())
+
+        // hilt testing
+        add("testImplementation", libs.findLibrary("hilt-android-testing").get())
+        add("kspTest", libs.findLibrary("hilt.compiler").get())
+
     }
 }
 
@@ -38,6 +43,10 @@ internal fun Project.configureDependenciesAndroidTests() {
         add("androidTestImplementation", libs.findLibrary("androidx.espresso.core").get())
         add("androidTestImplementation", libs.findLibrary("kotlin.test").get())
         add("androidTestImplementation", libs.findLibrary("kotlin.coroutines.test").get())
+
+        // hilt testing
+        add("androidTestImplementation", libs.findLibrary("hilt-android-testing").get())
+        add("kspAndroidTest", libs.findLibrary("hilt.compiler").get())
     }
 }
 
