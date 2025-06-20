@@ -6,8 +6,6 @@
 
 ## 🎥 Demo
 
-> _Screencast of the application in action will be added here._
-
 ![Demo](https://github.com/user-attachments/assets/0d65b014-050b-4733-8d55-9ae5655efd8d)
 
 ---

@@ -36,7 +36,7 @@ fun ViewContext.FeedRootComponentView(component: FeedRootComponent): View {
     routerView.children(
         stack = component.childStack,
         lifecycle = lifecycle,
-        replaceChildView = viewSwitcher { child ->
+        replaceChildView = viewSwitcherWithRegistry { child ->
             when (child) {
                 is FeedRootComponent.Child.ArticleScreen -> ArticleItemView(
                     child.component,

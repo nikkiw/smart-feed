@@ -2,6 +2,7 @@ package com.feature.feed.article
 
 
 import com.arkivanov.decompose.value.Value
+import com.core.domain.model.ContentId
 import com.core.domain.model.ContentItem
 import com.feature.feed.article_recommendation.ArticleRecommendationsComponent
 
@@ -14,6 +15,8 @@ interface ArticleItemComponent {
      * UI state for the element.
      */
     val model: Value<State>
+
+    val itemId: ContentId
 
     val articleRecommendationsComponent: ArticleRecommendationsComponent
 

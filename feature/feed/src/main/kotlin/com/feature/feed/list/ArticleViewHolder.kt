@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.core.di.ImageLoaderEntryPoint
 import com.core.domain.model.ContentItemPreview
@@ -25,6 +26,7 @@ class ArticleViewHolder private constructor(
     private val imageLoader: ImageLoader
 ) : RecyclerView.ViewHolder(itemView) {
 
+    private val cardView: CardView = itemView.findViewById(R.id.contentItem)
     private val image: ImageView = itemView.findViewById(R.id.articleImage)
     private val title: TextView = itemView.findViewById(R.id.articleTitle)
     private val content: TextView = itemView.findViewById(R.id.articleContent)
@@ -41,6 +43,8 @@ class ArticleViewHolder private constructor(
 
     fun bind(article: ContentItemPreview.ArticlePreview) {
         currentArticle = article
+        cardView.transitionName = "transition_content_${article.id}"
+
         // Uploading an image using the ImageLoader abstraction
         if (article.mainImageUrl.value.isNotEmpty()) {
             imageLoader.load(
@@ -54,6 +58,8 @@ class ArticleViewHolder private constructor(
         } else {
             image.setImageDrawable(null)
         }
+
+
         title.text = article.title.value
         content.text = article.short.value
         date.text = article.updatedAt.toString()

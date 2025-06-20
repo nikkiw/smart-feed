@@ -24,7 +24,7 @@ class ArticleItemComponentImpl(
     private val getContentItemUseCase: GetContentItemUseCase,
     private val recommendForArticleUseCase: RecommendForArticleUseCase,
     private val analyticsService: AnalyticsService,
-    private val itemId: ContentId,
+    override val itemId: ContentId,
     private val onFinished: () -> Unit,
     private val onClickItem: (ContentId) -> Unit,
 ) : ArticleItemComponent, ComponentContext by componentContext {

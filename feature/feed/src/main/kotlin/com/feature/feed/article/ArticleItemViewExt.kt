@@ -1,6 +1,5 @@
 package com.feature.feed.article
 
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.ScrollView
@@ -11,7 +10,6 @@ import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.extensions.android.child
 import com.arkivanov.decompose.extensions.android.layoutInflater
 import com.arkivanov.decompose.value.subscribe
-import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.core.domain.model.ContentItem
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
@@ -47,8 +45,10 @@ fun ViewContext.ArticleItemView(
         )
     }
 
-    val scrollView = view.findViewById<ScrollView>(R.id.articleScrollView)
-    val allContent = view.findViewById<CardView>(R.id.allContent)
+    val scrollView = view.findViewById<ScrollView>(R.id.articleScrollView).apply {
+        transitionName =  "transition_content_${component.itemId}"
+    }
+    val allContent = view.findViewById<CardView>(R.id.contentItem)
     val image = view.findViewById<ImageView>(R.id.articleImage)
     val title = view.findViewById<TextView>(R.id.articleTitle)
     val content = view.findViewById<TextView>(R.id.articleContent)
@@ -82,14 +82,14 @@ fun ViewContext.ArticleItemView(
             }
 
             ArticleItemComponent.State.Init -> {
-                image.visibility = View.GONE
-                title.apply {
-                    text = context.getString(R.string.article_state_is_loaded)
-                    visibility = View.VISIBLE
-                }
-                content.visibility = View.GONE
-                date.visibility = View.GONE
-                tagGroup.removeAllViews()
+//                image.visibility = View.VISIBLE
+//                title.apply {
+//                    text = context.getString(R.string.article_state_is_loaded)
+//                    visibility = View.VISIBLE
+//                }
+//                content.visibility = View.GONE
+//                date.visibility = View.GONE
+//                tagGroup.removeAllViews()
             }
 
             is ArticleItemComponent.State.Loaded -> {

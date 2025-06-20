@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.extensions.android.layoutInflater
@@ -30,12 +31,16 @@ fun ViewContext.ArticleRecommendationsView(
 
         list.forEach { preview ->
             // Inflate элемента
+
             val itemView = layoutInflater.inflate(R.layout.item_article_recommendation, container, false)
-            val ivImage = itemView.findViewById<ImageView>(R.id.ivMainImage)
-            val tvTitle = itemView.findViewById<TextView>(R.id.tvTitle)
-            val tvShort = itemView.findViewById<TextView>(R.id.tvShortDesc)
-            val tvDate = itemView.findViewById<TextView>(R.id.tvDate)
-            val tvTags = itemView.findViewById<TextView>(R.id.tvTags)
+            itemView.findViewById<CardView>(R.id.contentItem).apply {
+                transitionName = "transition_content_${preview.id}"
+            }
+            val ivImage = itemView.findViewById<ImageView>(R.id.articleImage)
+            val tvTitle = itemView.findViewById<TextView>(R.id.articleTitle)
+            val tvShort = itemView.findViewById<TextView>(R.id.articleContent)
+            val tvDate = itemView.findViewById<TextView>(R.id.articleDate)
+            val tvTags = itemView.findViewById<TextView>(R.id.articleTags)
 
             // Заполняем данные
             imageLoader.load(

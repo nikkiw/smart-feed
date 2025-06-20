@@ -157,4 +157,34 @@ class FeedRootComponentImpl @AssistedInject constructor(
         )
 
 
+    init {
+        TransitionRegistry.apply {
+            register(
+                from = Config.FeedScreenConfig::class,
+                to = Config.ArticleScreenConfig::class,
+                transition = ComplexBoundsTransformTransition
+            )
+            register(
+                from = Config.RecommendationScreenConfig::class,
+                to = Config.ArticleScreenConfig::class,
+                transition = ComplexBoundsTransformTransition
+            )
+            register(
+                from = Config.ArticleScreenConfig::class,
+                to = Config.ArticleScreenConfig::class,
+                transition = ComplexBoundsTransformTransition
+            )
+            register(
+                from = Config.FeedScreenConfig::class,
+                to = Config.RecommendationScreenConfig::class,
+                transition = SlideFadeDelayedTransitionTo
+            )
+            register(
+                from = Config.RecommendationScreenConfig::class,
+                to = Config.FeedScreenConfig::class,
+                transition = SlideFadeDelayedTransitionBack
+            )
+        }
+    }
+
 }
