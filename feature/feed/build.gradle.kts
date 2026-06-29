@@ -14,11 +14,9 @@ android {
 //    }
 }
 
-
 dependencies {
     implementation(projects.core.core)
     implementation(projects.core.coreDomain)
-
 
     // Pagging
     implementation(libs.androidx.pagging.ktx)
@@ -27,9 +25,6 @@ dependencies {
     implementation(libs.markwon.core)
     implementation(libs.nikkiw.android.ui.components)
 
-
     // Unit test
     testImplementation(libs.google.truth)
-
-
 }

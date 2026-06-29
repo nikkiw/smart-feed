@@ -4,10 +4,10 @@ plugins {
 }
 
 android {
-    namespace = com.config.Config.NAMESPACE
+    namespace = com.ndev.convention.common.Config.NAMESPACE
 
     defaultConfig {
-        applicationId = com.config.Config.APPLICATION_ID
+        applicationId = com.ndev.convention.common.Config.APPLICATION_ID
 
         versionCode = 1
         versionName = "1.0"
@@ -18,7 +18,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }

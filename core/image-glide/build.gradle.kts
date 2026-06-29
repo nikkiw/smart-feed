@@ -7,7 +7,6 @@ android {
     namespace = "com.image.glide"
 }
 
-
 dependencies {
     implementation(projects.core.core)
     implementation(libs.bundles.glide)

@@ -1,0 +1,10 @@
+root = true
+
+[*.{kt,kts}]
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+max_line_length = 120
+
+[**ViewExt.kt]
+ktlint_standard_function-naming = disabled

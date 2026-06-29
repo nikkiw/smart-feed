@@ -14,19 +14,19 @@ plugins {
     alias(libs.plugins.android.kotlin.multiplatform.library) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.dokka)
+    id("smart.feed.spotless")
 //    jacoco
 }
-
 
 subprojects {
     apply(plugin = "org.jetbrains.dokka")
 }
-//jacoco {
+// jacoco {
 //    toolVersion = libs.versions.jacoco.get()
-//}
+// }
 //
-//// Паттерны исключений: не учитывать сгенерированные Hilt/Room/etc.
-//val coverageExcludes = listOf(
+// // Паттерны исключений: не учитывать сгенерированные Hilt/Room/etc.
+// val coverageExcludes = listOf(
 //    // Android‐сгенерированные
 //    "**/R.class",
 //    "**/R\$*.class",
@@ -49,9 +49,9 @@ subprojects {
 //
 //    // DataBinding (если используется)
 //    "**/androidx/databinding/**"
-//)
+// )
 //
-//tasks.register<JacocoReport>("jacocoRootReport") {
+// tasks.register<JacocoReport>("jacocoRootReport") {
 //    group = "verification"
 //    description = "Сводный Jacoco‐отчёт по всем подпроектам (по всем найденным test<Variant>UnitTest таскам)."
 //
@@ -113,23 +113,23 @@ subprojects {
 //        xml.required.set(true)   // Генерировать XML‐отчёт (для CI/SonarQube)
 //        csv.required.set(false)
 //    }
-//}
+// }
 
 val devDebugCombinedReport by tasks.registering(TestReport::class) {
     // Куда складывать готовый HTML
     destinationDirectory.set(layout.buildDirectory.dir("reports/devDebugCombined"))
 
     // Откуда брать XML с результатами
-    reportOn(
+    testResults.from(
         // unit-тесты
-        fileTree("$buildDir/test-results/testDevDebugUnitTest"),
+        fileTree(layout.buildDirectory.dir("test-results/testDevDebugUnitTest")),
         // androidTest результаты
-        fileTree("$buildDir/outputs/androidTest-results/connected")
+        fileTree(layout.buildDirectory.dir("outputs/androidTest-results/connected")),
     )
 
     // Чтобы агрегатор запускался только после тестов
     dependsOn(
 //        tasks.named("testDevDebugUnitTest"),
-        tasks.named("connectedDevDebugAndroidTest")
+        tasks.named("connectedDevDebugAndroidTest"),
     )
 }

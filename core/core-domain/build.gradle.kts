@@ -14,7 +14,6 @@ android {
     }
 }
 
-
 dependencies {
 
     // Pagging
@@ -22,5 +21,4 @@ dependencies {
     implementation(libs.androidx.pagging.ktx)
 
     implementation(libs.gson)
-
 }

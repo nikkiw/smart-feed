@@ -1,10 +1,12 @@
 [versions]
-agp = "8.10.1"
-kotlin = "2.1.10"
+agp = "9.2.1"
+kotlin = "2.2.10"
 coreKtx = "1.16.0"
+detekt = "1.23.8"
+spotless = "6.25.0"
 
 appcompat = "1.7.1"
-kotlinTestJunit = "2.1.10"
+kotlinTestJunit = "2.2.10"
 kotlinxCoroutinesCore = "1.10.2"
 concurrentFutures = "1.2.0"
 
@@ -33,7 +35,7 @@ pagging = "3.3.6"
 
 
 # KSP, Hilt and Dependency Injection
-ksp = "2.1.10-1.0.30"
+ksp = "2.2.10-2.0.2"
 hilt = "2.56.2"
 hiltCompilerAndroidx="1.2.0"
 
@@ -168,6 +170,8 @@ android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", ver
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "symbol-processing-gradle-plugin", version.ref = "ksp" }
 hilt-gradlePlugin = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hilt" }
+detekt-gradlePlugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+spotless-gradlePlugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 
 # Mock server
 ktor-serialization-kotlinx-json-jvm = { module = "io.ktor:ktor-serialization-kotlinx-json-jvm", version.ref = "ktorServerCoreJvm" }
@@ -202,6 +206,8 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 # Plugins defined by this project
 smart-feed-android-application = { id = "smart.feed.android.application" }

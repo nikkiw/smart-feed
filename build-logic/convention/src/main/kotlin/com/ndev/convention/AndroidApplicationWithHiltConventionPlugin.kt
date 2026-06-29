@@ -19,6 +19,8 @@ class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
             pluginManager.apply("org.jetbrains.kotlin.android")
             pluginManager.apply("com.google.devtools.ksp")
             pluginManager.apply("com.google.dagger.hilt.android")
+            pluginManager.apply("smart.feed.detekt")
+            pluginManager.apply("smart.feed.spotless")
             // 2) Конфигурируем Android Application Extension
             //    Для AGP 7 и выше: BaseAppModuleExtension
             //    Для более старых AGP: AppExtension
