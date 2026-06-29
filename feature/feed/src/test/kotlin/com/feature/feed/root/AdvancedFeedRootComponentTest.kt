@@ -40,9 +40,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-
 class AdvancedFeedRootComponentTest {
-
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -61,10 +59,11 @@ class AdvancedFeedRootComponentTest {
         mockDependencies = FeedTestDataBuilder.createMockDependencies()
 
         // Arrange: build the FeedRootComponent with test context and mocks
-        feedRootComponent = FeedTestDataBuilder.createFeedRootComponent(
-            componentContext = testContext.componentContext,
-            dependencies = mockDependencies
-        )
+        feedRootComponent =
+            FeedTestDataBuilder.createFeedRootComponent(
+                componentContext = testContext.componentContext,
+                dependencies = mockDependencies,
+            )
 
         // Arrange: start the component lifecycle
         testContext.startLifecycle()
@@ -78,47 +77,51 @@ class AdvancedFeedRootComponentTest {
     }
 
     @Test
-    fun `initial state should be correctly configured`() = runTest(testDispatcher) {
-        // Then: verify initial navigation state
-        NavigationTestScenarios.verifyInitialState(feedRootComponent)
+    fun `initial state should be correctly configured`() =
+        runTest(testDispatcher) {
+            // Then: verify initial navigation state
+            NavigationTestScenarios.verifyInitialState(feedRootComponent)
 
-        // Additional assertions on default config, back stack, and bottom bar
-        assertThat(feedRootComponent.getCurrentConfig()).isEqualTo(FeedRootComponent.Config.FeedScreenConfig)
-        assertThat(feedRootComponent.getBackStackSize()).isEqualTo(0)
-        assertThat(feedRootComponent.bottomBar).isNotNull()
-    }
+            // Additional assertions on default config, back stack, and bottom bar
+            assertThat(feedRootComponent.getCurrentConfig()).isEqualTo(FeedRootComponent.Config.FeedScreenConfig)
+            assertThat(feedRootComponent.getBackStackSize()).isEqualTo(0)
+            assertThat(feedRootComponent.bottomBar).isNotNull()
+        }
 
     @Test
-    fun `navigation to article screen should work correctly`() = runTest(testDispatcher) {
-        // Arrange: prepare test article data and stub use-case
-        val articleId = "test-article-123"
-        val testArticle = Article(
-            id = ContentId(articleId),
-            updatedAt = UpdatedAt(0L),
-            mainImageUrl = ImageUrl("http://example.com/img.png"),
-            tags = Tags(listOf("news", "kotlin")),
-            title = Title("Sample Title"),
-            content = Content("Full content goes here"),
-            short = ShortDescription("Short description")
-        )
-        coEvery { mockDependencies.getContentItemUseCase.invoke(any()) } returns Result.success(
-            testArticle
-        )
+    fun `navigation to article screen should work correctly`() =
+        runTest(testDispatcher) {
+            // Arrange: prepare test article data and stub use-case
+            val articleId = "test-article-123"
+            val testArticle =
+                Article(
+                    id = ContentId(articleId),
+                    updatedAt = UpdatedAt(0L),
+                    mainImageUrl = ImageUrl("http://example.com/img.png"),
+                    tags = Tags(listOf("news", "kotlin")),
+                    title = Title("Sample Title"),
+                    content = Content("Full content goes here"),
+                    short = ShortDescription("Short description"),
+                )
+            coEvery { mockDependencies.getContentItemUseCase.invoke(any()) } returns
+                Result.success(
+                    testArticle,
+                )
 
-        // Given: the Article screen config
-        val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
+            // Given: the Article screen config
+            val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
 
-        // When: create the child component for the Article screen
-        val child = feedRootComponent.createChild(articleConfig, testContext.componentContext)
+            // When: create the child component for the Article screen
+            val child = feedRootComponent.createChild(articleConfig, testContext.componentContext)
 
-        // Then: component type assertions
-        assertThat(child).isInstanceOf(FeedRootComponent.Child.ArticleScreen::class.java)
-        val articleScreen = child as FeedRootComponent.Child.ArticleScreen
-        assertThat(articleScreen.component).isInstanceOf(ArticleItemComponent::class.java)
+            // Then: component type assertions
+            assertThat(child).isInstanceOf(FeedRootComponent.Child.ArticleScreen::class.java)
+            val articleScreen = child as FeedRootComponent.Child.ArticleScreen
+            assertThat(articleScreen.component).isInstanceOf(ArticleItemComponent::class.java)
 
-        // Then: verify use-case invocation
-        coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) }
-    }
+            // Then: verify use-case invocation
+            coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) }
+        }
 
     @Test
     fun `navigation to recommendation screen should work correctly`() {
@@ -136,28 +139,29 @@ class AdvancedFeedRootComponentTest {
     }
 
     @Test
-    fun `bottom bar navigation should update child stack correctly`() = runTest(testDispatcher) {
-        // Given: access the BottomBarComponent
-        val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
+    fun `bottom bar navigation should update child stack correctly`() =
+        runTest(testDispatcher) {
+            // Given: access the BottomBarComponent
+            val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
 
-        // When: user taps the Recommendations tab
-        bottomBar.onClickTabBar(BottomBarState.Recommendation)
+            // When: user taps the Recommendations tab
+            bottomBar.onClickTabBar(BottomBarState.Recommendation)
 
-        // Then: verify Recommendation screen is active with empty back stack
-        FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
-            .hasActiveConfiguration(FeedRootComponent.Config.RecommendationScreenConfig)
-            .hasActiveChildOfType(FeedRootComponent.Child.RecommendationScreen::class.java)
-            .hasEmptyBackStack()
+            // Then: verify Recommendation screen is active with empty back stack
+            FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
+                .hasActiveConfiguration(FeedRootComponent.Config.RecommendationScreenConfig)
+                .hasActiveChildOfType(FeedRootComponent.Child.RecommendationScreen::class.java)
+                .hasEmptyBackStack()
 
-        // When: user taps the List tab to return
-        bottomBar.onClickTabBar(BottomBarState.List)
+            // When: user taps the List tab to return
+            bottomBar.onClickTabBar(BottomBarState.List)
 
-        // Then: verify Feed screen is active again with empty back stack
-        FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
-            .hasActiveConfiguration(FeedRootComponent.Config.FeedScreenConfig)
-            .hasActiveChildOfType(FeedRootComponent.Child.FeedScreen::class.java)
-            .hasEmptyBackStack()
-    }
+            // Then: verify Feed screen is active again with empty back stack
+            FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
+                .hasActiveConfiguration(FeedRootComponent.Config.FeedScreenConfig)
+                .hasActiveChildOfType(FeedRootComponent.Child.FeedScreen::class.java)
+                .hasEmptyBackStack()
+        }
 
     @Test
     fun `pop navigation should handle callback correctly`() {
@@ -173,57 +177,63 @@ class AdvancedFeedRootComponentTest {
     }
 
     @Test
-    fun `ArticleItemComponent should handle navigation callbacks`() = runTest(testDispatcher) {
-        // Arrange: stub use-case to return a fake article
-        val articleId = "test-article-nav"
-        val fakeArticle = Article(
-            id = ContentId(articleId),
-            updatedAt = UpdatedAt.now(),
-            mainImageUrl = ImageUrl("https://example.com/img.png"),
-            tags = Tags(listOf("tag1", "tag2")),
-            title = Title("Test Title"),
-            short = ShortDescription("Short desc"),
-            content = Content("Full article text")
-        )
-        coEvery { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) } returns Result.success(
-            fakeArticle
-        )
+    fun `ArticleItemComponent should handle navigation callbacks`() =
+        runTest(testDispatcher) {
+            // Arrange: stub use-case to return a fake article
+            val articleId = "test-article-nav"
+            val fakeArticle =
+                Article(
+                    id = ContentId(articleId),
+                    updatedAt = UpdatedAt.now(),
+                    mainImageUrl = ImageUrl("https://example.com/img.png"),
+                    tags = Tags(listOf("tag1", "tag2")),
+                    title = Title("Test Title"),
+                    short = ShortDescription("Short desc"),
+                    content = Content("Full article text"),
+                )
+            coEvery { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) } returns
+                Result.success(
+                    fakeArticle,
+                )
 
-        // Given: create the ArticleScreen child
-        val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
-        val articleChild = feedRootComponent.createChild(
-            articleConfig,
-            testContext.componentContext
-        ) as FeedRootComponent.Child.ArticleScreen
+            // Given: create the ArticleScreen child
+            val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
+            val articleChild =
+                feedRootComponent.createChild(
+                    articleConfig,
+                    testContext.componentContext,
+                ) as FeedRootComponent.Child.ArticleScreen
 
-        // Then: verify component type and use-case call
-        assertThat(articleChild.component).isInstanceOf(ArticleItemComponent::class.java)
-        coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) }
+            // Then: verify component type and use-case call
+            assertThat(articleChild.component).isInstanceOf(ArticleItemComponent::class.java)
+            coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) }
 
-        // Then: ensure analytics service was not called during initialization
-        verify { mockDependencies.analyticsService wasNot called }
-    }
+            // Then: ensure analytics service was not called during initialization
+            verify { mockDependencies.analyticsService wasNot called }
+        }
 
     @Test
     fun `RecommendationListComponent should handle item click navigation`() {
         // Arrange: prepare a preview article and stub the recommend use-case
-        val testArticle = ArticlePreview(
-            id = ContentId("test-id"),
-            updatedAt = UpdatedAt(0L),
-            mainImageUrl = ImageUrl("http://example.com/img.png"),
-            tags = Tags(listOf("news", "kotlin")),
-            title = Title("Sample Title"),
-            short = ShortDescription("Short desc")
-        )
+        val testArticle =
+            ArticlePreview(
+                id = ContentId("test-id"),
+                updatedAt = UpdatedAt(0L),
+                mainImageUrl = ImageUrl("http://example.com/img.png"),
+                tags = Tags(listOf("news", "kotlin")),
+                title = Title("Sample Title"),
+                short = ShortDescription("Short desc"),
+            )
         val testFlow: Flow<List<ContentItemPreview>> = flowOf(listOf(testArticle))
         every { mockDependencies.recommendForUserUseCase() } returns testFlow
 
         // Given: create the RecommendationScreen child
         val recommendationConfig = FeedRootComponent.Config.RecommendationScreenConfig
-        val recommendationChild = feedRootComponent.createChild(
-            recommendationConfig,
-            testContext.componentContext
-        ) as FeedRootComponent.Child.RecommendationScreen
+        val recommendationChild =
+            feedRootComponent.createChild(
+                recommendationConfig,
+                testContext.componentContext,
+            ) as FeedRootComponent.Child.RecommendationScreen
 
         // Then: verify component type and use-case invocation
         assertThat(recommendationChild.component).isInstanceOf(RecommendationListComponent::class.java)

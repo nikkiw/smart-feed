@@ -1,4 +1,4 @@
-package com.feature.feed.article_recommendation
+package com.feature.feed.articlerecommendation
 
 import android.view.View
 import android.widget.ImageView
@@ -14,11 +14,11 @@ import com.core.image.ImageOptions
 import com.core.image.ImageSource
 import com.feature.feed.R
 
-
 @OptIn(ExperimentalDecomposeApi::class)
+@Suppress("FunctionName")
 fun ViewContext.ArticleRecommendationsView(
     component: ArticleRecommendationsComponent,
-    imageLoader: ImageLoader
+    imageLoader: ImageLoader,
 ): View {
     // Inflate контейнер
     val root = layoutInflater.inflate(R.layout.article_recommendations_view, parent, false)
@@ -47,9 +47,10 @@ fun ViewContext.ArticleRecommendationsView(
                 context = ivImage.context,
                 imageSource = ImageSource.Url(preview.mainImageUrl.value),
                 imageView = ivImage,
-                options = ImageOptions(
-                    isCenterCrop = true
-                )
+                options =
+                    ImageOptions(
+                        isCenterCrop = true,
+                    ),
             )
 
             when (preview) {
@@ -63,7 +64,7 @@ fun ViewContext.ArticleRecommendationsView(
                     tvShort.text = ""
                 }
             }
-            tvDate.text = preview.updatedAt.toString()  // ISO-строка
+            tvDate.text = preview.updatedAt.toString() // ISO-строка
             tvTags.text = preview.tags.value.joinToString(", ")
 
             // Обработка клика

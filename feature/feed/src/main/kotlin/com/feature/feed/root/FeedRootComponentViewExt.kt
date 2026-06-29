@@ -15,41 +15,45 @@ import com.feature.feed.recommendation.RecommendationListView
 import dagger.hilt.android.EntryPointAccessors
 import io.noties.markwon.Markwon
 
-
 @OptIn(ExperimentalDecomposeApi::class)
 fun ViewContext.FeedRootComponentView(component: FeedRootComponent): View {
     val layout = layoutInflater.inflate(R.layout.feed_root, parent, false)
     val routerView: StackRouterView = layout.findViewById(R.id.router)
 
-    val imageLoader = EntryPointAccessors.fromApplication<ImageLoaderEntryPoint>(
-        parent.context.applicationContext
-    ).imageLoader()
+    val imageLoader =
+        EntryPointAccessors.fromApplication<ImageLoaderEntryPoint>(
+            parent.context.applicationContext,
+        ).imageLoader()
 
     // Контейнеры во View
     child(layout.findViewById(R.id.bottom_menu_view)) {
         BottomBarView(component.bottomBar)
     }
 
-    val markwon = Markwon.builder(parent.context.applicationContext)
+    val markwon =
+        Markwon.builder(parent.context.applicationContext)
 //            .usePlugin(HtmlPlugin.create())
-        .build()
+            .build()
     routerView.children(
         stack = component.childStack,
         lifecycle = lifecycle,
-        replaceChildView = viewSwitcherWithRegistry { child ->
-            when (child) {
-                is FeedRootComponent.Child.ArticleScreen -> ArticleItemView(
-                    child.component,
-                    imageLoader,
-                    markwon
-                )
+        replaceChildView =
+            viewSwitcherWithRegistry { child ->
+                when (child) {
+                    is FeedRootComponent.Child.ArticleScreen ->
+                        ArticleItemView(
+                            child.component,
+                            imageLoader,
+                            markwon,
+                        )
 
-                is FeedRootComponent.Child.FeedScreen -> FeedMasterView(child.component)
-                is FeedRootComponent.Child.RecommendationScreen -> RecommendationListView(
-                    child.component
-                )
-            }
-        },
+                    is FeedRootComponent.Child.FeedScreen -> FeedMasterView(child.component)
+                    is FeedRootComponent.Child.RecommendationScreen ->
+                        RecommendationListView(
+                            child.component,
+                        )
+                }
+            },
     )
     return layout
 }

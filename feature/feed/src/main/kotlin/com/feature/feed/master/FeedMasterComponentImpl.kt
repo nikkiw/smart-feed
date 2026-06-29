@@ -22,6 +22,7 @@ import com.feature.feed.list.FeedListComponentImpl
  * FeedRootComponent implementation.
  * Encapsulates the Filter Sort Component, Feed List Component, and the Article Item Component factory.
  */
+@Suppress("LongParameterList")
 class FeedMasterComponentImpl(
     componentContext: ComponentContext,
     private val contentItemRepository: ContentItemRepository,
@@ -30,53 +31,55 @@ class FeedMasterComponentImpl(
     private val connectivityRepository: ConnectivityRepository,
     onListItemClick: (ContentId) -> Unit,
     initialSortType: ContentItemsSortedType = ContentItemsSortedType.ByDateNewestFirst,
-    initialTags: Tags = Tags()
+    initialTags: Tags = Tags(),
 ) : FeedMasterComponent, ComponentContext by componentContext {
-
-
-    private val _state = MutableValue(
-        FeedMasterComponent.State(
-            selectedTags = initialTags,
-            selectedSortType = initialSortType
+    private val _state =
+        MutableValue(
+            FeedMasterComponent.State(
+                selectedTags = initialTags,
+                selectedSortType = initialSortType,
+            ),
         )
-    )
     override val state: Value<FeedMasterComponent.State> = _state
 
-    //We keep a link to the Feed List Component to update the query when changing the filter/sorting.
+    // We keep a link to the Feed List Component to update the query when changing the filter/sorting.
     override val feedListComponent: FeedListComponent
 
     override val filterSortComponent: FilterSortComponent
 
     init {
-        filterSortComponent = FilterSortComponentImpl(
-            componentContext = childContext(key = "filterSort"),
-            contentItemRepository = contentItemRepository,
-            initialSelectedTags = initialTags,
-            initialSortType = initialSortType,
-            onTagsChanged = { tags ->
-                onTagsSelected(tags)
-            },
-            onSortTypeChanged = { sortType ->
-                onSortTypeSelected(sortType)
-            }
-        )
+        filterSortComponent =
+            FilterSortComponentImpl(
+                componentContext = childContext(key = "filterSort"),
+                contentItemRepository = contentItemRepository,
+                initialSelectedTags = initialTags,
+                initialSortType = initialSortType,
+                onTagsChanged = { tags ->
+                    onTagsSelected(tags)
+                },
+                onSortTypeChanged = { sortType ->
+                    onSortTypeSelected(sortType)
+                },
+            )
 
-        val initialQuery = Query(
-            types = listOf(ContentType.ARTICLE),
-            tags = initialTags,
-            sortedBy = initialSortType
-        )
+        val initialQuery =
+            Query(
+                types = listOf(ContentType.ARTICLE),
+                tags = initialTags,
+                sortedBy = initialSortType,
+            )
 
-        feedListComponent = FeedListComponentImpl(
-            componentContext = componentContext,
-            getContentUseCase = getContentUseCase,
-            syncContentUseCase = syncContentUseCase,
-            connectivityRepository = connectivityRepository,
-            initialQuery = initialQuery,
-            onItemClick = { itemId ->
-                onListItemClick(itemId)
-            }
-        )
+        feedListComponent =
+            FeedListComponentImpl(
+                componentContext = componentContext,
+                getContentUseCase = getContentUseCase,
+                syncContentUseCase = syncContentUseCase,
+                connectivityRepository = connectivityRepository,
+                initialQuery = initialQuery,
+                onItemClick = { itemId ->
+                    onListItemClick(itemId)
+                },
+            )
     }
 
     override fun onTagsSelected(tags: Tags) {
@@ -92,14 +95,14 @@ class FeedMasterComponentImpl(
     }
 
     private fun updateFeedQuery() {
-        val query = Query(
-            types = listOf(ContentType.ARTICLE),
-            tags = _state.value.selectedTags,
-            sortedBy = _state.value.selectedSortType
-        )
+        val query =
+            Query(
+                types = listOf(ContentType.ARTICLE),
+                tags = _state.value.selectedTags,
+                sortedBy = _state.value.selectedSortType,
+            )
         if (feedListComponent is FeedListComponentImpl) {
             feedListComponent.updateQuery(query)
         }
     }
-
 }

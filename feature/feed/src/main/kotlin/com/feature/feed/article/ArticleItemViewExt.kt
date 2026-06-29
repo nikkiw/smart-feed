@@ -15,18 +15,18 @@ import com.core.image.ImageLoader
 import com.core.image.ImageOptions
 import com.core.image.ImageSource
 import com.feature.feed.R
-import com.feature.feed.article_recommendation.ArticleRecommendationsView
+import com.feature.feed.articlerecommendation.ArticleRecommendationsView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import io.noties.markwon.Markwon
 
-
 @OptIn(ExperimentalDecomposeApi::class)
+@Suppress("FunctionName", "LongMethod")
 fun ViewContext.ArticleItemView(
     component: ArticleItemComponent,
     imageLoader: ImageLoader,
-    markwon: Markwon
+    markwon: Markwon,
 ): View {
     val view = layoutInflater.inflate(R.layout.item_article_component, parent, false)
     val toolbar = view.findViewById<MaterialToolbar>(R.id.articleToolbar)
@@ -37,17 +37,17 @@ fun ViewContext.ArticleItemView(
         }
     }
 
-
     child(view.findViewById(R.id.articleRecommendations)) {
         ArticleRecommendationsView(
             component.articleRecommendationsComponent,
-            imageLoader
+            imageLoader,
         )
     }
 
-    val scrollView = view.findViewById<ScrollView>(R.id.articleScrollView).apply {
-        transitionName =  "transition_content_${component.itemId}"
-    }
+    val scrollView =
+        view.findViewById<ScrollView>(R.id.articleScrollView).apply {
+            transitionName = "transition_content_${component.itemId}"
+        }
     val allContent = view.findViewById<CardView>(R.id.contentItem)
     val image = view.findViewById<ImageView>(R.id.articleImage)
     val title = view.findViewById<TextView>(R.id.articleTitle)
@@ -55,14 +55,13 @@ fun ViewContext.ArticleItemView(
     val date = view.findViewById<TextView>(R.id.articleDate)
     val tagGroup = view.findViewById<ChipGroup>(R.id.articleTags)
 
-
     component.registerOnCloseListener {
         val contentHeight = allContent.height
         val scrollViewHeight = scrollView.height
         val percentSeen =
             ((scrollView.scrollY + scrollViewHeight).toFloat() / contentHeight).coerceIn(
                 0f,
-                1f
+                1f,
             )
 
         component.logPercentRead(percentSeen)
@@ -116,11 +115,11 @@ fun ViewContext.ArticleItemView(
                         context = view.context,
                         imageSource = ImageSource.Url(model.mainImageUrl.value),
                         imageView = image,
-                        options = ImageOptions(
-                            isCenterCrop = true
-                        )
+                        options =
+                            ImageOptions(
+                                isCenterCrop = true,
+                            ),
                     )
-
 
                     tagGroup.removeAllViews()
                     for (tag in model.tags.value) {
@@ -130,13 +129,19 @@ fun ViewContext.ArticleItemView(
                         chip.isClickable = false
                         tagGroup.addView(chip)
                     }
-                    scrollView.setOnScrollChangeListener { v: View, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
+                    scrollView.setOnScrollChangeListener {
+                            v: View,
+                            scrollX: Int,
+                            scrollY: Int,
+                            oldScrollX: Int,
+                            oldScrollY: Int,
+                        ->
                         val contentHeight = allContent.height
                         val scrollViewHeight = scrollView.height
                         val percentSeen =
                             ((scrollY + scrollViewHeight).toFloat() / contentHeight).coerceIn(
                                 0f,
-                                1f
+                                1f,
                             )
 
                         component.logPercentRead(percentSeen)
@@ -144,7 +149,6 @@ fun ViewContext.ArticleItemView(
                 }
             }
         }
-
     }
 
     return view

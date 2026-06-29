@@ -16,9 +16,7 @@ import com.feature.feed.list.ArticleViewHolder
 import com.ndev.android.ui.shimmer.ShimmerView
 
 @OptIn(ExperimentalDecomposeApi::class)
-fun ViewContext.RecommendationListView(
-    component: RecommendationListComponent
-): View {
+fun ViewContext.RecommendationListView(component: RecommendationListComponent): View {
     val view = layoutInflater.inflate(R.layout.recommendation_list, parent, false)
     val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFeed)
     val shimmerView = view.findViewById<ShimmerView>(R.id.shimmerView)
@@ -26,24 +24,31 @@ fun ViewContext.RecommendationListView(
 
     recyclerView.layoutManager = LinearLayoutManager(view.context)
 
-    val adapter = object : ListAdapter<ContentItemPreview, ArticleViewHolder>(DIFF_CALLBACK) {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
-            return ArticleViewHolder.create(
-                parent = parent,
-                onClick = { article ->
-                    component.onListItemClick(article.id)
-                }
-            )
-        }
+    val adapter =
+        object : ListAdapter<ContentItemPreview, ArticleViewHolder>(DIFF_CALLBACK) {
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int,
+            ): ArticleViewHolder {
+                return ArticleViewHolder.create(
+                    parent = parent,
+                    onClick = { article ->
+                        component.onListItemClick(article.id)
+                    },
+                )
+            }
 
-        override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
-            getItem(position)?.let { item ->
-                if (item is ContentItemPreview.ArticlePreview) {
-                    holder.bind(item)
+            override fun onBindViewHolder(
+                holder: ArticleViewHolder,
+                position: Int,
+            ) {
+                getItem(position)?.let { item ->
+                    if (item is ContentItemPreview.ArticlePreview) {
+                        holder.bind(item)
+                    }
                 }
             }
         }
-    }
     recyclerView.adapter = adapter
 
     component.items.subscribe { items ->
@@ -72,16 +77,15 @@ fun ViewContext.RecommendationListView(
     return view
 }
 
-private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ContentItemPreview>() {
-    override fun areItemsTheSame(
-        oldItem: ContentItemPreview,
-        newItem: ContentItemPreview
-    ): Boolean =
-        oldItem.id == newItem.id
+private val DIFF_CALLBACK =
+    object : DiffUtil.ItemCallback<ContentItemPreview>() {
+        override fun areItemsTheSame(
+            oldItem: ContentItemPreview,
+            newItem: ContentItemPreview,
+        ): Boolean = oldItem.id == newItem.id
 
-    override fun areContentsTheSame(
-        oldItem: ContentItemPreview,
-        newItem: ContentItemPreview
-    ): Boolean =
-        oldItem == newItem
-}
+        override fun areContentsTheSame(
+            oldItem: ContentItemPreview,
+            newItem: ContentItemPreview,
+        ): Boolean = oldItem == newItem
+    }

@@ -9,7 +9,6 @@ import com.core.domain.model.ContentItemPreview
  *A component for displaying a feed of articles with support for Paging and Pull-to-Refresh.
  */
 interface FeedListComponent {
-
     /**
      * Feed status: PagingData stream.
      * Updated when filtering/sorting is changed.
@@ -31,12 +30,13 @@ interface FeedListComponent {
      */
     fun onListItemClick(itemId: ContentId)
 
-
     val isOnline: Boolean
 
     sealed class State {
         data object IsRefreshing : State()
+
         data object RefreshSuccess : State()
+
         data class ErrorRefresh(val errorMessage: String) : State()
     }
 }

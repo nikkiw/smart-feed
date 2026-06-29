@@ -24,9 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalDecomposeApi::class)
-fun ViewContext.FeedListView(
-    component: FeedListComponent
-): View {
+fun ViewContext.FeedListView(component: FeedListComponent): View {
     val view = layoutInflater.inflate(R.layout.feed_list, parent, false)
 
     val shimmerView = view.findViewById<ShimmerView>(R.id.shimmerView)
@@ -37,34 +35,41 @@ fun ViewContext.FeedListView(
 
     recyclerView.layoutManager = LinearLayoutManager(view.context)
 
-    val adapter = object : PagingDataAdapter<ContentItemPreview, ArticleViewHolder>(DIFF_CALLBACK) {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
-            return ArticleViewHolder.create(
-                parent = parent,
-                onClick = { article ->
-                    component.onListItemClick(article.id)
-                }
-            )
-        }
+    val adapter =
+        object : PagingDataAdapter<ContentItemPreview, ArticleViewHolder>(DIFF_CALLBACK) {
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int,
+            ): ArticleViewHolder {
+                return ArticleViewHolder.create(
+                    parent = parent,
+                    onClick = { article ->
+                        component.onListItemClick(article.id)
+                    },
+                )
+            }
 
-        override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
-            getItem(position)?.let { item ->
-                if (item is ContentItemPreview.ArticlePreview) {
-                    holder.bind(item)
+            override fun onBindViewHolder(
+                holder: ArticleViewHolder,
+                position: Int,
+            ) {
+                getItem(position)?.let { item ->
+                    if (item is ContentItemPreview.ArticlePreview) {
+                        holder.bind(item)
+                    }
                 }
             }
         }
-    }
     // Более правильный способ через LoadState
     adapter.addLoadStateListener { loadState ->
-        val isEmpty = loadState.refresh is LoadState.NotLoading
-                && loadState.append.endOfPaginationReached
-                && adapter.itemCount == 0
-        if ( loadState.refresh is LoadState.Loading){
+        val isEmpty =
+            loadState.refresh is LoadState.NotLoading &&
+                loadState.append.endOfPaginationReached &&
+                adapter.itemCount == 0
+        if (loadState.refresh is LoadState.Loading) {
             swipeRefreshLayout.visibility = View.GONE
             errorContainer.visibility = View.GONE
-        }
-        else if (isEmpty) {
+        } else if (isEmpty) {
             swipeRefreshLayout.visibility = View.GONE
             if (component.isOnline) {
                 errorContainer.visibility = View.GONE
@@ -83,48 +88,50 @@ fun ViewContext.FeedListView(
                 visibility = View.GONE
             }
         }
-
     }
     recyclerView.adapter = adapter
 
     // Setting up the listener for attaching/unpinning the View
-    view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-        private val scope = MainScope()
-        private var submitJob: Job? = null
+    view.addOnAttachStateChangeListener(
+        object : View.OnAttachStateChangeListener {
+            private val scope = MainScope()
+            private var submitJob: Job? = null
 
-        override fun onViewAttachedToWindow(v: View) {
-            component.pagingItems.subscribe { pagingData ->
-                submitJob?.cancel() // Отменить предыдущую задачу
-                submitJob = scope.launch {
-                    while (true) {
-                        val lifecycleOwner = v.findViewTreeLifecycleOwner()
-                        if (lifecycleOwner != null) {
-                            adapter.submitData(lifecycleOwner.lifecycle, pagingData)
-                            break
+            override fun onViewAttachedToWindow(v: View) {
+                component.pagingItems.subscribe { pagingData ->
+                    submitJob?.cancel() // Отменить предыдущую задачу
+                    submitJob =
+                        scope.launch {
+                            while (true) {
+                                val lifecycleOwner = v.findViewTreeLifecycleOwner()
+                                if (lifecycleOwner != null) {
+                                    adapter.submitData(lifecycleOwner.lifecycle, pagingData)
+                                    break
+                                }
+                                delay(50) // Проверяем каждые 100 мс
+                            }
                         }
-                        delay(50) // Проверяем каждые 100 мс
-                    }
                 }
             }
-        }
 
-        override fun onViewDetachedFromWindow(v: View) {
-            scope.cancel() // Отменить все корутины
-            submitJob = null
-            v.removeOnAttachStateChangeListener(this)
-        }
-    })
-
-    val hideRunnable = Runnable {
-        textError.animate()
-            .alpha(0f)
-            .setDuration(1000L)
-            .withEndAction {
-                textError.visibility = View.GONE
-                textError.alpha = 1f // сбрасываем на будущее
+            override fun onViewDetachedFromWindow(v: View) {
+                scope.cancel() // Отменить все корутины
+                submitJob = null
+                v.removeOnAttachStateChangeListener(this)
             }
-    }
+        },
+    )
 
+    val hideRunnable =
+        Runnable {
+            textError.animate()
+                .alpha(0f)
+                .setDuration(1000L)
+                .withEndAction {
+                    textError.visibility = View.GONE
+                    textError.alpha = 1f // сбрасываем на будущее
+                }
+        }
 
     component.isRefreshing.subscribe { isRefreshing ->
         swipeRefreshLayout.isRefreshing = isRefreshing is FeedListComponent.State.IsRefreshing
@@ -154,16 +161,15 @@ fun ViewContext.FeedListView(
     return view
 }
 
-private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ContentItemPreview>() {
-    override fun areItemsTheSame(
-        oldItem: ContentItemPreview,
-        newItem: ContentItemPreview
-    ): Boolean =
-        oldItem.id == newItem.id
+private val DIFF_CALLBACK =
+    object : DiffUtil.ItemCallback<ContentItemPreview>() {
+        override fun areItemsTheSame(
+            oldItem: ContentItemPreview,
+            newItem: ContentItemPreview,
+        ): Boolean = oldItem.id == newItem.id
 
-    override fun areContentsTheSame(
-        oldItem: ContentItemPreview,
-        newItem: ContentItemPreview
-    ): Boolean =
-        oldItem == newItem
-}
+        override fun areContentsTheSame(
+            oldItem: ContentItemPreview,
+            newItem: ContentItemPreview,
+        ): Boolean = oldItem == newItem
+    }

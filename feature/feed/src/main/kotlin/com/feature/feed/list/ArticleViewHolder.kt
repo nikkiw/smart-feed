@@ -23,9 +23,8 @@ import dagger.hilt.android.EntryPointAccessors
 class ArticleViewHolder private constructor(
     itemView: View,
     private val onClick: (ContentItemPreview.ArticlePreview) -> Unit,
-    private val imageLoader: ImageLoader
+    private val imageLoader: ImageLoader,
 ) : RecyclerView.ViewHolder(itemView) {
-
     private val cardView: CardView = itemView.findViewById(R.id.contentItem)
     private val image: ImageView = itemView.findViewById(R.id.articleImage)
     private val title: TextView = itemView.findViewById(R.id.articleTitle)
@@ -51,14 +50,14 @@ class ArticleViewHolder private constructor(
                 context = itemView.context,
                 imageSource = ImageSource.Url(article.mainImageUrl.value),
                 imageView = image,
-                options = ImageOptions(
-                    isCenterCrop = true
-                )
+                options =
+                    ImageOptions(
+                        isCenterCrop = true,
+                    ),
             )
         } else {
             image.setImageDrawable(null)
         }
-
 
         title.text = article.title.value
         content.text = article.short.value
@@ -82,14 +81,16 @@ class ArticleViewHolder private constructor(
          */
         fun create(
             parent: ViewGroup,
-            onClick: (ContentItemPreview.ArticlePreview) -> Unit
+            onClick: (ContentItemPreview.ArticlePreview) -> Unit,
         ): ArticleViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_article, parent, false)
+            val view =
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_article, parent, false)
             // Getting ImageLoader via Hilt EntryPoint
-            val imageLoader = EntryPointAccessors.fromApplication<ImageLoaderEntryPoint>(
-                parent.context.applicationContext
-            ).imageLoader()
+            val imageLoader =
+                EntryPointAccessors.fromApplication<ImageLoaderEntryPoint>(
+                    parent.context.applicationContext,
+                ).imageLoader()
             return ArticleViewHolder(view, onClick, imageLoader)
         }
     }

@@ -7,7 +7,6 @@ import com.feature.feed.filter.FilterSortComponent
 import com.feature.feed.list.FeedListComponent
 
 interface FeedMasterComponent {
-
     val filterSortComponent: FilterSortComponent
     val feedListComponent: FeedListComponent
 
@@ -18,7 +17,7 @@ interface FeedMasterComponent {
 
     data class State(
         val selectedTags: Tags = Tags(),
-        val selectedSortType: ContentItemsSortedType = ContentItemsSortedType.ByDateNewestFirst
+        val selectedSortType: ContentItemsSortedType = ContentItemsSortedType.ByDateNewestFirst,
     )
 
     /**
@@ -30,5 +29,4 @@ interface FeedMasterComponent {
      * Called when the user changes the sorting type.
      */
     fun onSortTypeSelected(type: ContentItemsSortedType)
-
 }

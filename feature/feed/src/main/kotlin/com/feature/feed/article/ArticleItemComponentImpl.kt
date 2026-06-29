@@ -10,10 +10,8 @@ import com.core.domain.model.ContentId
 import com.core.domain.service.AnalyticsService
 import com.core.domain.usecase.content.GetContentItemUseCase
 import com.core.domain.usecase.recommendation.RecommendForArticleUseCase
-import com.feature.feed.article_recommendation.ArticleRecommendationsComponent
-import com.feature.feed.article_recommendation.ArticleRecommendationsComponentImpl
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import com.feature.feed.articlerecommendation.ArticleRecommendationsComponent
+import com.feature.feed.articlerecommendation.ArticleRecommendationsComponentImpl
 import kotlinx.coroutines.launch
 
 /**
@@ -41,7 +39,7 @@ class ArticleItemComponentImpl(
             recommendForArticleUseCase = recommendForArticleUseCase,
             onItemClick = { id ->
                 onClickItem(id)
-            }
+            },
         )
 
 //    private val scope = coroutineScope(Dispatchers.Main.immediate + SupervisorJob())
@@ -68,7 +66,6 @@ class ArticleItemComponentImpl(
         closeListeners += listener
     }
 
-
     init {
         // Подписываемся на события Decompose
         lifecycle.subscribe(
@@ -90,30 +87,28 @@ class ArticleItemComponentImpl(
                     closeListeners.forEach { it() }
                     logReadEvent()
                 }
-
-            }
+            },
         )
-
 
         coroutineScope()
             .launch {
-            getContentItemUseCase.invoke(itemId).onFailure { action: Throwable ->
-                _model.value = ArticleItemComponent.State.Error(action.message ?: "UnknownError")
-            }.onSuccess { contentItem ->
-                _model.value = ArticleItemComponent.State.Loaded(contentItem)
+                getContentItemUseCase.invoke(itemId).onFailure { action: Throwable ->
+                    _model.value = ArticleItemComponent.State.Error(action.message ?: "UnknownError")
+                }.onSuccess { contentItem ->
+                    _model.value = ArticleItemComponent.State.Loaded(contentItem)
+                }
             }
-        }
     }
 
     private fun logReadEvent() {
         Log.d(
             "logReadEvent",
-            "itemId=$itemId, accumulatedVisibleMillis=$accumulatedVisibleMillis, percent=$percent"
+            "itemId=$itemId, accumulatedVisibleMillis=$accumulatedVisibleMillis, percent=$percent",
         )
         analyticsService.trackEventReadContent(
             contentId = itemId,
             readingTimeMillis = accumulatedVisibleMillis,
-            readPercentage = percent
+            readPercentage = percent,
         )
     }
 }

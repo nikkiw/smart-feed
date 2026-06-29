@@ -8,7 +8,6 @@ import com.feature.feed.R
 import com.feature.feed.bottombar.model.BottomBarState
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-
 @OptIn(ExperimentalDecomposeApi::class)
 fun ViewContext.BottomBarView(component: BottomBarComponent): View {
     // Инфлейтим layout
@@ -18,10 +17,11 @@ fun ViewContext.BottomBarView(component: BottomBarComponent): View {
 
     // Подписываемся на изменение состояния компонента
     component.state.subscribe { state ->
-        bottomNav.selectedItemId = when (state) {
-            BottomBarState.List -> R.id.action_list
-            BottomBarState.Recommendation -> R.id.action_recommendation
-        }
+        bottomNav.selectedItemId =
+            when (state) {
+                BottomBarState.List -> R.id.action_list
+                BottomBarState.Recommendation -> R.id.action_recommendation
+            }
     }
 
     // Обработка кликов по табам

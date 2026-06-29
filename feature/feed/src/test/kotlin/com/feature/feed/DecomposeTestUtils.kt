@@ -34,12 +34,10 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 
-
 /**
  * Test utilities for Decompose components testing
  */
 object DecomposeTestUtils {
-
     /**
      * Creates a test ComponentContext with proper lifecycle management
      */
@@ -49,18 +47,19 @@ object DecomposeTestUtils {
         val instanceKeeper = InstanceKeeperDispatcher()
 
         return TestComponentContext(
-            componentContext = DefaultComponentContext(
-                lifecycle = lifecycle,
-                stateKeeper = stateKeeper,
-                instanceKeeper = instanceKeeper
-            ),
-            lifecycle = lifecycle
+            componentContext =
+                DefaultComponentContext(
+                    lifecycle = lifecycle,
+                    stateKeeper = stateKeeper,
+                    instanceKeeper = instanceKeeper,
+                ),
+            lifecycle = lifecycle,
         )
     }
 
     class TestComponentContext(
         val componentContext: ComponentContext,
-        val lifecycle: LifecycleRegistry
+        val lifecycle: LifecycleRegistry,
     ) {
         fun startLifecycle() {
             lifecycle.create()
@@ -77,23 +76,21 @@ object DecomposeTestUtils {
  * Custom Truth subjects for better assertions
  */
 object FeedComponentSubjects {
-
     fun assertThat(childStack: ChildStack<*, FeedRootComponent.Child>): ChildStackSubject {
         return ChildStackSubject.assertThat(childStack)
     }
 
     class ChildStackSubject(
         metadata: FailureMetadata,
-        private val actual: ChildStack<*, FeedRootComponent.Child>
+        private val actual: ChildStack<*, FeedRootComponent.Child>,
     ) : Subject(metadata, actual) {
-
         companion object {
             /** Truth factory for ChildStackSubject */
             private val FACTORY =
                 object : Factory<ChildStackSubject, ChildStack<*, FeedRootComponent.Child>> {
                     override fun createSubject(
                         metadata: FailureMetadata,
-                        actual: ChildStack<*, FeedRootComponent.Child>?
+                        actual: ChildStack<*, FeedRootComponent.Child>?,
                     ): ChildStackSubject {
                         return ChildStackSubject(metadata, actual!!)
                     }
@@ -101,9 +98,7 @@ object FeedComponentSubjects {
 
             /** Entry point to use in tests: */
             @JvmStatic
-            fun assertThat(
-                childStack: ChildStack<*, FeedRootComponent.Child>
-            ): ChildStackSubject {
+            fun assertThat(childStack: ChildStack<*, FeedRootComponent.Child>): ChildStackSubject {
                 return Truth.assertAbout(FACTORY).that(childStack)
             }
         }
@@ -114,9 +109,7 @@ object FeedComponentSubjects {
             return this
         }
 
-        fun hasActiveChildOfType(
-            expectedType: Class<out FeedRootComponent.Child>
-        ): ChildStackSubject {
+        fun hasActiveChildOfType(expectedType: Class<out FeedRootComponent.Child>): ChildStackSubject {
             check("active.instance").that(actual.active.instance)
                 .isInstanceOf(expectedType)
             return this
@@ -134,23 +127,19 @@ object FeedComponentSubjects {
             return this
         }
 
-        fun hasBackStackContaining(
-            expectedConfig: FeedRootComponent.Config
-        ): ChildStackSubject {
+        fun hasBackStackContaining(expectedConfig: FeedRootComponent.Config): ChildStackSubject {
             val configs = actual.backStack.map { it.configuration }
             check("backStack.configurationList").that(configs)
                 .contains(expectedConfig)
             return this
         }
     }
-
 }
 
 /**
  * Test data builders for creating test objects
  */
 object FeedTestDataBuilder {
-
     fun createMockDependencies(): MockDependencies {
         return MockDependencies(
             contentItemRepository = mockk(relaxed = true),
@@ -160,7 +149,7 @@ object FeedTestDataBuilder {
             analyticsService = mockk(relaxed = true),
             recommendForUserUseCase = mockk(relaxed = true),
             recommendForArticleUseCase = mockk(relaxed = true),
-            connectivityRepository = mockk(relaxed = true)
+            connectivityRepository = mockk(relaxed = true),
         )
     }
 
@@ -172,12 +161,12 @@ object FeedTestDataBuilder {
         val analyticsService: AnalyticsService,
         val recommendForUserUseCase: RecommendForUserUseCase,
         val recommendForArticleUseCase: RecommendForArticleUseCase,
-        val connectivityRepository: ConnectivityRepository
+        val connectivityRepository: ConnectivityRepository,
     )
 
     fun createFeedRootComponent(
         componentContext: ComponentContext = DecomposeTestUtils.createTestComponentContext().componentContext,
-        dependencies: MockDependencies = createMockDependencies()
+        dependencies: MockDependencies = createMockDependencies(),
     ): FeedRootComponentImpl {
         return FeedRootComponentImpl(
             componentContext = componentContext,
@@ -188,7 +177,7 @@ object FeedTestDataBuilder {
             analyticsService = dependencies.analyticsService,
             recommendForUserUseCase = dependencies.recommendForUserUseCase,
             recommendForArticleUseCase = dependencies.recommendForArticleUseCase,
-            connectivityRepository = dependencies.connectivityRepository
+            connectivityRepository = dependencies.connectivityRepository,
         )
     }
 }
@@ -197,7 +186,6 @@ object FeedTestDataBuilder {
  * Test scenarios for navigation testing
  */
 object NavigationTestScenarios {
-
     fun verifyInitialState(component: FeedRootComponent) {
         FeedComponentSubjects.assertThat(component.childStack.value)
             .hasActiveConfiguration(FeedRootComponent.Config.FeedScreenConfig)
@@ -207,7 +195,7 @@ object NavigationTestScenarios {
 
     fun verifyNavigationToArticle(
         component: FeedRootComponent,
-        itemId: String
+        itemId: String,
     ) {
         FeedComponentSubjects.assertThat(component.childStack.value)
             .hasActiveConfiguration(FeedRootComponent.Config.ArticleScreenConfig(itemId))
@@ -240,11 +228,10 @@ fun FeedRootComponent.getBackStackSize(): Int {
  * Mock factories for creating test doubles
  */
 object MockFactories {
-
     fun createContentItemPreview(
         id: String = "test-id",
         title: String = "Test Title",
-        description: String = "Test Description"
+        description: String = "Test Description",
     ): ContentItemPreview {
         return mockk<ContentItemPreview.ArticlePreview>(relaxed = true) {
             every { this@mockk.id } returns ContentId(id)
@@ -253,6 +240,7 @@ object MockFactories {
         }
     }
 
+    @Suppress("UnusedParameter")
     fun createPagingData(items: List<ContentItemPreview>): PagingData<ContentItemPreview> {
         return mockk<PagingData<ContentItemPreview>>(relaxed = true)
     }
@@ -263,7 +251,7 @@ object MockFactories {
  */
 fun assertBottomBarState(
     bottomBar: BottomBarComponent,
-    expectedState: BottomBarState
+    expectedState: BottomBarState,
 ) {
     when (bottomBar) {
         is BottomBarComponentImpl -> {

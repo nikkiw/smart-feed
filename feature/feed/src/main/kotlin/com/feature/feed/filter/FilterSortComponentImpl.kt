@@ -7,8 +7,6 @@ import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemRepository
 import com.core.domain.repository.ContentItemsSortedType
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 /**
@@ -22,17 +20,17 @@ class FilterSortComponentImpl(
     private val onTagsChanged: (Tags) -> Unit,
     private val onSortTypeChanged: (ContentItemsSortedType) -> Unit,
 ) : FilterSortComponent, ComponentContext by componentContext {
+    //    private val scope = coroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
-//    private val scope = coroutineScope(Dispatchers.Main.immediate + SupervisorJob())
-
-    private val _state = MutableValue(
-        FilterSortComponent.State(
-            availableTags =  emptyList(),
-            selectedTags = initialSelectedTags,
-            availableSortTypes = ContentItemsSortedType.entries.toList(),
-            selectedSortType = initialSortType
+    private val _state =
+        MutableValue(
+            FilterSortComponent.State(
+                availableTags = emptyList(),
+                selectedTags = initialSelectedTags,
+                availableSortTypes = ContentItemsSortedType.entries.toList(),
+                selectedSortType = initialSortType,
+            ),
         )
-    )
     override val state: Value<FilterSortComponent.State> = _state
 
     init {
@@ -40,13 +38,13 @@ class FilterSortComponentImpl(
         coroutineScope().launch {
             contentItemRepository.flowAllTags().collect { tagsObj ->
                 // Обновляем состояние, сохраняя остальные поля как есть
-                _state.value = _state.value.copy(
-                    availableTags =  tagsObj.value
-                )
+                _state.value =
+                    _state.value.copy(
+                        availableTags = tagsObj.value,
+                    )
             }
         }
     }
-
 
     override fun onTagClicked(tag: String) {
         val current = _state.value

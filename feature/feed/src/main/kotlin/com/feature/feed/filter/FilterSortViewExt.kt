@@ -16,7 +16,6 @@ import com.google.android.material.chip.ChipGroup
  */
 @OptIn(ExperimentalDecomposeApi::class)
 fun ViewContext.FilterSortView(component: FilterSortComponent): View {
-
     val view = layoutInflater.inflate(R.layout.filter_sort, parent, false)
 
     val chipGroup = view.findViewById<ChipGroup>(R.id.chipGroupTags)
@@ -35,29 +34,31 @@ fun ViewContext.FilterSortView(component: FilterSortComponent): View {
         }
 
         val items = state.availableSortTypes
-        val adapter = ArrayAdapter(
-            context,
-            android.R.layout.simple_spinner_item,
-            items.map { it.name }
-        ).apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        val adapter =
+            ArrayAdapter(
+                context,
+                android.R.layout.simple_spinner_item,
+                items.map { it.name },
+            ).apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         spinner.adapter = adapter
         spinner.setSelection(items.indexOf(state.selectedSortType))
     }
 
-    spinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(
-            parent: android.widget.AdapterView<*>,
-            view: View?,
-            position: Int,
-            id: Long
-        ) {
-            component.onSortTypeSelected(
-                component.state.value.availableSortTypes[position]
-            )
-        }
+    spinner.onItemSelectedListener =
+        object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: android.widget.AdapterView<*>,
+                view: View?,
+                position: Int,
+                id: Long,
+            ) {
+                component.onSortTypeSelected(
+                    component.state.value.availableSortTypes[position],
+                )
+            }
 
-        override fun onNothingSelected(parent: android.widget.AdapterView<*>) = Unit
-    }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>) = Unit
+        }
 
     return view
 }

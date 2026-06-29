@@ -8,7 +8,6 @@ import com.core.domain.repository.ContentItemsSortedType
  * Component for filtering by tags and selecting sorting.
  */
 interface FilterSortComponent {
-
     /**
      * UI state of filtering and sorting.
      */
@@ -18,7 +17,7 @@ interface FilterSortComponent {
         val availableTags: List<String> = emptyList(),
         val selectedTags: Tags = Tags(),
         val availableSortTypes: List<ContentItemsSortedType> = ContentItemsSortedType.entries.toList(),
-        val selectedSortType: ContentItemsSortedType = ContentItemsSortedType.ByDateNewestFirst
+        val selectedSortType: ContentItemsSortedType = ContentItemsSortedType.ByDateNewestFirst,
     )
 
     /**

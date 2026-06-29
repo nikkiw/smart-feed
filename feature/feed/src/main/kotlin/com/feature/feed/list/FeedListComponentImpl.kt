@@ -25,9 +25,8 @@ class FeedListComponentImpl(
     private val syncContentUseCase: SyncContentUseCase,
     private val connectivityRepository: ConnectivityRepository,
     initialQuery: Query,
-    private val onItemClick: (ContentId) -> Unit
+    private val onItemClick: (ContentId) -> Unit,
 ) : FeedListComponent, ComponentContext by componentContext {
-
     private val _pagingItems = MutableValue<PagingData<ContentItemPreview>>(PagingData.empty())
     override val pagingItems: Value<PagingData<ContentItemPreview>> = _pagingItems
 
@@ -51,29 +50,32 @@ class FeedListComponentImpl(
 
     private fun loadContent(query: Query) {
         pagingJob?.cancel()
-        pagingJob = coroutineScope()
-            .launch {
-                getContentUseCase(query)
-                    .cachedIn(this)
-                    .collectLatest {
-                        _pagingItems.value = it
-                    }
-            }
+        pagingJob =
+            coroutineScope()
+                .launch {
+                    getContentUseCase(query)
+                        .cachedIn(this)
+                        .collectLatest {
+                            _pagingItems.value = it
+                        }
+                }
     }
 
     override fun onRefresh() {
         refreshJob?.cancel()
-        refreshJob = coroutineScope()
-            .launch {
-                _isRefreshing.value = FeedListComponent.State.IsRefreshing
-                syncContentUseCase.invoke().onFailure {
-                    _isRefreshing.value = FeedListComponent.State.ErrorRefresh(
-                        it.message ?: "Failed refresh data (unknown error)"
-                    )
-                }.onSuccess {
-                    _isRefreshing.value = FeedListComponent.State.RefreshSuccess
+        refreshJob =
+            coroutineScope()
+                .launch {
+                    _isRefreshing.value = FeedListComponent.State.IsRefreshing
+                    syncContentUseCase.invoke().onFailure {
+                        _isRefreshing.value =
+                            FeedListComponent.State.ErrorRefresh(
+                                it.message ?: "Failed refresh data (unknown error)",
+                            )
+                    }.onSuccess {
+                        _isRefreshing.value = FeedListComponent.State.RefreshSuccess
+                    }
                 }
-            }
     }
 
     override fun onListItemClick(itemId: ContentId) {

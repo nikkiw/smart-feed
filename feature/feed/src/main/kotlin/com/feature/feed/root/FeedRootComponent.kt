@@ -9,16 +9,14 @@ import com.feature.feed.master.FeedMasterComponent
 import com.feature.feed.recommendation.RecommendationListComponent
 import kotlinx.serialization.Serializable
 
-
 /**
- * Root component for article feed, responsible for setting up filter/sorting, displaying the feed and creating ArticleItemComponent.
+ * Root component for article feed, responsible for setting up filter/sorting,
+ * displaying the feed and creating ArticleItemComponent.
  */
 interface FeedRootComponent {
-
     val childStack: Value<ChildStack<*, Child>>
 
     val bottomBar: BottomBarComponent
-
 
     fun pop(onComplete: (Boolean) -> Unit)
 
@@ -36,12 +34,13 @@ interface FeedRootComponent {
 
     sealed class Child {
         data class FeedScreen(val component: FeedMasterComponent) : Child()
+
         data class ArticleScreen(val component: ArticleItemComponent) : Child()
+
         data class RecommendationScreen(val component: RecommendationListComponent) : Child()
     }
 
     fun interface Factory {
         operator fun invoke(componentContext: ComponentContext): FeedRootComponent
     }
-
 }

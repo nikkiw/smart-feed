@@ -16,7 +16,6 @@ import com.feature.feed.list.FeedListView
 fun ViewContext.FeedMasterView(component: FeedMasterComponent): View {
     val layout = layoutInflater.inflate(R.layout.feed_master_view, parent, false)
 
-
     // Контейнеры во View
     child(layout.findViewById(R.id.filterSortContainer)) {
         FilterSortView(component.filterSortComponent)

@@ -8,11 +8,8 @@ import com.core.domain.model.ContentId
 import com.core.domain.model.ContentItemPreview
 import com.core.domain.usecase.recommendation.RecommendForUserUseCase
 import com.core.observers.ConnectivityRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-
 
 /**
  * Implementation of the Recommendation List Component
@@ -23,7 +20,6 @@ class RecommendationListComponentImpl(
     private val connectivityRepository: ConnectivityRepository,
     private val onItemClick: (ContentId) -> Unit,
 ) : RecommendationListComponent, ComponentContext by componentContext {
-
     private val _items = MutableValue<List<ContentItemPreview>>(emptyList())
     override val items: Value<List<ContentItemPreview>> = _items
 
@@ -39,11 +35,9 @@ class RecommendationListComponentImpl(
                     _items.value = it
                 }
         }
-
     }
 
     override fun onListItemClick(itemId: ContentId) {
         onItemClick(itemId)
     }
-
 }

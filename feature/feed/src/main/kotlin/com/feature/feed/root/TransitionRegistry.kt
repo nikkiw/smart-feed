@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
  */
 data class TransitionKey(
     val from: KClass<out FeedRootComponent.Config>,
-    val to:   KClass<out FeedRootComponent.Config>
+    val to: KClass<out FeedRootComponent.Config>,
 )
 
 /**
@@ -24,18 +24,17 @@ object TransitionRegistry {
 
     fun register(
         from: KClass<out FeedRootComponent.Config>,
-        to:   KClass<out FeedRootComponent.Config>,
-        transition: DelayedTransition
+        to: KClass<out FeedRootComponent.Config>,
+        transition: DelayedTransition,
     ) {
         map[TransitionKey(from, to)] = transition
     }
 
     fun get(
         from: FeedRootComponent.Config,
-        to:   FeedRootComponent.Config
+        to: FeedRootComponent.Config,
     ): DelayedTransition {
         return map[ TransitionKey(from::class, to::class) ]
             ?: defaultTransition
     }
 }
-
