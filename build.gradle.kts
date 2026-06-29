@@ -127,9 +127,5 @@ val devDebugCombinedReport by tasks.registering(TestReport::class) {
         fileTree(layout.buildDirectory.dir("outputs/androidTest-results/connected")),
     )
 
-    // Чтобы агрегатор запускался только после тестов
-    dependsOn(
-//        tasks.named("testDevDebugUnitTest"),
-        tasks.named("connectedDevDebugAndroidTest"),
-    )
+    // Run app unit/instrumentation tests before this report when fresh results are needed.
 }

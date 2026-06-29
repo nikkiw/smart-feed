@@ -1,0 +1,21 @@
+# Android instrumentation tests are integration-heavy and commonly need larger setup code.
+
+complexity:
+  LongParameterList:
+    active: false
+  LongMethod:
+    active: true
+    threshold: 220
+  LargeClass:
+    active: true
+    threshold: 900
+
+naming:
+  FunctionNaming:
+    active: true
+    functionPattern: '([a-zA-Z][a-zA-Z0-9]*)|(`.*`)'
+    excludeClassPattern: '.*Test$'
+
+style:
+  MagicNumber:
+    active: false

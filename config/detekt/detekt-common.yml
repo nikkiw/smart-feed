@@ -1,12 +1,12 @@
-# Compatibility entry point for the Detekt Gradle plugin default lookup.
-# Layered tasks use detekt-common.yml plus a source-set/layer profile.
+# Shared Detekt configuration. Layered tasks add one profile on top:
+# detekt-domain.yml, detekt-data.yml, detekt-ui.yml, detekt-test.yml, or detekt-android-test.yml.
 
 complexity:
   TooManyFunctions:
     active: false
   LongParameterList:
     active: true
-    functionThreshold: 8 # Compose functions often have more parameters
+    functionThreshold: 8
     constructorThreshold: 8
   LongMethod:
     active: true
@@ -18,7 +18,6 @@ complexity:
 naming:
   FunctionNaming:
     active: true
-    # Allow uppercase starting letters for Compose @Composable functions
     functionPattern: '[a-zA-Z][a-zA-Z0-9]*'
     excludeClassPattern: '.*Test$'
   ConstructorParameterNaming:
@@ -27,9 +26,9 @@ naming:
 
 style:
   MagicNumber:
-    active: false # Disabled as magic numbers are frequent in UI and animations
+    active: false
   WildcardImport:
-    active: false # Formatting is handled by Spotless/KtLint anyway
+    active: false
   UnusedPrivateMember:
     active: true
     allowedNames: '(_|ignored|expected)'
@@ -38,4 +37,4 @@ style:
 
 performance:
   SpreadOperator:
-    active: false # Spread operator is sometimes unavoidable
+    active: false
