@@ -51,3 +51,4 @@ google-services.json
 .cxx
 changes_for_llm.txt
 /scripts/.venv/**
+docs/plans/
