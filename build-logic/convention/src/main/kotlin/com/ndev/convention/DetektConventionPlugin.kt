@@ -5,6 +5,7 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 
@@ -69,7 +70,7 @@ class DetektConventionPlugin : Plugin<Project> {
         sourceDirs: List<String>,
         configFiles: List<java.io.File>,
     ) {
-        tasks.register<Detekt>(taskName) {
+        val configureTask: Detekt.() -> Unit = {
             group = "verification"
             this.description = description
             buildUponDefaultConfig = true
@@ -77,6 +78,16 @@ class DetektConventionPlugin : Plugin<Project> {
             setSource(files(sourceDirs.map(::file).filter { it.exists() }))
             config.setFrom(files(configFiles.filter { it.exists() }))
             exclude("**/build/**")
+        }
+
+        if (tasks.findByName(taskName) == null) {
+            tasks.register<Detekt>(taskName) {
+                configureTask()
+            }
+        } else {
+            tasks.named<Detekt>(taskName) {
+                configureTask()
+            }
         }
     }
 
