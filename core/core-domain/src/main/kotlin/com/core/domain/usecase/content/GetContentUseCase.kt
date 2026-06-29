@@ -5,7 +5,6 @@ import com.core.domain.model.ContentItemPreview
 import com.core.domain.repository.Query
 import kotlinx.coroutines.flow.Flow
 
-
 /**
  * Use case interface for retrieving a paginated list of content items based on a query.
  *
@@ -26,7 +25,6 @@ import kotlinx.coroutines.flow.Flow
  * ```
  */
 interface GetContentUseCase {
-
     /**
      * Retrieves a flow of paginated content items that match the given [Query].
      *

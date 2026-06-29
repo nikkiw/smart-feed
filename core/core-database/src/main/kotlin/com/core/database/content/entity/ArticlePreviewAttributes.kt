@@ -12,5 +12,5 @@ package com.core.database.content.entity
 data class ArticlePreviewAttributes(
     val contentId: String,
     val title: String,
-    val shortDescription: String
+    val shortDescription: String,
 )

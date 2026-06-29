@@ -13,7 +13,6 @@ import com.bumptech.glide.module.AppGlideModule
  */
 @GlideModule
 class GlideApp : AppGlideModule() {
-
     /**
      * Called to apply options to the [GlideBuilder] before the generated API is initialized.
      *
@@ -21,8 +20,10 @@ class GlideApp : AppGlideModule() {
      * @param builder The [GlideBuilder] used to configure Glide.
      * @see AppGlideModule.applyOptions
      */
-    override fun applyOptions(context: Context, builder: GlideBuilder) {
-        // TODO: Read and apply user preferences or app settings
+    @Suppress("EmptyFunctionBlock")
+    override fun applyOptions(
+        context: Context,
+        builder: GlideBuilder,
+    ) {
     }
 }
-

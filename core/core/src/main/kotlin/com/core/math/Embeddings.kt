@@ -18,7 +18,10 @@ object Embeddings {
      * @return The cosine similarity value in the range [-1.0, 1.0].
      * @throws IllegalArgumentException if the vectors differ in size.
      */
-    fun cosineSimilarity(a: FloatArray, b: FloatArray): Float {
+    fun cosineSimilarity(
+        a: FloatArray,
+        b: FloatArray,
+    ): Float {
         require(a.size == b.size) { "Embedding vectors must have the same length." }
         var dot = 0f
         var normA = 0f

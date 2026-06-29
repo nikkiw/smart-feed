@@ -54,7 +54,6 @@ value class Tags(val value: List<String> = emptyList())
 @JvmInline
 value class ImageUrl(val value: String)
 
-
 /**
  * Value class representing a timestamp of when content was last updated.
  *
@@ -65,7 +64,6 @@ value class ImageUrl(val value: String)
  */
 @JvmInline
 value class UpdatedAt(val epochMillis: Long) {
-
     /**
      * Converts this [UpdatedAt] into a [java.util.Date].
      *
@@ -109,12 +107,13 @@ value class UpdatedAt(val epochMillis: Long) {
          * @throws IllegalArgumentException If the input string cannot be parsed.
          */
         fun parse(isoString: String): UpdatedAt {
-            val patterns = arrayOf(
-                "yyyy-MM-dd'T'HH:mm:ss'Z'",
-                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-                "yyyy-MM-dd'T'HH:mm:ssXXX",
-                "yyyy-MM-dd'T'HH:mm:ss"
-            )
+            val patterns =
+                arrayOf(
+                    "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                    "yyyy-MM-dd'T'HH:mm:ssXXX",
+                    "yyyy-MM-dd'T'HH:mm:ss",
+                )
             for (pat in patterns) {
                 try {
                     val sdf = SimpleDateFormat(pat, Locale.US)
@@ -131,7 +130,6 @@ value class UpdatedAt(val epochMillis: Long) {
             }
             throw IllegalArgumentException("Невозможно распарсить ISO-строку '$isoString'")
         }
-
     }
 }
 
@@ -142,14 +140,16 @@ value class UpdatedAt(val epochMillis: Long) {
  */
 enum class ContentType(private val typeName: String) {
     ARTICLE("article"),
-    UNKNOWN("unknown");
+    UNKNOWN("unknown"),
+    ;
 
     override fun toString(): String = typeName
 
     companion object {
-        fun fromString(type: String): ContentType = when (type.lowercase()) {
-            "article" -> ARTICLE
-            else -> UNKNOWN
-        }
+        fun fromString(type: String): ContentType =
+            when (type.lowercase()) {
+                "article" -> ARTICLE
+                else -> UNKNOWN
+            }
     }
 }

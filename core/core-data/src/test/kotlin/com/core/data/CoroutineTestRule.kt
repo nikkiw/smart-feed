@@ -30,6 +30,5 @@ class CoroutineTestRule : TestWatcher() {
     /**
      * Обёртка для kotlinx.coroutines.test.runTest
      */
-    fun runBlockingTest(block: suspend TestScope.() -> Unit) =
-        runTest { block() }
+    fun runBlockingTest(block: suspend TestScope.() -> Unit) = runTest { block() }
 }

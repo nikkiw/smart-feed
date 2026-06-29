@@ -1,6 +1,7 @@
 package com.core.domain.model
 
-import com.core.domain.model.ContentItemPreview.*
+import com.core.domain.model.ContentItemPreview.ArticlePreview
+import com.core.domain.model.ContentItemPreview.UnknownPreview
 
 /**
  * Base sealed class representing a content item in the system.
@@ -17,7 +18,6 @@ sealed class ContentItem {
     abstract val updatedAt: UpdatedAt
     abstract val mainImageUrl: ImageUrl
     abstract val tags: Tags
-
 
     /**
      * Represents an article — a specific type of content.
@@ -37,7 +37,7 @@ sealed class ContentItem {
         override val tags: Tags,
         val title: Title,
         val short: ShortDescription,
-        val content: Content
+        val content: Content,
     ) : ContentItem() {
         override val type: ContentType = ContentType.ARTICLE
     }
@@ -56,7 +56,7 @@ sealed class ContentItem {
         override val updatedAt: UpdatedAt,
         override val mainImageUrl: ImageUrl,
         override val tags: Tags,
-        val rawType: String
+        val rawType: String,
     ) : ContentItem() {
         override val type: ContentType = ContentType.UNKNOWN
     }
@@ -71,21 +71,23 @@ sealed class ContentItem {
  */
 fun ContentItem.toContentItemPreview(): ContentItemPreview {
     return when (this) {
-        is ContentItem.Article -> ArticlePreview(
-            id = id,
-            updatedAt = updatedAt,
-            mainImageUrl = mainImageUrl,
-            tags = tags,
-            title = title,
-            short = short
-        )
+        is ContentItem.Article ->
+            ArticlePreview(
+                id = id,
+                updatedAt = updatedAt,
+                mainImageUrl = mainImageUrl,
+                tags = tags,
+                title = title,
+                short = short,
+            )
 
-        is ContentItem.Unknown -> UnknownPreview(
-            id = id,
-            updatedAt = updatedAt,
-            mainImageUrl = mainImageUrl,
-            tags = tags,
-            rawType = type.toString()
-        )
+        is ContentItem.Unknown ->
+            UnknownPreview(
+                id = id,
+                updatedAt = updatedAt,
+                mainImageUrl = mainImageUrl,
+                tags = tags,
+                rawType = type.toString(),
+            )
     }
 }

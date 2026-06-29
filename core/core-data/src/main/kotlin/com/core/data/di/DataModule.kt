@@ -30,11 +30,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
-
     @Singleton
     @Provides
     fun provideContentItemRepository(
@@ -42,19 +40,20 @@ object DataModule {
         contentTagsDao: ContentTagsDao,
         updatesMetaDao: UpdatesMetaDao,
         networkDataSource: NetworkDataSource,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): ContentItemRepository {
         return ContentItemRepositoryImpl(
             contentDao = contentDao,
             contentTagsDao = contentTagsDao,
             updatesMetaDao = updatesMetaDao,
             networkDataSource = networkDataSource,
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
         )
     }
 
     @Singleton
     @Provides
+    @Suppress("LongParameterList")
     fun provideRecommender(
         userProfileRepository: UserProfileRepository,
         contentInteractionStatsDao: ContentInteractionStatsDao,
@@ -63,7 +62,7 @@ object DataModule {
         recommendationDao: RecommendationDao,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher,
-        @ApplicationScope applicationScope: CoroutineScope
+        @ApplicationScope applicationScope: CoroutineScope,
     ): Recommender {
         return RecommenderImpl(
             userProfileRepository = userProfileRepository,
@@ -77,7 +76,7 @@ object DataModule {
             topK = 10,
             coldK = 4,
             mmrK = 5,
-            lambda = 0.5f
+            lambda = 0.5f,
         )
     }
 
@@ -87,16 +86,15 @@ object DataModule {
         embeddingDao: ArticleEmbeddingDao,
         contentInteractionStatsDao: ContentInteractionStatsDao,
         userProfileDao: UserProfileDao,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): UserProfileRepository {
         return UserProfileRepositoryImpl(
             embeddingDao = embeddingDao,
             contentInteractionStatsDao = contentInteractionStatsDao,
             userProfileDao = userProfileDao,
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
         )
     }
-
 
     @Singleton
     @Provides
@@ -105,29 +103,26 @@ object DataModule {
         userProfileRepository: UserProfileRepository,
         @ApplicationScope applicationScope: CoroutineScope,
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): AnalyticsService {
         return AnalyticsServiceImpl(
             eventLogDao = eventLogDao,
             userProfileRepository = userProfileRepository,
             applicationScope = applicationScope,
             defaultDispatcher = defaultDispatcher,
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
         )
     }
-
 
     @Singleton
     @Provides
     fun provideRecommendationRepository(
         recommendationDao: RecommendationDao,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): RecommendationRepository {
         return RecommendationRepositoryImpl(
             recommendationDao = recommendationDao,
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
         )
     }
-
-
 }

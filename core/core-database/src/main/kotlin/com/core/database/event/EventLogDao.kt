@@ -1,7 +1,6 @@
 package com.core.database.event
 
 import androidx.room.Dao
-
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface EventLogDao {
-
     /**
      * Inserts a single event into the database.
      * If a conflict occurs (duplicate), the event is ignored.
@@ -74,6 +72,8 @@ interface EventLogDao {
      * @return The count of matching events as an integer.
      */
     @Query("SELECT COUNT(*) FROM event_log WHERE contentId = :contentId AND eventType = :eventType")
-    suspend fun countEventsForContent(contentId: String, eventType: EventType): Int
+    suspend fun countEventsForContent(
+        contentId: String,
+        eventType: EventType,
+    ): Int
 }
-

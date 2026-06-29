@@ -1,6 +1,5 @@
 package com.core.database.embeding
 
-
 /**
  * Represents an article embedding with its unique ID and associated vector.
  *
@@ -11,7 +10,7 @@ package com.core.database.embeding
  */
 data class ArticleEmbedding(
     val articleId: String,
-    val unitEmbedding: FloatArray
+    val unitEmbedding: FloatArray,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

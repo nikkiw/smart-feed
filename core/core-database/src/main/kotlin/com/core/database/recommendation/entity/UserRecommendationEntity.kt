@@ -24,11 +24,11 @@ import com.core.database.content.entity.ContentEntity
             parentColumns = ["id"],
             childColumns = ["recommendedContentId"],
             onDelete = ForeignKey.Companion.CASCADE,
-            onUpdate = ForeignKey.Companion.CASCADE
-        )
-    ]
+            onUpdate = ForeignKey.Companion.CASCADE,
+        ),
+    ],
 )
 data class UserRecommendationEntity(
     @PrimaryKey val recommendedContentId: String,
-    val score: Float
+    val score: Float,
 )

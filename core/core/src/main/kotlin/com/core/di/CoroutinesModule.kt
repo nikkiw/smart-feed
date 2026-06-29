@@ -13,7 +13,6 @@ import kotlinx.coroutines.SupervisorJob
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-
 @Retention(AnnotationRetention.RUNTIME)
 @Qualifier
 annotation class MainDispatcher
@@ -57,7 +56,6 @@ object CoroutinesModule {
     @DefaultDispatcher
     fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
-
     @Singleton
     @AppCoroutineExceptionHandler
     @Provides
@@ -66,7 +64,7 @@ object CoroutinesModule {
             Log.e(
                 "AppCoroutinesModule",
                 "coroutineExceptionHandler error: ${exception.localizedMessage}",
-                exception
+                exception,
             )
         }
     }
@@ -76,9 +74,8 @@ object CoroutinesModule {
     @Provides
     fun providesCoroutineScope(
         @DefaultDispatcher dispatcher: CoroutineDispatcher,
-        @AppCoroutineExceptionHandler coroutineExceptionHandler: CoroutineExceptionHandler
+        @AppCoroutineExceptionHandler coroutineExceptionHandler: CoroutineExceptionHandler,
     ): CoroutineScope {
         return CoroutineScope(SupervisorJob() + dispatcher + coroutineExceptionHandler)
     }
-
 }

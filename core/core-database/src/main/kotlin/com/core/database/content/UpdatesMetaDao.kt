@@ -13,7 +13,6 @@ import com.core.database.content.entity.UpdatesMetaEntity
  */
 @Dao
 interface UpdatesMetaDao {
-
     /**
      * Retrieves the current update metadata.
      * Usually contains the timestamp of the last successful sync.
@@ -31,7 +30,6 @@ interface UpdatesMetaDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveMeta(meta: UpdatesMetaEntity)
-
 
     /**
      * Retrieves all records from the updates_meta table.

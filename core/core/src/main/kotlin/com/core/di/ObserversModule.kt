@@ -21,17 +21,16 @@ annotation class ApplicationLifecycleObserver
 @Module
 @InstallIn(SingletonComponent::class)
 object ObserversModule {
-
     @Provides
     @Singleton
     @ApplicationLifecycleObserver
     fun provideAppLifecycleObserver(
         @ApplicationScope applicationScope: CoroutineScope,
-        @MainDispatcher mainDispatcher: CoroutineDispatcher
+        @MainDispatcher mainDispatcher: CoroutineDispatcher,
     ): AppLifecycleObserver {
         return AppLifecycleObserver(
             applicationScope,
-            mainDispatcher
+            mainDispatcher,
         )
     }
 
@@ -39,7 +38,7 @@ object ObserversModule {
     @Singleton
     fun provideConnectivityRepository(
         @ApplicationContext context: Context,
-        @ApplicationLifecycleObserver appLifecycleObserver: AppLifecycleObserver
+        @ApplicationLifecycleObserver appLifecycleObserver: AppLifecycleObserver,
     ): ConnectivityRepository {
         return ConnectivityRepositoryImpl(context).also {
             appLifecycleObserver.addObserver(it)

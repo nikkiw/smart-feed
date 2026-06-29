@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
-
 /**
  * Data Access Object (DAO) for accessing content tag data.
  *
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface ContentTagsDao {
-
     /**
      * Returns a stream of all unique tag names found in the `content_tags` table.
      *

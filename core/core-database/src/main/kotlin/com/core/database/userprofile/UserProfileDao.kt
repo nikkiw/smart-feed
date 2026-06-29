@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface UserProfileDao {
-
     /**
      * Retrieves the user profile for the given [id] as a [Flow].
      * Emits updates whenever the profile changes.

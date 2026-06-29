@@ -7,7 +7,6 @@ package com.core.domain.service
  * e.g. based on new content, user interactions, or changes in embeddings.
  */
 interface Recommender {
-
     /**
      * Updates personalized recommendations for the current user.
      *

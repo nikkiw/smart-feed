@@ -11,24 +11,28 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 @HiltWorker
-class ContentFetchWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val contentItemRepository: ContentItemRepository,
-    private val recommender: Recommender
-) : CoroutineWorker(appContext, workerParams) {
-    companion object {
-        const val KEY_ERROR_MESSAGE = "key_error_message"
-    }
+class ContentFetchWorker
+    @AssistedInject
+    constructor(
+        @Assisted appContext: Context,
+        @Assisted workerParams: WorkerParameters,
+        private val contentItemRepository: ContentItemRepository,
+        private val recommender: Recommender,
+    ) : CoroutineWorker(appContext, workerParams) {
+        companion object {
+            const val KEY_ERROR_MESSAGE = "key_error_message"
+        }
 
-    override suspend fun doWork(): Result = try {
-        contentItemRepository.syncContent()
-            .getOrThrow()
-        recommender.updateRecommendationsForUser()
-        recommender.updateRecommendationsForArticles()
-        Result.success()
-    } catch (e: Exception) {
-        val data = workDataOf(KEY_ERROR_MESSAGE to (e.message ?: "Unknown error"))
-        Result.failure(data)
+        @Suppress("TooGenericExceptionCaught")
+        override suspend fun doWork(): Result =
+            try {
+                contentItemRepository.syncContent()
+                    .getOrThrow()
+                recommender.updateRecommendationsForUser()
+                recommender.updateRecommendationsForArticles()
+                Result.success()
+            } catch (e: Exception) {
+                val data = workDataOf(KEY_ERROR_MESSAGE to (e.message ?: "Unknown error"))
+                Result.failure(data)
+            }
     }
-}

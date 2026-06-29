@@ -1,9 +1,8 @@
 package com.core.domain.repository
 
-
 import androidx.paging.PagingData
-import com.core.domain.model.ContentItem
 import com.core.domain.model.ContentId
+import com.core.domain.model.ContentItem
 import com.core.domain.model.ContentItemPreview
 import com.core.domain.model.ContentType
 import com.core.domain.model.Tags
@@ -31,7 +30,7 @@ enum class ContentItemsSortedType {
     /**
      * Sort content items by date, oldest first.
      */
-    ByDateOldestFirst
+    ByDateOldestFirst,
 }
 
 /**
@@ -44,14 +43,13 @@ enum class ContentItemsSortedType {
 data class Query(
     val types: List<ContentType>,
     val tags: Tags,
-    val sortedBy: ContentItemsSortedType
+    val sortedBy: ContentItemsSortedType,
 )
 
 /**
  * Repository interface responsible for fetching and persisting content updates.
  */
 interface ContentItemRepository {
-
     /**
      * Returns a Flow of paginated content items based on the provided query.
      *

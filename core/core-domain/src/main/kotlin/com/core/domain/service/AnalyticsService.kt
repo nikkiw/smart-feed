@@ -9,7 +9,6 @@ import com.core.domain.model.ContentId
  * to measure how users engage with content items.
  */
 interface AnalyticsService {
-
     /**
      * Tracks that a user has read a specific content item.
      *
@@ -21,6 +20,6 @@ interface AnalyticsService {
     fun trackEventReadContent(
         contentId: ContentId,
         readingTimeMillis: Long,
-        readPercentage: Float
+        readPercentage: Float,
     )
 }

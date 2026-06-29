@@ -24,9 +24,8 @@ data class ImageOptions(
     val isCenterInside: Boolean = false,
     val isCircular: Boolean = false,
     val isFitCenter: Boolean = false,
-
     val withFill: Boolean = false,
-    val overrideSize: Pair<Int, Int>? = null
+    val overrideSize: Pair<Int, Int>? = null,
 )
 
 /**
@@ -45,7 +44,7 @@ interface ImageLoader {
         context: Context,
         imageSource: ImageSource,
         imageView: ImageView,
-        options: ImageOptions = ImageOptions()
+        options: ImageOptions = ImageOptions(),
     )
 
     /**
@@ -58,6 +57,6 @@ interface ImageLoader {
     fun preload(
         context: Context,
         imageSource: ImageSource,
-        options: ImageOptions = ImageOptions()
+        options: ImageOptions = ImageOptions(),
     )
 }

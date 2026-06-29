@@ -9,7 +9,6 @@ import androidx.room.Transaction
  */
 @Dao
 interface ArticleEmbeddingDao {
-
     /**
      * Retrieves all article embeddings from the database.
      *

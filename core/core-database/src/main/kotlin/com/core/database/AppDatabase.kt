@@ -8,22 +8,22 @@ import androidx.room.TypeConverters
 import androidx.room.execSQL
 import androidx.room.useWriterConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import com.core.database.content.entity.ArticleAttributesEntity
 import com.core.database.content.ContentDao
 import com.core.database.content.ContentTagsDao
+import com.core.database.content.UpdatesMetaDao
+import com.core.database.content.entity.ArticleAttributesEntity
 import com.core.database.content.entity.ContentEntity
 import com.core.database.content.entity.ContentTag
 import com.core.database.content.entity.Converter
-import com.core.database.content.UpdatesMetaDao
 import com.core.database.content.entity.UpdatesMetaEntity
 import com.core.database.embeding.ArticleEmbeddingDao
-import com.core.database.event.entity.ContentInteractionStats
 import com.core.database.event.ContentInteractionStatsDao
-import com.core.database.event.entity.EventLog
 import com.core.database.event.EventLogDao
+import com.core.database.event.entity.ContentInteractionStats
+import com.core.database.event.entity.EventLog
 import com.core.database.event.entity.EventType
-import com.core.database.recommendation.entity.ContentRecommendationEntity
 import com.core.database.recommendation.RecommendationDao
+import com.core.database.recommendation.entity.ContentRecommendationEntity
 import com.core.database.recommendation.entity.UserRecommendationEntity
 import com.core.database.userprofile.UserProfileDao
 import com.core.database.userprofile.UserProfileEntity
@@ -60,24 +60,29 @@ import kotlinx.coroutines.runBlocking
         ContentInteractionStats::class,
         UserProfileEntity::class,
         ContentRecommendationEntity::class,
-        UserRecommendationEntity::class
+        UserRecommendationEntity::class,
     ],
-    version = 1
+    version = 1,
 )
 @TypeConverters(Converter::class)
 abstract class AppDatabase : RoomDatabase() {
-
     abstract fun contentDao(): ContentDao
+
     abstract fun updatesMetaDao(): UpdatesMetaDao
+
     abstract fun contentTagsDao(): ContentTagsDao
+
     abstract fun eventLogDao(): EventLogDao
+
     abstract fun articleInteractionStatsDao(): ContentInteractionStatsDao
+
     abstract fun articleEmbeddingDao(): ArticleEmbeddingDao
+
     abstract fun userProfileDao(): UserProfileDao
+
     abstract fun recommendationDao(): RecommendationDao
 
     companion object {
-
         /**
          * Creates necessary SQL triggers on the database.
          *
@@ -100,7 +105,7 @@ abstract class AppDatabase : RoomDatabase() {
                         SELECT DISTINCT NEW.id, json_each.value
                         FROM json_each(NEW.tags);
                     END;
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
 
                 // Trigger inserts tags after new content row inserted
@@ -113,7 +118,7 @@ abstract class AppDatabase : RoomDatabase() {
                         SELECT DISTINCT NEW.id, json_each.value
                         FROM json_each(NEW.tags);
                     END;
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
 
                 // Trigger updates content interaction stats after READ event
@@ -135,7 +140,7 @@ abstract class AppDatabase : RoomDatabase() {
                             avgReadingTime = ((avgReadingTime * readCount) + COALESCE(NEW.readingTimeMillis, 0)) / (readCount + 1),
                             avgReadPercentage = ((avgReadPercentage * readCount) + COALESCE(NEW.readPercentage, 0.0)) / (readCount + 1);
                     END;
-                    """
+                    """,
                 )
             }
         }
@@ -149,11 +154,12 @@ abstract class AppDatabase : RoomDatabase() {
          * @return A test instance of [AppDatabase].
          */
         fun getTestDatabase(context: Context): AppDatabase {
-            val db = Room
-                .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-                .setDriver(BundledSQLiteDriver())
-                .allowMainThreadQueries()
-                .build()
+            val db =
+                Room
+                    .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                    .setDriver(BundledSQLiteDriver())
+                    .allowMainThreadQueries()
+                    .build()
 
             runBlocking {
                 createTrigger(db)

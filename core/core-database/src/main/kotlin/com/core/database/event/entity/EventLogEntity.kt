@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
  * Types of user interaction events related to articles.
  */
 enum class EventType {
-    IMPRESSION,     // Article impression (view)
-    CLICK,          // Article clicked
-    READ,           // Started reading
+    IMPRESSION, // Article impression (view)
+    CLICK, // Article clicked
+    READ, // Started reading
 //    READ_COMPLETE,  // Finished reading
 //    BOOKMARK,       // Added to bookmarks/favorites
 //    SHARE,          // Shared article
@@ -33,7 +33,5 @@ data class EventLog(
     val eventType: EventType,
     val timestamp: Long = System.currentTimeMillis(),
     val readingTimeMillis: Long? = null,
-    val readPercentage: Float? = null
+    val readPercentage: Float? = null,
 )
-
-

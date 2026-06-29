@@ -3,7 +3,6 @@ package com.core.domain.usecase.content
 import com.core.domain.model.ContentId
 import com.core.domain.model.ContentItem
 
-
 /**
  * Use case interface for retrieving a specific content item by its ID.
  *
@@ -21,7 +20,6 @@ import com.core.domain.model.ContentItem
  * ```
  */
 interface GetContentItemUseCase {
-
     /**
      * Retrieves the content item with the given ID.
      *

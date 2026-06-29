@@ -26,15 +26,15 @@ import androidx.room.Index
             entity = ContentEntity::class,
             parentColumns = ["id"],
             childColumns = ["contentId"],
-            onDelete = ForeignKey.CASCADE
-        )
+            onDelete = ForeignKey.CASCADE,
+        ),
     ],
     indices = [
         Index("contentId"),
-        Index("tagName")
-    ]
+        Index("tagName"),
+    ],
 )
 data class ContentTag(
     val contentId: String,
-    val tagName: String
+    val tagName: String,
 )

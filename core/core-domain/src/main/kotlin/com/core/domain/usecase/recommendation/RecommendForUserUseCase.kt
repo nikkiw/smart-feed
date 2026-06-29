@@ -3,7 +3,6 @@ package com.core.domain.usecase.recommendation
 import com.core.domain.model.ContentItemPreview
 import kotlinx.coroutines.flow.Flow
 
-
 /**
  * Use case interface for retrieving personalized content recommendations for the current user.
  *
@@ -18,7 +17,6 @@ import kotlinx.coroutines.flow.Flow
  * ```
  */
 interface RecommendForUserUseCase {
-
     /**
      * Retrieves a [Flow] of recommended content items for the current user.
      *
@@ -28,5 +26,3 @@ interface RecommendForUserUseCase {
      */
     operator fun invoke(): Flow<List<ContentItemPreview>>
 }
-
-

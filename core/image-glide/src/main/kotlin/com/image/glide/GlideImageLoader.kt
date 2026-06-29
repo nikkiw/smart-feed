@@ -13,7 +13,6 @@ import com.core.image.ImageSource
  * into [ImageView]s using the Glide library.
  */
 class GlideImageLoader : ImageLoader {
-
     /**
      * Loads an image into the given [ImageView], applying the specified [ImageOptions].
      *
@@ -32,31 +31,32 @@ class GlideImageLoader : ImageLoader {
         context: Context,
         imageSource: ImageSource,
         imageView: ImageView,
-        options: ImageOptions
+        options: ImageOptions,
     ) {
         // Build a RequestOptions object from ImageOptions
         val requestOptions = buildRequestOptions(options)
 
         // Determine the model to load based on ImageSource
-        val glideRequest = when (imageSource) {
-            is ImageSource.Url -> Glide.with(context).load(imageSource.url)
-            is ImageSource.Resource -> Glide.with(context).load(imageSource.resId)
-            is ImageSource.FilePath -> Glide.with(context).load(imageSource.path)
-            is ImageSource.UriSource -> Glide.with(context).load(imageSource.uri)
-            ImageSource.Empty -> {
-                // If source is empty, just load placeholder or clear the view
-                if (options.placeholder != 0) {
-                    Glide.with(context)
-                        .load(options.placeholder)
-                        .apply(requestOptions)
-                        .into(imageView)
-                } else {
-                    // Clear the ImageView if no placeholder is provided
-                    Glide.with(context).clear(imageView)
+        val glideRequest =
+            when (imageSource) {
+                is ImageSource.Url -> Glide.with(context).load(imageSource.url)
+                is ImageSource.Resource -> Glide.with(context).load(imageSource.resId)
+                is ImageSource.FilePath -> Glide.with(context).load(imageSource.path)
+                is ImageSource.UriSource -> Glide.with(context).load(imageSource.uri)
+                ImageSource.Empty -> {
+                    // If source is empty, just load placeholder or clear the view
+                    if (options.placeholder != 0) {
+                        Glide.with(context)
+                            .load(options.placeholder)
+                            .apply(requestOptions)
+                            .into(imageView)
+                    } else {
+                        // Clear the ImageView if no placeholder is provided
+                        Glide.with(context).clear(imageView)
+                    }
+                    return
                 }
-                return
             }
-        }
 
         // Apply RequestOptions and into(imageView)
         glideRequest
@@ -77,7 +77,7 @@ class GlideImageLoader : ImageLoader {
     override fun preload(
         context: Context,
         imageSource: ImageSource,
-        options: ImageOptions
+        options: ImageOptions,
     ) {
         val requestOptions = buildRequestOptions(options)
 
@@ -115,7 +115,6 @@ class GlideImageLoader : ImageLoader {
             }
         }
     }
-
 
     /**
      * Builds Glide [RequestOptions] based on our custom [ImageOptions].

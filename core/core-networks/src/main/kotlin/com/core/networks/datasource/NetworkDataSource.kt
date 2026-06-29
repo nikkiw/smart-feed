@@ -10,7 +10,6 @@ import com.core.networks.models.UpdatesResponse
  * `yyyy-MM-dd'T'HH:mm:ss'Z'` (e.g., `2024-06-01T09:15:00Z`).
  */
 interface NetworkDataSource {
-
     /**
      * Retrieves a batch of updates from the server starting from a given timestamp.
      *
@@ -21,7 +20,7 @@ interface NetworkDataSource {
      */
     suspend fun getUpdates(
         since: String,
-        limit: Int = 100
+        limit: Int = 100,
     ): Result<UpdatesResponse>
 
     /**
@@ -31,7 +30,10 @@ interface NetworkDataSource {
      * @param id   The unique identifier of the content item.
      * @return A [Result] wrapping the [ContentUpdate] on success or an error on failure.
      */
-    suspend fun getContentById(type: String, id: String): Result<ContentUpdate>
+    suspend fun getContentById(
+        type: String,
+        id: String,
+    ): Result<ContentUpdate>
 
     /**
      * Returns the currently stored access token used for authenticated requests.

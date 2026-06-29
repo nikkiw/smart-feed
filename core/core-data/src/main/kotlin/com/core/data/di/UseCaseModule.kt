@@ -21,43 +21,33 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class UseCaseModule {
-
     @Singleton
     @Binds
-    abstract fun bindSyncContentUseCase(
-        syncContentUseCaseImpl: SyncContentUseCaseImpl
-    ): SyncContentUseCase
-
+    abstract fun bindSyncContentUseCase(syncContentUseCaseImpl: SyncContentUseCaseImpl): SyncContentUseCase
 
     @Singleton
     @Binds
     abstract fun bindContentFetchScheduleUseCase(
-        contentFetchScheduleUseCaseImpl: ContentFetchScheduleUseCaseImpl
+        contentFetchScheduleUseCaseImpl: ContentFetchScheduleUseCaseImpl,
     ): ContentFetchScheduleUseCase
 
+    @Singleton
+    @Binds
+    abstract fun bindGetContentItemUseCase(getContentItemUseCaseImpl: GetContentItemUseCaseImpl): GetContentItemUseCase
 
     @Singleton
     @Binds
-    abstract fun bindGetContentItemUseCase(
-        getContentItemUseCaseImpl: GetContentItemUseCaseImpl
-    ): GetContentItemUseCase
-
-
-    @Singleton
-    @Binds
-    abstract fun bindGetContentUseCase(
-        getContentUseCaseImpl: GetContentUseCaseImpl
-    ): GetContentUseCase
+    abstract fun bindGetContentUseCase(getContentUseCaseImpl: GetContentUseCaseImpl): GetContentUseCase
 
     @Singleton
     @Binds
     abstract fun bindRecommendForArticleUseCase(
-        recommendForArticleUseCaseImpl: RecommendForArticleUseCaseImpl
+        recommendForArticleUseCaseImpl: RecommendForArticleUseCaseImpl,
     ): RecommendForArticleUseCase
 
     @Singleton
     @Binds
     abstract fun bindRecommendForUserUseCase(
-        recommendForUserUseCaseImpl: RecommendForUserUseCaseImpl
+        recommendForUserUseCaseImpl: RecommendForUserUseCaseImpl,
     ): RecommendForUserUseCase
 }

@@ -25,10 +25,8 @@ import javax.inject.Inject
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-
 @HiltAndroidTest
 class AnalyticsServiceImplTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -54,7 +52,6 @@ class AnalyticsServiceImplTest {
         context = ApplicationProvider.getApplicationContext()
     }
 
-
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
     fun tearDown() {
@@ -63,79 +60,77 @@ class AnalyticsServiceImplTest {
     }
 
     @Test
-    fun returnsNull_whenNoReadEventsTracked() = runTest(testDispatcher) {
-        // act
-        val id = "id1"
-        val result = contentInteractionStatsDao.getStatsForContent(id)
+    fun returnsNull_whenNoReadEventsTracked() =
+        runTest(testDispatcher) {
+            // act
+            val id = "id1"
+            val result = contentInteractionStatsDao.getStatsForContent(id)
 
-        // assert
-        assertNull(result)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun returnsCorrectStats_afterSingleReadEventTracked() = runTest {
-        // act
-        val id = "id1"
-        analyticsService.trackEventReadContent(
-            contentId = ContentId(id),
-            readingTimeMillis = 30000L,
-            readPercentage = 0.9f
-        )
-        advanceUntilIdle()
-
-
-        val result = contentInteractionStatsDao.getStatsForContent(id)
-        // assert
-        assertNotNull(result)
-
-        assertThat(result.contentId).isEqualTo(id)
-        assertThat(result.readCount).isEqualTo(1)
-        assertThat(result.avgReadingTime).isWithin(1e-6).of(30000.0)
-        assertThat(result.avgReadPercentage).isWithin(1e-6).of(0.9)
-    }
+            // assert
+            assertNull(result)
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun returnsCorrectAggregatedStats_afterMultipleReadEvents() = runTest(testDispatcher) {
-        val id = "id1"
-        analyticsService.trackEventReadContent(
-            contentId = ContentId(id),
-            readingTimeMillis = 30000L,
-            readPercentage = 0.9f
-        )
-        advanceUntilIdle()
+    fun returnsCorrectStats_afterSingleReadEventTracked() =
+        runTest {
+            // act
+            val id = "id1"
+            analyticsService.trackEventReadContent(
+                contentId = ContentId(id),
+                readingTimeMillis = 30000L,
+                readPercentage = 0.9f,
+            )
+            advanceUntilIdle()
 
-        // Дополнительная проверка после первого события
-        // Проверим, что событие сохранилось в EventLog
-        val events = db.eventLogDao().getEventsForContent(id).first() // или другой подходящий метод
-        assertThat(events).hasSize(1)
+            val result = contentInteractionStatsDao.getStatsForContent(id)
+            // assert
+            assertNotNull(result)
 
-        val intermediateResult = contentInteractionStatsDao.getStatsForContent(id)
-        assertNotNull(intermediateResult)
-        assertThat(intermediateResult.readCount).isEqualTo(1)
+            assertThat(result.contentId).isEqualTo(id)
+            assertThat(result.readCount).isEqualTo(1)
+            assertThat(result.avgReadingTime).isWithin(1e-6).of(30000.0)
+            assertThat(result.avgReadPercentage).isWithin(1e-6).of(0.9)
+        }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun returnsCorrectAggregatedStats_afterMultipleReadEvents() =
+        runTest(testDispatcher) {
+            val id = "id1"
+            analyticsService.trackEventReadContent(
+                contentId = ContentId(id),
+                readingTimeMillis = 30000L,
+                readPercentage = 0.9f,
+            )
+            advanceUntilIdle()
 
-        analyticsService.trackEventReadContent(
-            contentId = ContentId(id),
-            readingTimeMillis = 10000L,
-            readPercentage = 0.7f
-        )
-        advanceUntilIdle()
+            // Дополнительная проверка после первого события
+            // Проверим, что событие сохранилось в EventLog
+            val events = db.eventLogDao().getEventsForContent(id).first() // или другой подходящий метод
+            assertThat(events).hasSize(1)
 
-        val eventsTwo =
-            db.eventLogDao().getEventsForContent(id).first() // или другой подходящий метод
-        assertThat(eventsTwo).hasSize(2)
+            val intermediateResult = contentInteractionStatsDao.getStatsForContent(id)
+            assertNotNull(intermediateResult)
+            assertThat(intermediateResult.readCount).isEqualTo(1)
 
+            analyticsService.trackEventReadContent(
+                contentId = ContentId(id),
+                readingTimeMillis = 10000L,
+                readPercentage = 0.7f,
+            )
+            advanceUntilIdle()
 
-        val result = contentInteractionStatsDao.getStatsForContent(id)
+            val eventsTwo =
+                db.eventLogDao().getEventsForContent(id).first() // или другой подходящий метод
+            assertThat(eventsTwo).hasSize(2)
 
-        assertNotNull(result)
-        assertThat(result.contentId).isEqualTo(id)
-        assertThat(result.readCount).isEqualTo(2)
-        assertThat(result.avgReadingTime).isWithin(1e-6).of(20000.0)
-        assertThat(result.avgReadPercentage).isWithin(1e-6).of(0.8)
-    }
+            val result = contentInteractionStatsDao.getStatsForContent(id)
 
-
+            assertNotNull(result)
+            assertThat(result.contentId).isEqualTo(id)
+            assertThat(result.readCount).isEqualTo(2)
+            assertThat(result.avgReadingTime).isWithin(1e-6).of(20000.0)
+            assertThat(result.avgReadPercentage).isWithin(1e-6).of(0.8)
+        }
 }

@@ -8,7 +8,6 @@ import com.core.domain.usecase.content.GetContentUseCase
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-
 /**
  * Default implementation of [GetContentUseCase].
  *
@@ -33,17 +32,18 @@ import javax.inject.Inject
  * @see GetContentUseCase for interface definition
  * @see ContentItemRepository for data source details
  */
-class GetContentUseCaseImpl @Inject constructor(
-    private val contentItemRepository: ContentItemRepository
-) : GetContentUseCase {
-
-    /**
-     * Retrieves a flow of paginated content previews based on the provided query.
-     *
-     * @param query Filtering and sorting criteria for the content.
-     * @return A [Flow] of [PagingData] containing [ContentItemPreview] objects.
-     */
-    override operator fun invoke(query: Query): Flow<PagingData<ContentItemPreview>> {
-        return contentItemRepository.flowContent(query)
+class GetContentUseCaseImpl
+    @Inject
+    constructor(
+        private val contentItemRepository: ContentItemRepository,
+    ) : GetContentUseCase {
+        /**
+         * Retrieves a flow of paginated content previews based on the provided query.
+         *
+         * @param query Filtering and sorting criteria for the content.
+         * @return A [Flow] of [PagingData] containing [ContentItemPreview] objects.
+         */
+        override operator fun invoke(query: Query): Flow<PagingData<ContentItemPreview>> {
+            return contentItemRepository.flowContent(query)
+        }
     }
-}

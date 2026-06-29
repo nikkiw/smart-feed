@@ -9,12 +9,12 @@ import com.core.domain.service.Recommender
 
 class TestWorkerFactory(
     private val repository: ContentItemRepository,
-    private val recommender: Recommender
+    private val recommender: Recommender,
 ) : WorkerFactory() {
     override fun createWorker(
         appContext: Context,
         workerClassName: String,
-        workerParameters: WorkerParameters
+        workerParameters: WorkerParameters,
     ): ListenableWorker? {
         return when (workerClassName) {
             ContentFetchWorker::class.java.name ->
