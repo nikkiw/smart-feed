@@ -93,6 +93,7 @@ concurrent-futures-ktx = { group = "androidx.concurrent", name = "concurrent-fut
 
 # Lifecycle and Architecture
 androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "androidxLifecycle" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
 
 # UI
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }

@@ -1,18 +1,20 @@
 package com.core.data.service
 
-import com.core.di.ApplicationScope
 import com.core.domain.repository.ContentItemRepository
 import com.core.domain.service.AppBootstrapper
 import com.core.domain.service.Recommender
 import com.core.domain.usecase.sync.ContentFetchScheduleUseCase
 import com.core.domain.usecase.sync.SyncContentUseCase
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Implementation of [AppBootstrapper] that runs startup tasks using the application scope.
+ * Implementation of [AppBootstrapper] that runs idempotent startup tasks.
+ *
+ * AppStartupCoordinator may be recreated on configuration changes. Startup stays safe because
+ * the initial sync is guarded by an empty-database check and scheduling is handled idempotently.
  */
 @Singleton
 class AppBootstrapperImpl
@@ -22,10 +24,9 @@ class AppBootstrapperImpl
         private val syncContentUseCase: SyncContentUseCase,
         private val contentFetchScheduleUseCase: ContentFetchScheduleUseCase,
         private val recommender: Recommender,
-        @ApplicationScope private val scope: CoroutineScope,
     ) : AppBootstrapper {
-        override fun bootstrap() {
-            scope.launch {
+        override suspend fun bootstrap() {
+            supervisorScope {
                 launch {
                     if (contentItemRepository.isEmpty()) {
                         syncContentUseCase()

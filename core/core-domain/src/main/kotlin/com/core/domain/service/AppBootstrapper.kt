@@ -8,5 +8,5 @@ interface AppBootstrapper {
     /**
      * Initializes and bootstraps the application startup tasks.
      */
-    fun bootstrap()
+    suspend fun bootstrap()
 }

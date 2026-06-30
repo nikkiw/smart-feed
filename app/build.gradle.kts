@@ -41,6 +41,7 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.material)
     implementation(libs.bundles.decompose.libs)
 
@@ -49,6 +50,9 @@ dependencies {
     implementation(libs.hilt.work)
 
     testImplementation(libs.junit4)
+    testImplementation(libs.kotlin.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.robolectric)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -59,13 +59,35 @@ class FeatureBoundaryKonsistTest {
     }
 
     @Test
-    fun `app depends on feed root public factory only`() {
-        sourceFilesUnder("app/src/main").assertNoImports(
-            forbiddenPrefixes = listOf("com.feature.feed.root.FeedRootComponentImpl"),
-            reason =
-                "App startup must depend on the FeedRootComponent public contract, " +
-                    "not the implementation factory.",
-        )
+    fun `main activity stays thin app shell`() {
+        val violations =
+            sourceFilesUnder("app/src/main")
+                .filter { it.relativePath.endsWith("MainActivity.kt") }
+                .flatMap { file ->
+                    file.imports.mapNotNull { import ->
+                        val reason =
+                            when {
+                                import.hasImplementationType() ->
+                                    "imports an implementation type"
+                                import.startsWith("com.core.") ->
+                                    "imports core/domain/data code directly"
+                                import.isInfrastructureImport() ->
+                                    "imports infrastructure API directly"
+                                else -> null
+                            }
+                        reason?.let { "${file.relativePath} imports $import ($it)" }
+                    }
+                }
+
+        check(violations.isEmpty()) {
+            buildString {
+                appendLine(
+                    "MainActivity must stay a thin Android shell and delegate feature, " +
+                        "startup, domain, and infrastructure work to focused collaborators.",
+                )
+                violations.forEach { appendLine("- $it") }
+            }
+        }
     }
 
     @Test
@@ -84,4 +106,12 @@ class FeatureBoundaryKonsistTest {
                         "contracts, not implementation casts.",
             )
     }
+
+    private fun String.hasImplementationType(): Boolean = substringAfterLast('.').endsWith("Impl") || contains(".impl.")
+
+    private fun String.isInfrastructureImport(): Boolean =
+        startsWith("androidx.work.") ||
+            startsWith("androidx.room.") ||
+            startsWith("retrofit2.") ||
+            startsWith("okhttp3.")
 }
