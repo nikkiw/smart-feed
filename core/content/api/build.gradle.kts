@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.core.content.api"
 }
+
+dependencies {
+    testImplementation(libs.google.truth)
+}

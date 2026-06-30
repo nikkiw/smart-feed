@@ -1,12 +1,12 @@
 package com.core.data.service
 
+import com.core.content.model.ContentId
 import com.core.database.event.EventLogDao
 import com.core.database.event.entity.EventLog
 import com.core.database.event.entity.EventType
 import com.core.di.ApplicationScope
 import com.core.di.DefaultDispatcher
 import com.core.di.IoDispatcher
-import com.core.content.model.ContentId
 import com.core.domain.repository.UserProfileRepository
 import com.core.domain.service.AnalyticsService
 import kotlinx.coroutines.CoroutineDispatcher

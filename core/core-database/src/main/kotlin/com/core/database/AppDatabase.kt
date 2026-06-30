@@ -8,14 +8,6 @@ import androidx.room.TypeConverters
 import androidx.room.execSQL
 import androidx.room.useWriterConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import com.feature.feed.local.content.ContentDao
-import com.feature.feed.local.content.ContentTagsDao
-import com.feature.feed.local.content.UpdatesMetaDao
-import com.feature.feed.local.content.entity.ArticleAttributesEntity
-import com.feature.feed.local.content.entity.ContentEntity
-import com.feature.feed.local.content.entity.ContentTag
-import com.feature.feed.local.content.entity.Converter
-import com.feature.feed.local.content.entity.UpdatesMetaEntity
 import com.core.database.embeding.ArticleEmbeddingDao
 import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.event.EventLogDao
@@ -27,6 +19,14 @@ import com.core.database.recommendation.entity.ContentRecommendationEntity
 import com.core.database.recommendation.entity.UserRecommendationEntity
 import com.core.database.userprofile.UserProfileDao
 import com.core.database.userprofile.UserProfileEntity
+import com.feature.feed.local.content.ContentDao
+import com.feature.feed.local.content.ContentTagsDao
+import com.feature.feed.local.content.UpdatesMetaDao
+import com.feature.feed.local.content.entity.ArticleAttributesEntity
+import com.feature.feed.local.content.entity.ContentEntity
+import com.feature.feed.local.content.entity.ContentTag
+import com.feature.feed.local.content.entity.Converter
+import com.feature.feed.local.content.entity.UpdatesMetaEntity
 import kotlinx.coroutines.runBlocking
 
 /**

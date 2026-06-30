@@ -1,7 +1,6 @@
 package com.core.data.di
 
 import android.content.Context
-import com.core.data.work.FakeImageLoader
 import com.core.database.AppDatabase
 import com.core.database.di.DatabaseModule
 import com.core.image.ImageLoader
@@ -28,5 +27,5 @@ object DatabaseTestModule {
 
     @Provides
     @Singleton
-    fun provideImageLoader(rec: FakeImageLoader): ImageLoader = rec
+    fun provideImageLoader(loader: CoreDataFakeImageLoader): ImageLoader = loader
 }

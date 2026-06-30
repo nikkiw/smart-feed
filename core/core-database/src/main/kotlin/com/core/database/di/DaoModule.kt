@@ -1,14 +1,14 @@
 package com.core.database.di
 
 import com.core.database.AppDatabase
-import com.feature.feed.local.content.ContentDao
-import com.feature.feed.local.content.ContentTagsDao
-import com.feature.feed.local.content.UpdatesMetaDao
 import com.core.database.embeding.ArticleEmbeddingDao
 import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.event.EventLogDao
 import com.core.database.recommendation.RecommendationDao
 import com.core.database.userprofile.UserProfileDao
+import com.feature.feed.local.content.ContentDao
+import com.feature.feed.local.content.ContentTagsDao
+import com.feature.feed.local.content.UpdatesMetaDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

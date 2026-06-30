@@ -2,16 +2,16 @@ package com.core.data.repository
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.core.data.di.CoroutinesTestModule
-import com.core.database.AppDatabase
-import com.feature.feed.local.content.entity.ArticleAttributesEntity
-import com.feature.feed.local.content.entity.ContentEntity
-import com.core.database.event.entity.EventLog
-import com.core.database.event.entity.EventType
 import com.core.content.model.ContentId
 import com.core.content.model.ContentType
+import com.core.data.di.CoroutinesTestModule
+import com.core.database.AppDatabase
+import com.core.database.event.entity.EventLog
+import com.core.database.event.entity.EventType
 import com.core.domain.repository.UserProfileRepository
 import com.core.utils.DateTimeConvertors
+import com.feature.feed.local.content.entity.ArticleAttributesEntity
+import com.feature.feed.local.content.entity.ContentEntity
 import com.google.common.truth.Truth.assertWithMessage
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

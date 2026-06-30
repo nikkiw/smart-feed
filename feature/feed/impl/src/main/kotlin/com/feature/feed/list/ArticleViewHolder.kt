@@ -8,11 +8,11 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.core.di.ImageLoaderEntryPoint
-import com.feature.feed.domain.model.ContentItemPreview
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
 import com.core.image.ImageSource
 import com.feature.feed.R
+import com.feature.feed.domain.model.ContentItemPreview
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import dagger.hilt.android.EntryPointAccessors

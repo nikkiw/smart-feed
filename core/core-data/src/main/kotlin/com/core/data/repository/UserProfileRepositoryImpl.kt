@@ -1,13 +1,13 @@
 package com.core.data.repository
 
 import androidx.annotation.VisibleForTesting
+import com.core.content.model.ContentId
+import com.core.content.model.Embeddings
 import com.core.database.embeding.ArticleEmbeddingDao
 import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.userprofile.UserProfileDao
 import com.core.database.userprofile.UserProfileEntity
 import com.core.di.IoDispatcher
-import com.core.content.model.ContentId
-import com.core.content.model.Embeddings
 import com.core.domain.repository.UserProfileRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

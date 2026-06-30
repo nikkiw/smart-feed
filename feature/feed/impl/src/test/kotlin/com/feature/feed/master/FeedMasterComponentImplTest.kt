@@ -4,13 +4,13 @@ import androidx.paging.PagingData
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.core.content.model.ContentId
-import com.feature.feed.domain.model.ContentItemPreview
 import com.core.content.model.ContentType
 import com.core.content.model.Tags
+import com.feature.feed.DecomposeTestUtils
+import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.repository.ContentItemsSortedType
 import com.feature.feed.domain.repository.Query
-import com.feature.feed.DecomposeTestUtils
 import com.feature.feed.list.FeedListComponent
 import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk

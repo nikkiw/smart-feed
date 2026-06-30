@@ -3,9 +3,6 @@ package com.feature.feed.root
 import com.arkivanov.decompose.ComponentContext
 import com.core.content.model.Content
 import com.core.content.model.ContentId
-import com.feature.feed.domain.model.ContentItem.Article
-import com.feature.feed.domain.model.ContentItemPreview
-import com.feature.feed.domain.model.ContentItemPreview.ArticlePreview
 import com.core.content.model.ImageUrl
 import com.core.content.model.ShortDescription
 import com.core.content.model.Tags
@@ -19,6 +16,9 @@ import com.feature.feed.article.ArticleItemComponent
 import com.feature.feed.bottombar.BottomBarComponent
 import com.feature.feed.bottombar.BottomBarComponentImpl
 import com.feature.feed.bottombar.model.BottomBarState
+import com.feature.feed.domain.model.ContentItem.Article
+import com.feature.feed.domain.model.ContentItemPreview
+import com.feature.feed.domain.model.ContentItemPreview.ArticlePreview
 import com.feature.feed.getBackStackSize
 import com.feature.feed.getCurrentConfig
 import com.feature.feed.recommendation.RecommendationListComponent

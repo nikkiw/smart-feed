@@ -62,6 +62,21 @@ class LayerDependencyKonsistTest {
     }
 
     @Test
+    fun `core data does not own feed implementations`() {
+        sourceFilesUnder("core/core-data/src/main").assertTextDoesNotContain(
+            forbiddenSnippets =
+                listOf(
+                    "ContentItemRepositoryImpl",
+                    "GetContentItemUseCaseImpl",
+                    "SyncContentUseCaseImpl",
+                    "ContentFetchWorker",
+                    "ContentFetchScheduler",
+                ),
+            reason = "Feed data implementations must live in feature/feed/impl.",
+        )
+    }
+
+    @Test
     fun `data layer does not depend on app or feature packages`() {
         sourceFilesUnder(
             "core/core-data/src/main",

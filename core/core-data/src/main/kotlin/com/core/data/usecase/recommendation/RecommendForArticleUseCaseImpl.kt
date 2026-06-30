@@ -39,7 +39,7 @@ class RecommendForArticleUseCaseImpl
          *
          * 1. Fetches raw recommendations via [RecommendationRepository.recommendForArticle].
          * 2. For each recommended article ID, fetches the actual content item.
-         * 3. Converts each content item into a preview using [com.feature.feed.domain.model.ContentItem.toContentItemPreview].
+         * 3. Converts each content item into a preview using [toContentItemPreview].
          *
          * @param articleId The ID of the article for which to get recommendations.
          * @return A list of [ContentItemPreview] objects representing recommended content.

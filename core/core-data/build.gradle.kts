@@ -30,29 +30,20 @@ dependencies {
     implementation(projects.feature.feed.local)
     implementation(projects.feature.recommendation.api)
 
-    implementation(libs.concurrent.futures.ktx)
-
     // Pagging
     implementation(libs.room.paging)
     implementation(libs.androidx.pagging.ktx)
 
     implementation(libs.gson)
 
-    // Worker
-    implementation(libs.work.runtime.ktx)
-    implementation(libs.hilt.work)
-    ksp(libs.hilt.compiler.androidx)
-
     // Testing dependencies
     // Unit tests
     testImplementation(libs.google.truth)
-    testImplementation(libs.androidx.work.testing)
     testImplementation(libs.androidx.test.core.ktx)
 
     // Instrumental tests
     androidTestImplementation(libs.room.testing)
     androidTestImplementation(libs.androidx.pagging.testing)
-    androidTestImplementation(libs.androidx.work.testing)
     androidTestImplementation(libs.androidx.test.core.ktx)
     androidTestImplementation(libs.google.truth)
     androidTestImplementation(projects.core.image.api)

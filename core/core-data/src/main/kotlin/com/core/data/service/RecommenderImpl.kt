@@ -1,7 +1,7 @@
 package com.core.data.service
 
-import com.core.data.embedding.EmbeddingIndex
-import com.feature.feed.local.content.ContentDao
+import com.core.content.embedding.EmbeddingIndex
+import com.core.content.model.ContentId
 import com.core.database.embeding.ArticleEmbeddingDao
 import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.recommendation.RecommendationDao
@@ -10,9 +10,9 @@ import com.core.database.recommendation.entity.UserRecommendationEntity
 import com.core.di.ApplicationScope
 import com.core.di.DefaultDispatcher
 import com.core.di.IoDispatcher
-import com.core.content.model.ContentId
-import com.feature.recommendation.domain.model.Recommendation
 import com.core.domain.repository.UserProfileRepository
+import com.feature.feed.local.content.ContentDao
+import com.feature.recommendation.domain.model.Recommendation
 import com.feature.recommendation.domain.service.Recommender
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope

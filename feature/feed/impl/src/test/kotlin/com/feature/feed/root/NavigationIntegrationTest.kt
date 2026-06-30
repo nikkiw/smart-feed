@@ -5,8 +5,6 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.push
 import com.core.content.model.Content
 import com.core.content.model.ContentId
-import com.feature.feed.domain.model.ContentItem.Article
-import com.feature.feed.domain.model.ContentItemPreview
 import com.core.content.model.ImageUrl
 import com.core.content.model.ShortDescription
 import com.core.content.model.Tags
@@ -19,6 +17,8 @@ import com.feature.feed.NavigationTestScenarios
 import com.feature.feed.article.ArticleItemComponent
 import com.feature.feed.bottombar.BottomBarComponentImpl
 import com.feature.feed.bottombar.model.BottomBarState
+import com.feature.feed.domain.model.ContentItem.Article
+import com.feature.feed.domain.model.ContentItemPreview
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify

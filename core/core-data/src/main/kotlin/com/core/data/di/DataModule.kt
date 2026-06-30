@@ -1,13 +1,9 @@
 package com.core.data.di
 
-import com.core.data.repository.ContentItemRepositoryImpl
 import com.core.data.repository.RecommendationRepositoryImpl
 import com.core.data.repository.UserProfileRepositoryImpl
 import com.core.data.service.AnalyticsServiceImpl
 import com.core.data.service.RecommenderImpl
-import com.feature.feed.local.content.ContentDao
-import com.feature.feed.local.content.ContentTagsDao
-import com.feature.feed.local.content.UpdatesMetaDao
 import com.core.database.embeding.ArticleEmbeddingDao
 import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.event.EventLogDao
@@ -16,13 +12,11 @@ import com.core.database.userprofile.UserProfileDao
 import com.core.di.ApplicationScope
 import com.core.di.DefaultDispatcher
 import com.core.di.IoDispatcher
-import com.feature.feed.domain.repository.ContentItemRepository
-import com.feature.recommendation.domain.repository.RecommendationRepository
 import com.core.domain.repository.UserProfileRepository
 import com.core.domain.service.AnalyticsService
+import com.feature.feed.local.content.ContentDao
+import com.feature.recommendation.domain.repository.RecommendationRepository
 import com.feature.recommendation.domain.service.Recommender
-import com.core.networks.datasource.NetworkDataSource
-import com.core.paging.ContentPagingRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,32 +28,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
-    @Singleton
-    @Provides
-    fun provideContentItemRepositoryImpl(
-        contentDao: ContentDao,
-        contentTagsDao: ContentTagsDao,
-        updatesMetaDao: UpdatesMetaDao,
-        networkDataSource: NetworkDataSource,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    ): ContentItemRepositoryImpl {
-        return ContentItemRepositoryImpl(
-            contentDao = contentDao,
-            contentTagsDao = contentTagsDao,
-            updatesMetaDao = updatesMetaDao,
-            networkDataSource = networkDataSource,
-            ioDispatcher = ioDispatcher,
-        )
-    }
-
-    @Singleton
-    @Provides
-    fun provideContentItemRepository(repository: ContentItemRepositoryImpl): ContentItemRepository = repository
-
-    @Singleton
-    @Provides
-    fun provideContentPagingRepository(repository: ContentItemRepositoryImpl): ContentPagingRepository = repository
-
     @Singleton
     @Provides
     @Suppress("LongParameterList")

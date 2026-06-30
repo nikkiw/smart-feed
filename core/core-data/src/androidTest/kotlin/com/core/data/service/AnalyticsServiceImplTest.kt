@@ -2,10 +2,10 @@ package com.core.data.service
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import com.core.content.model.ContentId
 import com.core.data.di.CoroutinesTestModule
 import com.core.database.AppDatabase
 import com.core.database.event.ContentInteractionStatsDao
-import com.core.content.model.ContentId
 import com.core.domain.service.AnalyticsService
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidRule

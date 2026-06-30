@@ -10,12 +10,12 @@ import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.extensions.android.child
 import com.arkivanov.decompose.extensions.android.layoutInflater
 import com.arkivanov.decompose.value.subscribe
-import com.feature.feed.domain.model.ContentItem
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
 import com.core.image.ImageSource
 import com.feature.feed.R
 import com.feature.feed.articlerecommendation.ArticleRecommendationsView
+import com.feature.feed.domain.model.ContentItem
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
