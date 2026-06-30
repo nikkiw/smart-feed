@@ -5,9 +5,9 @@ import com.core.data.repository.RecommendationRepositoryImpl
 import com.core.data.repository.UserProfileRepositoryImpl
 import com.core.data.service.AnalyticsServiceImpl
 import com.core.data.service.RecommenderImpl
-import com.core.database.content.ContentDao
-import com.core.database.content.ContentTagsDao
-import com.core.database.content.UpdatesMetaDao
+import com.feature.feed.local.content.ContentDao
+import com.feature.feed.local.content.ContentTagsDao
+import com.feature.feed.local.content.UpdatesMetaDao
 import com.core.database.embeding.ArticleEmbeddingDao
 import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.event.EventLogDao

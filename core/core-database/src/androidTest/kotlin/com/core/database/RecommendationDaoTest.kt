@@ -4,8 +4,8 @@ import android.content.Context
 import android.database.SQLException
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.core.database.content.ContentDao
-import com.core.database.content.entity.ContentEntity
+import com.feature.feed.local.content.ContentDao
+import com.feature.feed.local.content.entity.ContentEntity
 import com.core.database.recommendation.RecommendationDao
 import com.core.database.recommendation.entity.ContentRecommendationEntity
 import com.core.database.recommendation.entity.UserRecommendationEntity

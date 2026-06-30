@@ -3,8 +3,8 @@ package com.core.database
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.core.database.content.entity.ArticleAttributesEntity
-import com.core.database.content.entity.ContentEntity
+import com.feature.feed.local.content.entity.ArticleAttributesEntity
+import com.feature.feed.local.content.entity.ContentEntity
 import com.core.database.embeding.ArticleEmbedding
 import com.core.domain.model.ContentType
 import com.core.utils.DateTimeConvertors

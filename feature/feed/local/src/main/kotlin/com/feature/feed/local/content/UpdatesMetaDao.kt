@@ -1,10 +1,10 @@
-package com.core.database.content
+package com.feature.feed.local.content
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.core.database.content.entity.UpdatesMetaEntity
+import com.feature.feed.local.content.entity.UpdatesMetaEntity
 
 /**
  * DAO for managing update metadata.

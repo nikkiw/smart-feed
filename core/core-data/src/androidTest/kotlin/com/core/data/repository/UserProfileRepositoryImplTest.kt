@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.core.data.di.CoroutinesTestModule
 import com.core.database.AppDatabase
-import com.core.database.content.entity.ArticleAttributesEntity
-import com.core.database.content.entity.ContentEntity
+import com.feature.feed.local.content.entity.ArticleAttributesEntity
+import com.feature.feed.local.content.entity.ContentEntity
 import com.core.database.event.entity.EventLog
 import com.core.database.event.entity.EventType
 import com.core.domain.model.ContentId

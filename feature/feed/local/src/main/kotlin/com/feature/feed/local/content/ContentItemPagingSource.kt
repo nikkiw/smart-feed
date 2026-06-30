@@ -1,8 +1,8 @@
-package com.core.database.content
+package com.feature.feed.local.content
 
 import androidx.paging.PagingSource
 import androidx.room.RoomRawQuery
-import com.core.database.content.entity.ContentPreviewWithDetails
+import com.feature.feed.local.content.entity.ContentPreviewWithDetails
 import com.core.domain.repository.ContentItemsSortedType
 import com.core.domain.repository.Query
 

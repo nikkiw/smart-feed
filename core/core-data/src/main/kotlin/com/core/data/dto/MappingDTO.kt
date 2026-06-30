@@ -1,7 +1,7 @@
 package com.core.data.dto
 
-import com.core.database.content.entity.ContentPreviewWithDetails
-import com.core.database.content.entity.ContentWithDetails
+import com.feature.feed.local.content.entity.ContentPreviewWithDetails
+import com.feature.feed.local.content.entity.ContentWithDetails
 import com.core.database.recommendation.entity.ContentRecommendationEntity
 import com.core.database.recommendation.entity.UserRecommendationEntity
 import com.core.domain.model.Content

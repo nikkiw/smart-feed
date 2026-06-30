@@ -1,9 +1,9 @@
 package com.core.database.di
 
 import com.core.database.AppDatabase
-import com.core.database.content.ContentDao
-import com.core.database.content.ContentTagsDao
-import com.core.database.content.UpdatesMetaDao
+import com.feature.feed.local.content.ContentDao
+import com.feature.feed.local.content.ContentTagsDao
+import com.feature.feed.local.content.UpdatesMetaDao
 import com.core.database.embeding.ArticleEmbeddingDao
 import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.event.EventLogDao

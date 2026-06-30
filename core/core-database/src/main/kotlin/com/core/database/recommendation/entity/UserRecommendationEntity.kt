@@ -3,7 +3,7 @@ package com.core.database.recommendation.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.core.database.content.entity.ContentEntity
+import com.feature.feed.local.content.entity.ContentEntity
 
 /**
  * Entity representing a user's recommended content item.

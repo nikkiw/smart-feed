@@ -25,6 +25,7 @@ android {
 dependencies {
     implementation(projects.core.core)
     implementation(projects.core.coreDomain)
+    implementation(projects.feature.feed.local)
 
     // Sqlite
     implementation(libs.sqlite.ktx)

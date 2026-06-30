@@ -1,4 +1,4 @@
-package com.core.database.content
+package com.feature.feed.local.content
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
@@ -9,10 +9,10 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.RoomRawQuery
 import androidx.room.Transaction
-import com.core.database.content.entity.ArticleAttributesEntity
-import com.core.database.content.entity.ContentEntity
-import com.core.database.content.entity.ContentPreviewWithDetails
-import com.core.database.content.entity.ContentWithDetails
+import com.feature.feed.local.content.entity.ArticleAttributesEntity
+import com.feature.feed.local.content.entity.ContentEntity
+import com.feature.feed.local.content.entity.ContentPreviewWithDetails
+import com.feature.feed.local.content.entity.ContentWithDetails
 
 /**
  * Data Access Object (DAO) for accessing and manipulating content data,

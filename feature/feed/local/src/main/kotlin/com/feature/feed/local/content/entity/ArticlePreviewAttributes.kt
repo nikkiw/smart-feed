@@ -1,4 +1,4 @@
-package com.core.database.content.entity
+package com.feature.feed.local.content.entity
 
 /**
  * Lightweight view model of article data for previews.

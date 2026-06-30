@@ -1,4 +1,4 @@
-package com.core.database.content.entity
+package com.feature.feed.local.content.entity
 
 import androidx.room.Embedded
 import androidx.room.Relation

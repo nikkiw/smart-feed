@@ -25,6 +25,7 @@ dependencies {
     implementation(projects.core.coreNetworks)
     implementation(projects.core.coreDatabase)
     implementation(projects.core.coroutines)
+    implementation(projects.feature.feed.local)
 
     implementation(libs.concurrent.futures.ktx)
 
@@ -51,4 +52,5 @@ dependencies {
     androidTestImplementation(libs.androidx.work.testing)
     androidTestImplementation(libs.androidx.test.core.ktx)
     androidTestImplementation(libs.google.truth)
+    androidTestImplementation(projects.core.image.api)
 }

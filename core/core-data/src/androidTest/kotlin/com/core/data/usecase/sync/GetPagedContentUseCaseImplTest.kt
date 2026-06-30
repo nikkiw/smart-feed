@@ -6,8 +6,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.core.data.repository.ContentItemRepositoryImpl
 import com.core.database.AppDatabase
-import com.core.database.content.entity.ArticleAttributesEntity
-import com.core.database.content.entity.ContentEntity
+import com.feature.feed.local.content.entity.ArticleAttributesEntity
+import com.feature.feed.local.content.entity.ContentEntity
 import com.core.domain.model.ContentType
 import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemsSortedType

@@ -1,4 +1,4 @@
-package com.core.database.content
+package com.feature.feed.local.content
 
 import androidx.room.Dao
 import androidx.room.Query
