@@ -1,17 +1,17 @@
 package com.core.data.di
 
 import com.core.data.usecase.content.GetContentItemUseCaseImpl
-import com.core.data.usecase.content.GetContentUseCaseImpl
 import com.core.data.usecase.recommendation.RecommendForArticleUseCaseImpl
 import com.core.data.usecase.recommendation.RecommendForUserUseCaseImpl
 import com.core.data.usecase.sync.ContentFetchScheduleUseCaseImpl
 import com.core.data.usecase.sync.SyncContentUseCaseImpl
 import com.core.domain.usecase.content.GetContentItemUseCase
-import com.core.domain.usecase.content.GetContentUseCase
 import com.core.domain.usecase.recommendation.RecommendForArticleUseCase
 import com.core.domain.usecase.recommendation.RecommendForUserUseCase
 import com.core.domain.usecase.sync.ContentFetchScheduleUseCase
 import com.core.domain.usecase.sync.SyncContentUseCase
+import com.core.paging.GetPagedContentUseCase
+import com.core.paging.GetPagedContentUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -37,7 +37,9 @@ abstract class UseCaseModule {
 
     @Singleton
     @Binds
-    abstract fun bindGetContentUseCase(getContentUseCaseImpl: GetContentUseCaseImpl): GetContentUseCase
+    abstract fun bindGetPagedContentUseCase(
+        getPagedContentUseCaseImpl: GetPagedContentUseCaseImpl,
+    ): GetPagedContentUseCase
 
     @Singleton
     @Binds

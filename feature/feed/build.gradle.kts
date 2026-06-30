@@ -17,6 +17,7 @@ android {
 dependencies {
     implementation(projects.core.core)
     implementation(projects.core.coreDomain)
+    implementation(projects.core.corePaging)
 
     // Pagging
     implementation(libs.androidx.pagging.ktx)

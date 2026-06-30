@@ -9,9 +9,9 @@ import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import com.core.domain.model.ContentId
 import com.core.domain.model.ContentItemPreview
 import com.core.domain.repository.Query
-import com.core.domain.usecase.content.GetContentUseCase
 import com.core.domain.usecase.sync.SyncContentUseCase
 import com.core.observers.ConnectivityRepository
+import com.core.paging.GetPagedContentUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
  */
 class FeedListComponentImpl(
     componentContext: ComponentContext,
-    private val getContentUseCase: GetContentUseCase,
+    private val getPagedContentUseCase: GetPagedContentUseCase,
     private val syncContentUseCase: SyncContentUseCase,
     private val connectivityRepository: ConnectivityRepository,
     initialQuery: Query,
@@ -53,7 +53,7 @@ class FeedListComponentImpl(
         pagingJob =
             coroutineScope()
                 .launch {
-                    getContentUseCase(query)
+                    getPagedContentUseCase(query)
                         .cachedIn(this)
                         .collectLatest {
                             _pagingItems.value = it

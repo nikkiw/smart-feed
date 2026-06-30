@@ -17,11 +17,11 @@ import com.core.domain.model.Title
 import com.core.domain.repository.ContentItemRepository
 import com.core.domain.service.AnalyticsService
 import com.core.domain.usecase.content.GetContentItemUseCase
-import com.core.domain.usecase.content.GetContentUseCase
 import com.core.domain.usecase.recommendation.RecommendForArticleUseCase
 import com.core.domain.usecase.recommendation.RecommendForUserUseCase
 import com.core.domain.usecase.sync.SyncContentUseCase
 import com.core.observers.ConnectivityRepository
+import com.core.paging.GetPagedContentUseCase
 import com.feature.feed.bottombar.BottomBarComponent
 import com.feature.feed.bottombar.BottomBarComponentImpl
 import com.feature.feed.bottombar.model.BottomBarState
@@ -144,7 +144,7 @@ object FeedTestDataBuilder {
     fun createMockDependencies(): MockDependencies {
         return MockDependencies(
             contentItemRepository = mockk(relaxed = true),
-            getContentUseCase = mockk(relaxed = true),
+            getPagedContentUseCase = mockk(relaxed = true),
             syncContentUseCase = mockk(relaxed = true),
             getContentItemUseCase = mockk(relaxed = true),
             analyticsService = mockk(relaxed = true),
@@ -156,7 +156,7 @@ object FeedTestDataBuilder {
 
     data class MockDependencies(
         val contentItemRepository: ContentItemRepository,
-        val getContentUseCase: GetContentUseCase,
+        val getPagedContentUseCase: GetPagedContentUseCase,
         val syncContentUseCase: SyncContentUseCase,
         val getContentItemUseCase: GetContentItemUseCase,
         val analyticsService: AnalyticsService,
@@ -174,7 +174,7 @@ object FeedTestDataBuilder {
             contentItemRepository = dependencies.contentItemRepository,
             feedListComponentFactory =
                 DefaultFeedListComponentFactory(
-                    getContentUseCase = dependencies.getContentUseCase,
+                    getPagedContentUseCase = dependencies.getPagedContentUseCase,
                     syncContentUseCase = dependencies.syncContentUseCase,
                     connectivityRepository = dependencies.connectivityRepository,
                 ),

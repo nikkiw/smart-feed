@@ -5,17 +5,17 @@ import androidx.paging.testing.asSnapshot
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.core.data.repository.ContentItemRepositoryImpl
-import com.core.data.usecase.content.GetContentUseCaseImpl
 import com.core.database.AppDatabase
 import com.core.database.content.entity.ArticleAttributesEntity
 import com.core.database.content.entity.ContentEntity
 import com.core.domain.model.ContentType
 import com.core.domain.model.Tags
-import com.core.domain.repository.ContentItemRepository
 import com.core.domain.repository.ContentItemsSortedType
 import com.core.domain.repository.Query
-import com.core.domain.usecase.content.GetContentUseCase
 import com.core.networks.datasource.dev.DevStaticJsonTestNetworkDataSource
+import com.core.paging.ContentPagingRepository
+import com.core.paging.GetPagedContentUseCase
+import com.core.paging.GetPagedContentUseCaseImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -33,12 +33,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
-class GetContentUseCaseImplTest {
+class GetPagedContentUseCaseImplTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var db: AppDatabase
-    private lateinit var repository: ContentItemRepository
-    private lateinit var useCase: GetContentUseCase
+    private lateinit var repository: ContentPagingRepository
+    private lateinit var useCase: GetPagedContentUseCase
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -55,7 +55,7 @@ class GetContentUseCaseImplTest {
                 networkDataSource = DevStaticJsonTestNetworkDataSource(context),
                 ioDispatcher = testDispatcher,
             )
-        useCase = GetContentUseCaseImpl(repository)
+        useCase = GetPagedContentUseCaseImpl(repository)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

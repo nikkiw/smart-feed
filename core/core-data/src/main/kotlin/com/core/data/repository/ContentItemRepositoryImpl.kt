@@ -23,6 +23,7 @@ import com.core.domain.repository.ContentItemRepository
 import com.core.domain.repository.Query
 import com.core.networks.datasource.NetworkDataSource
 import com.core.networks.models.ContentAttributes
+import com.core.paging.ContentPagingRepository
 import com.core.runSuspendCatching
 import com.core.utils.DateTimeConvertors
 import kotlinx.coroutines.CoroutineDispatcher
@@ -43,7 +44,7 @@ class ContentItemRepositoryImpl
         private val updatesMetaDao: UpdatesMetaDao,
         private val networkDataSource: NetworkDataSource,
         @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    ) : ContentItemRepository {
+    ) : ContentItemRepository, ContentPagingRepository {
         private val mutex = Mutex()
 
         override fun flowContent(query: Query): Flow<PagingData<ContentItemPreview>> {

@@ -10,7 +10,6 @@ import com.core.database.content.entity.ArticleAttributesEntity
 import com.core.database.content.entity.ContentEntity
 import com.core.domain.model.ContentType
 import com.core.domain.model.Tags
-import com.core.domain.repository.ContentItemRepository
 import com.core.domain.repository.ContentItemsSortedType
 import com.core.domain.repository.Query
 import com.core.networks.datasource.dev.DevNetworkDataSource
@@ -31,7 +30,7 @@ class ContentItemRepositoryImplTest {
     private lateinit var networkDataSource: DevNetworkDataSource
     private lateinit var db: AppDatabase
     private lateinit var contentDao: ContentDao
-    private lateinit var repo: ContentItemRepository
+    private lateinit var repo: ContentItemRepositoryImpl
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before

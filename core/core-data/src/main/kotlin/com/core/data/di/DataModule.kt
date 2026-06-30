@@ -22,6 +22,7 @@ import com.core.domain.repository.UserProfileRepository
 import com.core.domain.service.AnalyticsService
 import com.core.domain.service.Recommender
 import com.core.networks.datasource.NetworkDataSource
+import com.core.paging.ContentPagingRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,13 +36,13 @@ import javax.inject.Singleton
 object DataModule {
     @Singleton
     @Provides
-    fun provideContentItemRepository(
+    fun provideContentItemRepositoryImpl(
         contentDao: ContentDao,
         contentTagsDao: ContentTagsDao,
         updatesMetaDao: UpdatesMetaDao,
         networkDataSource: NetworkDataSource,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    ): ContentItemRepository {
+    ): ContentItemRepositoryImpl {
         return ContentItemRepositoryImpl(
             contentDao = contentDao,
             contentTagsDao = contentTagsDao,
@@ -50,6 +51,14 @@ object DataModule {
             ioDispatcher = ioDispatcher,
         )
     }
+
+    @Singleton
+    @Provides
+    fun provideContentItemRepository(repository: ContentItemRepositoryImpl): ContentItemRepository = repository
+
+    @Singleton
+    @Provides
+    fun provideContentPagingRepository(repository: ContentItemRepositoryImpl): ContentPagingRepository = repository
 
     @Singleton
     @Provides

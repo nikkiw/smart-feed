@@ -21,6 +21,7 @@ android {
 dependencies {
     implementation(projects.core.core)
     implementation(projects.core.coreDomain)
+    implementation(projects.core.corePaging)
     implementation(projects.core.coreNetworks)
     implementation(projects.core.coreDatabase)
 

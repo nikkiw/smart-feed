@@ -2,13 +2,10 @@ package com.core.data.work
 
 import android.content.Context
 import android.widget.ImageView
-import androidx.paging.PagingData
 import com.core.domain.model.ContentId
 import com.core.domain.model.ContentItem
-import com.core.domain.model.ContentItemPreview
 import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemRepository
-import com.core.domain.repository.Query
 import com.core.domain.service.Recommender
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
@@ -46,10 +43,6 @@ class FakeContentRepo
     constructor() : ContentItemRepository {
         // переключаемое поведение
         var shouldFail = false
-
-        override fun flowContent(query: Query): Flow<PagingData<ContentItemPreview>> {
-            TODO("Not yet implemented")
-        }
 
         override suspend fun getContentById(itemId: ContentId): Result<ContentItem> {
             TODO("Not yet implemented")

@@ -15,10 +15,5 @@ android {
 }
 
 dependencies {
-
-    // Pagging
-    implementation(libs.room.paging)
-    implementation(libs.androidx.pagging.ktx)
-
     implementation(libs.gson)
 }
