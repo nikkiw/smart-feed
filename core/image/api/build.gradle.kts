@@ -4,11 +4,9 @@ plugins {
 }
 
 android {
-    namespace = "com.image.glide"
+    namespace = "com.core.image.api"
 }
 
 dependencies {
-    implementation(projects.core.image.api)
-    implementation(libs.bundles.glide)
-    ksp(libs.glide.ksp)
+    implementation(libs.hilt.android.core)
 }

@@ -36,6 +36,7 @@ dependencies {
     implementation(projects.core.coreDatabase)
     implementation(projects.core.coreData)
     implementation(projects.core.coreDomain)
+    implementation(projects.core.image.api)
     implementation(projects.core.imageGlide)
     implementation(projects.feature.feed.impl)
 
