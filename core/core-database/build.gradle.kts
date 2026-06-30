@@ -47,4 +47,5 @@ dependencies {
     // Testing dependencies
     androidTestImplementation(libs.room.testing)
     androidTestImplementation(libs.google.truth)
+    androidTestImplementation(projects.feature.feed.api)
 }

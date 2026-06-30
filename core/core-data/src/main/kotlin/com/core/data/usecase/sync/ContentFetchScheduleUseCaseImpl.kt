@@ -1,7 +1,7 @@
 package com.core.data.usecase.sync
 
 import com.core.data.work.ContentFetchScheduler
-import com.core.domain.usecase.sync.ContentFetchScheduleUseCase
+import com.feature.feed.domain.usecase.sync.ContentFetchScheduleUseCase
 import javax.inject.Inject
 
 /**

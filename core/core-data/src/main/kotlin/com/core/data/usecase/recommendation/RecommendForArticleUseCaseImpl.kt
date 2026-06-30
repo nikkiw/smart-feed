@@ -1,11 +1,11 @@
 package com.core.data.usecase.recommendation
 
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItemPreview
-import com.core.domain.model.toContentItemPreview
-import com.core.domain.repository.ContentItemRepository
-import com.core.domain.repository.RecommendationRepository
-import com.core.domain.usecase.recommendation.RecommendForArticleUseCase
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItemPreview
+import com.feature.feed.domain.model.toContentItemPreview
+import com.feature.feed.domain.repository.ContentItemRepository
+import com.feature.recommendation.domain.repository.RecommendationRepository
+import com.feature.recommendation.domain.usecase.RecommendForArticleUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
@@ -39,7 +39,7 @@ class RecommendForArticleUseCaseImpl
          *
          * 1. Fetches raw recommendations via [RecommendationRepository.recommendForArticle].
          * 2. For each recommended article ID, fetches the actual content item.
-         * 3. Converts each content item into a preview using [com.core.domain.model.ContentItem.toContentItemPreview].
+         * 3. Converts each content item into a preview using [com.feature.feed.domain.model.ContentItem.toContentItemPreview].
          *
          * @param articleId The ID of the article for which to get recommendations.
          * @return A list of [ContentItemPreview] objects representing recommended content.

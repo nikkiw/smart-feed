@@ -1,4 +1,12 @@
-package com.core.domain.model
+package com.feature.feed.domain.model
+
+import com.core.content.model.ContentId
+import com.core.content.model.ContentType
+import com.core.content.model.ImageUrl
+import com.core.content.model.ShortDescription
+import com.core.content.model.Tags
+import com.core.content.model.Title
+import com.core.content.model.UpdatedAt
 
 /**
  * Base sealed class representing a preview of a content item.

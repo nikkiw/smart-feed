@@ -8,10 +8,10 @@ import com.core.data.repository.ContentItemRepositoryImpl
 import com.core.database.AppDatabase
 import com.feature.feed.local.content.entity.ArticleAttributesEntity
 import com.feature.feed.local.content.entity.ContentEntity
-import com.core.domain.model.ContentType
-import com.core.domain.model.Tags
-import com.core.domain.repository.ContentItemsSortedType
-import com.core.domain.repository.Query
+import com.core.content.model.ContentType
+import com.core.content.model.Tags
+import com.feature.feed.domain.repository.ContentItemsSortedType
+import com.feature.feed.domain.repository.Query
 import com.core.networks.datasource.dev.DevStaticJsonTestNetworkDataSource
 import com.core.paging.ContentPagingRepository
 import com.core.paging.GetPagedContentUseCase

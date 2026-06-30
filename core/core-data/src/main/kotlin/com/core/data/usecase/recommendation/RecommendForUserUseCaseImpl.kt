@@ -1,10 +1,10 @@
 package com.core.data.usecase.recommendation
 
-import com.core.domain.model.ContentItemPreview
-import com.core.domain.model.toContentItemPreview
-import com.core.domain.repository.ContentItemRepository
-import com.core.domain.repository.RecommendationRepository
-import com.core.domain.usecase.recommendation.RecommendForUserUseCase
+import com.feature.feed.domain.model.ContentItemPreview
+import com.feature.feed.domain.model.toContentItemPreview
+import com.feature.feed.domain.repository.ContentItemRepository
+import com.feature.recommendation.domain.repository.RecommendationRepository
+import com.feature.recommendation.domain.usecase.RecommendForUserUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
@@ -38,7 +38,7 @@ class RecommendForUserUseCaseImpl
         /**
          * Retrieves a [Flow] of recommended content items for the current user.
          *
-         * 1. Fetches a flow of raw [com.core.domain.model.Recommendation] objects
+         * 1. Fetches a flow of raw [com.feature.recommendation.domain.model.Recommendation] objects
          *    via [RecommendationRepository.recommendForUser].
          * 2. For each list of recommendations, maps them to previewable content items.
          * 3. Skips any articles that cannot be fetched or converted to previews.

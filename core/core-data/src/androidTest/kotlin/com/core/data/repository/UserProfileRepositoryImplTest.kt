@@ -8,8 +8,8 @@ import com.feature.feed.local.content.entity.ArticleAttributesEntity
 import com.feature.feed.local.content.entity.ContentEntity
 import com.core.database.event.entity.EventLog
 import com.core.database.event.entity.EventType
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentType
+import com.core.content.model.ContentId
+import com.core.content.model.ContentType
 import com.core.domain.repository.UserProfileRepository
 import com.core.utils.DateTimeConvertors
 import com.google.common.truth.Truth.assertWithMessage

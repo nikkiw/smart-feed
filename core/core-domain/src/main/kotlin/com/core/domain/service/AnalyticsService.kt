@@ -1,6 +1,6 @@
 package com.core.domain.service
 
-import com.core.domain.model.ContentId
+import com.core.content.model.ContentId
 
 /**
  * Service interface for tracking user interaction events related to content.

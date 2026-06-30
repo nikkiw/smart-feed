@@ -30,6 +30,38 @@ class LayerDependencyKonsistTest {
     }
 
     @Test
+    fun `core domain does not own feed content contracts`() {
+        sourceFilesUnder("core/core-domain/src/main").assertTextDoesNotContain(
+            forbiddenSnippets =
+                listOf(
+                    "ContentItemRepository",
+                    "ContentItemPreview",
+                    "data class Query",
+                    "enum class ContentItemsSortedType",
+                    "interface GetContentItemUseCase",
+                    "interface SyncContentUseCase",
+                    "interface ContentFetchScheduleUseCase",
+                ),
+            reason = "Feed content contracts must be owned by feature/feed/api.",
+        )
+    }
+
+    @Test
+    fun `core domain does not own recommendation contracts`() {
+        sourceFilesUnder("core/core-domain/src/main").assertTextDoesNotContain(
+            forbiddenSnippets =
+                listOf(
+                    "data class Recommendation",
+                    "interface RecommendationRepository",
+                    "interface Recommender",
+                    "interface RecommendForArticleUseCase",
+                    "interface RecommendForUserUseCase",
+                ),
+            reason = "Recommendation contracts must be owned by feature/recommendation/api.",
+        )
+    }
+
+    @Test
     fun `data layer does not depend on app or feature packages`() {
         sourceFilesUnder(
             "core/core-data/src/main",

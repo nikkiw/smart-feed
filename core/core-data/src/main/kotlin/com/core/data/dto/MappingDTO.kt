@@ -4,16 +4,16 @@ import com.feature.feed.local.content.entity.ContentPreviewWithDetails
 import com.feature.feed.local.content.entity.ContentWithDetails
 import com.core.database.recommendation.entity.ContentRecommendationEntity
 import com.core.database.recommendation.entity.UserRecommendationEntity
-import com.core.domain.model.Content
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItem
-import com.core.domain.model.ContentType
-import com.core.domain.model.ImageUrl
-import com.core.domain.model.Recommendation
-import com.core.domain.model.ShortDescription
-import com.core.domain.model.Tags
-import com.core.domain.model.Title
-import com.core.domain.model.UpdatedAt
+import com.core.content.model.Content
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItem
+import com.core.content.model.ContentType
+import com.core.content.model.ImageUrl
+import com.feature.recommendation.domain.model.Recommendation
+import com.core.content.model.ShortDescription
+import com.core.content.model.Tags
+import com.core.content.model.Title
+import com.core.content.model.UpdatedAt
 
 fun ContentWithDetails.toContentItem(): ContentItem {
     val type = ContentType.Companion.fromString(contentUpdate.type)
@@ -40,11 +40,11 @@ fun ContentWithDetails.toContentItem(): ContentItem {
     }
 }
 
-fun ContentPreviewWithDetails.toContentPreview(): com.core.domain.model.ContentItemPreview {
+fun ContentPreviewWithDetails.toContentPreview(): com.feature.feed.domain.model.ContentItemPreview {
     val type = ContentType.Companion.fromString(contentUpdate.type)
     return when (type) {
         ContentType.ARTICLE ->
-            com.core.domain.model.ContentItemPreview.ArticlePreview(
+            com.feature.feed.domain.model.ContentItemPreview.ArticlePreview(
                 id = ContentId(contentUpdate.id),
                 updatedAt = UpdatedAt(contentUpdate.updatedAt),
                 mainImageUrl = ImageUrl(contentUpdate.mainImageUrl),
@@ -54,7 +54,7 @@ fun ContentPreviewWithDetails.toContentPreview(): com.core.domain.model.ContentI
             )
 
         else ->
-            com.core.domain.model.ContentItemPreview.UnknownPreview(
+            com.feature.feed.domain.model.ContentItemPreview.UnknownPreview(
                 id = ContentId(contentUpdate.id),
                 updatedAt = UpdatedAt(contentUpdate.updatedAt),
                 mainImageUrl = ImageUrl(contentUpdate.mainImageUrl),

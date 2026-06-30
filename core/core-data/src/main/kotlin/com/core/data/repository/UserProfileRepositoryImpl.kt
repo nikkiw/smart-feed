@@ -6,8 +6,8 @@ import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.userprofile.UserProfileDao
 import com.core.database.userprofile.UserProfileEntity
 import com.core.di.IoDispatcher
-import com.core.domain.model.ContentId
-import com.core.domain.model.Embeddings
+import com.core.content.model.ContentId
+import com.core.content.model.Embeddings
 import com.core.domain.repository.UserProfileRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

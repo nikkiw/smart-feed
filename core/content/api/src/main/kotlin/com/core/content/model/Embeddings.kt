@@ -1,4 +1,4 @@
-package com.core.domain.model
+package com.core.content.model
 
 /**
  * A value class that wraps a [FloatArray] representing vector embeddings of content.

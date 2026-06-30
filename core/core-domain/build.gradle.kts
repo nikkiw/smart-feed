@@ -15,5 +15,6 @@ android {
 }
 
 dependencies {
+    api(projects.core.content.api)
     implementation(libs.gson)
 }

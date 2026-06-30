@@ -1,9 +1,9 @@
 package com.feature.feed.list
 
 import com.arkivanov.decompose.ComponentContext
-import com.core.domain.model.ContentId
-import com.core.domain.repository.Query
-import com.core.domain.usecase.sync.SyncContentUseCase
+import com.core.content.model.ContentId
+import com.feature.feed.domain.repository.Query
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import com.core.observers.ConnectivityRepository
 import com.core.paging.GetPagedContentUseCase
 import javax.inject.Inject

@@ -10,12 +10,12 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushToFront
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
-import com.core.domain.model.ContentId
-import com.core.domain.repository.ContentItemRepository
+import com.core.content.model.ContentId
+import com.feature.feed.domain.repository.ContentItemRepository
 import com.core.domain.service.AnalyticsService
-import com.core.domain.usecase.content.GetContentItemUseCase
-import com.core.domain.usecase.recommendation.RecommendForArticleUseCase
-import com.core.domain.usecase.recommendation.RecommendForUserUseCase
+import com.feature.feed.domain.usecase.GetContentItemUseCase
+import com.feature.recommendation.domain.usecase.RecommendForArticleUseCase
+import com.feature.recommendation.domain.usecase.RecommendForUserUseCase
 import com.core.observers.ConnectivityRepository
 import com.feature.feed.article.ArticleItemComponent
 import com.feature.feed.article.ArticleItemComponentImpl

@@ -1,7 +1,7 @@
-package com.core.domain.repository
+package com.feature.recommendation.domain.repository
 
-import com.core.domain.model.ContentId
-import com.core.domain.model.Recommendation
+import com.core.content.model.ContentId
+import com.feature.recommendation.domain.model.Recommendation
 import kotlinx.coroutines.flow.Flow
 
 /**

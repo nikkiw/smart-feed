@@ -1,6 +1,6 @@
-package com.core.domain.usecase.recommendation
+package com.feature.recommendation.domain.usecase
 
-import com.core.domain.model.ContentItemPreview
+import com.feature.feed.domain.model.ContentItemPreview
 import kotlinx.coroutines.flow.Flow
 
 /**

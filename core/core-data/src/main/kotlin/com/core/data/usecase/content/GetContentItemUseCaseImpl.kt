@@ -1,9 +1,9 @@
 package com.core.data.usecase.content
 
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItem
-import com.core.domain.repository.ContentItemRepository
-import com.core.domain.usecase.content.GetContentItemUseCase
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItem
+import com.feature.feed.domain.repository.ContentItemRepository
+import com.feature.feed.domain.usecase.GetContentItemUseCase
 import javax.inject.Inject
 
 /**

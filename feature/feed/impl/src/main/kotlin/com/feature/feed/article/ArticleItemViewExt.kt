@@ -10,7 +10,7 @@ import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.extensions.android.child
 import com.arkivanov.decompose.extensions.android.layoutInflater
 import com.arkivanov.decompose.value.subscribe
-import com.core.domain.model.ContentItem
+import com.feature.feed.domain.model.ContentItem
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
 import com.core.image.ImageSource

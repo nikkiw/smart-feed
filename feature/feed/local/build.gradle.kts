@@ -9,8 +9,6 @@ android {
 
 dependencies {
     implementation(projects.feature.feed.api)
-    implementation(projects.core.coreDomain)
-    implementation(projects.core.corePaging)
 
     implementation(libs.room.runtime)
     implementation(libs.room.common)

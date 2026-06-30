@@ -1,4 +1,6 @@
-package com.core.domain.model
+package com.feature.recommendation.domain.model
+
+import com.core.content.model.ContentId
 
 /**
  * Represents a recommendation for a content item, typically based on relevance or user preferences.

@@ -1,9 +1,9 @@
-package com.core.domain.repository
+package com.feature.feed.domain.repository
 
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItem
-import com.core.domain.model.ContentType
-import com.core.domain.model.Tags
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItem
+import com.core.content.model.ContentType
+import com.core.content.model.Tags
 import kotlinx.coroutines.flow.Flow
 
 /**

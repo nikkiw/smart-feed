@@ -1,7 +1,15 @@
-package com.core.domain.model
+package com.feature.feed.domain.model
 
-import com.core.domain.model.ContentItemPreview.ArticlePreview
-import com.core.domain.model.ContentItemPreview.UnknownPreview
+import com.core.content.model.Content
+import com.core.content.model.ContentId
+import com.core.content.model.ContentType
+import com.core.content.model.ImageUrl
+import com.core.content.model.ShortDescription
+import com.core.content.model.Tags
+import com.core.content.model.Title
+import com.core.content.model.UpdatedAt
+import com.feature.feed.domain.model.ContentItemPreview.ArticlePreview
+import com.feature.feed.domain.model.ContentItemPreview.UnknownPreview
 
 /**
  * Base sealed class representing a content item in the system.

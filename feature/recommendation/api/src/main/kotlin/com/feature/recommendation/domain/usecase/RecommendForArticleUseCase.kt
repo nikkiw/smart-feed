@@ -1,7 +1,7 @@
-package com.core.domain.usecase.recommendation
+package com.feature.recommendation.domain.usecase
 
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItemPreview
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItemPreview
 
 /**
  * Use case interface for retrieving content recommendations based on a specific article.

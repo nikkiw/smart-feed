@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.core.data.CoroutineTestRule
-import com.core.domain.repository.ContentItemRepository
-import com.core.domain.service.Recommender
+import com.feature.feed.domain.repository.ContentItemRepository
+import com.feature.recommendation.domain.service.Recommender
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify

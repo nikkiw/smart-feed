@@ -3,9 +3,9 @@ package com.core.data.repository
 import com.core.data.dto.toRecommendation
 import com.core.database.recommendation.RecommendationDao
 import com.core.di.IoDispatcher
-import com.core.domain.model.ContentId
-import com.core.domain.model.Recommendation
-import com.core.domain.repository.RecommendationRepository
+import com.core.content.model.ContentId
+import com.feature.recommendation.domain.model.Recommendation
+import com.feature.recommendation.domain.repository.RecommendationRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

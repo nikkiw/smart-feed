@@ -2,11 +2,11 @@ package com.core.data.work
 
 import android.content.Context
 import android.widget.ImageView
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItem
-import com.core.domain.model.Tags
-import com.core.domain.repository.ContentItemRepository
-import com.core.domain.service.Recommender
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItem
+import com.core.content.model.Tags
+import com.feature.feed.domain.repository.ContentItemRepository
+import com.feature.recommendation.domain.service.Recommender
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
 import com.core.image.ImageSource

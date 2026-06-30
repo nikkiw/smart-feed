@@ -4,9 +4,9 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItemPreview
-import com.core.domain.usecase.recommendation.RecommendForUserUseCase
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItemPreview
+import com.feature.recommendation.domain.usecase.RecommendForUserUseCase
 import com.core.observers.ConnectivityRepository
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch

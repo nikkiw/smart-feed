@@ -1,8 +1,8 @@
 package com.feature.feed.filter
 
 import com.arkivanov.decompose.value.Value
-import com.core.domain.model.Tags
-import com.core.domain.repository.ContentItemsSortedType
+import com.core.content.model.Tags
+import com.feature.feed.domain.repository.ContentItemsSortedType
 
 /**
  * Component for filtering by tags and selecting sorting.

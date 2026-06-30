@@ -1,4 +1,4 @@
-package com.core.domain.model
+package com.core.content.model
 
 import java.text.ParseException
 import java.text.SimpleDateFormat

@@ -16,11 +16,11 @@ import com.core.database.userprofile.UserProfileDao
 import com.core.di.ApplicationScope
 import com.core.di.DefaultDispatcher
 import com.core.di.IoDispatcher
-import com.core.domain.repository.ContentItemRepository
-import com.core.domain.repository.RecommendationRepository
+import com.feature.feed.domain.repository.ContentItemRepository
+import com.feature.recommendation.domain.repository.RecommendationRepository
 import com.core.domain.repository.UserProfileRepository
 import com.core.domain.service.AnalyticsService
-import com.core.domain.service.Recommender
+import com.feature.recommendation.domain.service.Recommender
 import com.core.networks.datasource.NetworkDataSource
 import com.core.paging.ContentPagingRepository
 import dagger.Module

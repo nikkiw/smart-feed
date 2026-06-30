@@ -10,10 +10,10 @@ import com.core.database.recommendation.entity.UserRecommendationEntity
 import com.core.di.ApplicationScope
 import com.core.di.DefaultDispatcher
 import com.core.di.IoDispatcher
-import com.core.domain.model.ContentId
-import com.core.domain.model.Recommendation
+import com.core.content.model.ContentId
+import com.feature.recommendation.domain.model.Recommendation
 import com.core.domain.repository.UserProfileRepository
-import com.core.domain.service.Recommender
+import com.feature.recommendation.domain.service.Recommender
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

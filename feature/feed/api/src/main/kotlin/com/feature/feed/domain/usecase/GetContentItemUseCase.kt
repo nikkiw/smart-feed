@@ -1,7 +1,7 @@
-package com.core.domain.usecase.content
+package com.feature.feed.domain.usecase
 
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItem
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItem
 
 /**
  * Use case interface for retrieving a specific content item by its ID.

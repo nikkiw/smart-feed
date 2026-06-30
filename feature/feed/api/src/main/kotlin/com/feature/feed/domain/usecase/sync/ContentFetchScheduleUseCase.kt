@@ -1,4 +1,4 @@
-package com.core.domain.usecase.sync
+package com.feature.feed.domain.usecase.sync
 
 /**
  * Use case interface for scheduling background content fetching.

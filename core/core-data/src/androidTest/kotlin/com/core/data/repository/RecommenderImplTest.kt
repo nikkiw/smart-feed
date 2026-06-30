@@ -7,11 +7,11 @@ import com.core.data.service.RecommenderImpl
 import com.core.database.AppDatabase
 import com.core.database.event.entity.EventLog
 import com.core.database.event.entity.EventType
-import com.core.domain.model.ContentId
-import com.core.domain.repository.ContentItemRepository
-import com.core.domain.repository.RecommendationRepository
+import com.core.content.model.ContentId
+import com.feature.feed.domain.repository.ContentItemRepository
+import com.feature.recommendation.domain.repository.RecommendationRepository
 import com.core.domain.repository.UserProfileRepository
-import com.core.domain.service.Recommender
+import com.feature.recommendation.domain.service.Recommender
 import com.core.networks.datasource.dev.DevStaticJsonTestNetworkDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

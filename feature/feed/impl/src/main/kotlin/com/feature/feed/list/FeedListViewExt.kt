@@ -14,7 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.extensions.android.layoutInflater
-import com.core.domain.model.ContentItemPreview
+import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.R
 import com.ndev.android.ui.shimmer.ShimmerView
 import kotlinx.coroutines.Job

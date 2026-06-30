@@ -6,10 +6,10 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItemPreview
-import com.core.domain.repository.Query
-import com.core.domain.usecase.sync.SyncContentUseCase
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItemPreview
+import com.feature.feed.domain.repository.Query
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import com.core.observers.ConnectivityRepository
 import com.core.paging.GetPagedContentUseCase
 import kotlinx.coroutines.Job

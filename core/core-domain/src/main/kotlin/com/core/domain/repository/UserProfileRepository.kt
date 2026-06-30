@@ -1,7 +1,7 @@
 package com.core.domain.repository
 
-import com.core.domain.model.ContentId
-import com.core.domain.model.Embeddings
+import com.core.content.model.ContentId
+import com.core.content.model.Embeddings
 import kotlinx.coroutines.flow.Flow
 
 /**

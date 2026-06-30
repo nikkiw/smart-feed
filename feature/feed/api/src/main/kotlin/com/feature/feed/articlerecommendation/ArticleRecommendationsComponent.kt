@@ -1,8 +1,8 @@
 package com.feature.feed.articlerecommendation
 
 import com.arkivanov.decompose.value.Value
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItemPreview
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItemPreview
 
 interface ArticleRecommendationsComponent {
     val items: Value<List<ContentItemPreview>>

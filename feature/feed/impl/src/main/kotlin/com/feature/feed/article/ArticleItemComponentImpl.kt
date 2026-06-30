@@ -6,10 +6,10 @@ import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
-import com.core.domain.model.ContentId
+import com.core.content.model.ContentId
 import com.core.domain.service.AnalyticsService
-import com.core.domain.usecase.content.GetContentItemUseCase
-import com.core.domain.usecase.recommendation.RecommendForArticleUseCase
+import com.feature.feed.domain.usecase.GetContentItemUseCase
+import com.feature.recommendation.domain.usecase.RecommendForArticleUseCase
 import com.feature.feed.articlerecommendation.ArticleRecommendationsComponent
 import com.feature.feed.articlerecommendation.ArticleRecommendationsComponentImpl
 import kotlinx.coroutines.launch

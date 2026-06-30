@@ -25,7 +25,10 @@ dependencies {
     implementation(projects.core.coreNetworks)
     implementation(projects.core.coreDatabase)
     implementation(projects.core.coroutines)
+    implementation(projects.core.content.api)
+    implementation(projects.feature.feed.api)
     implementation(projects.feature.feed.local)
+    implementation(projects.feature.recommendation.api)
 
     implementation(libs.concurrent.futures.ktx)
 

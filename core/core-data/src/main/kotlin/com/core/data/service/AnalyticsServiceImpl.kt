@@ -6,7 +6,7 @@ import com.core.database.event.entity.EventType
 import com.core.di.ApplicationScope
 import com.core.di.DefaultDispatcher
 import com.core.di.IoDispatcher
-import com.core.domain.model.ContentId
+import com.core.content.model.ContentId
 import com.core.domain.repository.UserProfileRepository
 import com.core.domain.service.AnalyticsService
 import kotlinx.coroutines.CoroutineDispatcher

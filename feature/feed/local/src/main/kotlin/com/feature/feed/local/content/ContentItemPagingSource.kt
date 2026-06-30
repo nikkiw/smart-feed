@@ -3,8 +3,8 @@ package com.feature.feed.local.content
 import androidx.paging.PagingSource
 import androidx.room.RoomRawQuery
 import com.feature.feed.local.content.entity.ContentPreviewWithDetails
-import com.core.domain.repository.ContentItemsSortedType
-import com.core.domain.repository.Query
+import com.feature.feed.domain.repository.ContentItemsSortedType
+import com.feature.feed.domain.repository.Query
 
 /**
  * Builds a dynamic SQL query and returns a [PagingSource] for paginated content previews.

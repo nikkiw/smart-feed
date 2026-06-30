@@ -1,4 +1,4 @@
-package com.core.domain.service
+package com.feature.recommendation.domain.service
 
 /**
  * Interface defining methods for updating recommendations for users and articles.

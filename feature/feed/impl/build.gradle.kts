@@ -22,6 +22,7 @@ dependencies {
     implementation(projects.core.corePaging)
     implementation(projects.core.connectivity)
     implementation(projects.core.image.api)
+    implementation(projects.feature.recommendation.api)
 
     // Pagging
     implementation(libs.androidx.pagging.ktx)

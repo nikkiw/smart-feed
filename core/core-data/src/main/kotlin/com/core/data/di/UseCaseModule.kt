@@ -5,11 +5,11 @@ import com.core.data.usecase.recommendation.RecommendForArticleUseCaseImpl
 import com.core.data.usecase.recommendation.RecommendForUserUseCaseImpl
 import com.core.data.usecase.sync.ContentFetchScheduleUseCaseImpl
 import com.core.data.usecase.sync.SyncContentUseCaseImpl
-import com.core.domain.usecase.content.GetContentItemUseCase
-import com.core.domain.usecase.recommendation.RecommendForArticleUseCase
-import com.core.domain.usecase.recommendation.RecommendForUserUseCase
-import com.core.domain.usecase.sync.ContentFetchScheduleUseCase
-import com.core.domain.usecase.sync.SyncContentUseCase
+import com.feature.feed.domain.usecase.GetContentItemUseCase
+import com.feature.recommendation.domain.usecase.RecommendForArticleUseCase
+import com.feature.recommendation.domain.usecase.RecommendForUserUseCase
+import com.feature.feed.domain.usecase.sync.ContentFetchScheduleUseCase
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import com.core.paging.GetPagedContentUseCase
 import com.core.paging.GetPagedContentUseCaseImpl
 import dagger.Binds

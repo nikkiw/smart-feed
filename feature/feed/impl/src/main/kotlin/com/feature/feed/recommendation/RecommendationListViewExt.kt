@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.extensions.android.layoutInflater
-import com.core.domain.model.ContentItemPreview
+import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.R
 import com.feature.feed.list.ArticleViewHolder
 import com.ndev.android.ui.shimmer.ShimmerView

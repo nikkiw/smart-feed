@@ -1,10 +1,10 @@
 package com.core.data.service
 
-import com.core.domain.repository.ContentItemRepository
+import com.feature.feed.domain.repository.ContentItemRepository
 import com.core.domain.service.AppBootstrapper
-import com.core.domain.service.Recommender
-import com.core.domain.usecase.sync.ContentFetchScheduleUseCase
-import com.core.domain.usecase.sync.SyncContentUseCase
+import com.feature.recommendation.domain.service.Recommender
+import com.feature.feed.domain.usecase.sync.ContentFetchScheduleUseCase
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject

@@ -8,7 +8,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.await
 import com.core.data.work.ContentFetchWorker
-import com.core.domain.usecase.sync.SyncContentUseCase
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject

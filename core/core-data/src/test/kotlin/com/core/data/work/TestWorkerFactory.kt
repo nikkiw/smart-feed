@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.core.domain.repository.ContentItemRepository
-import com.core.domain.service.Recommender
+import com.feature.feed.domain.repository.ContentItemRepository
+import com.feature.recommendation.domain.service.Recommender
 
 class TestWorkerFactory(
     private val repository: ContentItemRepository,

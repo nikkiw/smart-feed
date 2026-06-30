@@ -1,8 +1,8 @@
 package com.feature.feed.recommendation
 
 import com.arkivanov.decompose.value.Value
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItemPreview
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItemPreview
 
 /**
  *A component for displaying a recommendation of articles
