@@ -24,6 +24,7 @@ dependencies {
     implementation(projects.core.corePaging)
     implementation(projects.core.coreNetworks)
     implementation(projects.core.coreDatabase)
+    implementation(projects.core.coroutines)
 
     implementation(libs.concurrent.futures.ktx)
 

@@ -4,9 +4,12 @@ plugins {
 }
 
 android {
-    namespace = "com.core.core"
+    namespace = "com.core.connectivity"
 }
 
 dependencies {
+    implementation(projects.core.coroutines)
+    implementation(projects.core.lifecycle)
+    implementation(libs.androidx.lifecycle.process)
     implementation(libs.kotlinx.coroutines.core)
 }

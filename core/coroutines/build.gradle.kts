@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.core.core"
+    namespace = "com.core.coroutines"
 }
 
 dependencies {

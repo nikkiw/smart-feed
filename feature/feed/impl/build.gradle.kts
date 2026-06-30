@@ -20,6 +20,7 @@ dependencies {
     implementation(projects.core.core)
     implementation(projects.core.coreDomain)
     implementation(projects.core.corePaging)
+    implementation(projects.core.connectivity)
     implementation(projects.core.image.api)
 
     // Pagging

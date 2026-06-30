@@ -55,7 +55,7 @@ class ConnectivityRepositoryImpl
 
         override fun isInternetAvailable(): Boolean = _isConnected.value
 
-        // BroadcastReceiver for API levels 21–22
+        // BroadcastReceiver for API levels 21-22
         private val networkReceiver =
             object : BroadcastReceiver() {
                 override fun onReceive(

@@ -9,6 +9,7 @@ android {
 
 dependencies {
     implementation(projects.core.core)
+    implementation(projects.core.coroutines)
     // Network - Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
