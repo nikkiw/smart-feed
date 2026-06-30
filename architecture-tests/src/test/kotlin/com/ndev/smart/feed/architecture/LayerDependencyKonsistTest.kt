@@ -46,15 +46,27 @@ class LayerDependencyKonsistTest {
     }
 
     @Test
-    fun `database layer does not depend on app feature or network packages`() {
+    fun `database aggregator depends only on feature local storage schemas`() {
         sourceFilesUnder("core/core-database/src/main").assertNoImports(
             forbiddenPrefixes =
                 listOf(
-                    "com.feature.",
-                    "com.ndev.android.smart.feed.",
+                    "com.feature.feed.impl.",
+                    "com.feature.feed.root.",
+                    "com.feature.feed.list.",
+                    "com.feature.feed.master.",
+                    "com.feature.feed.article.",
+                    "com.feature.feed.recommendation.",
+                    "com.feature.recommendation.api.",
+                    "com.feature.recommendation.impl.",
+                    "com.core.analytics.api.",
+                    "com.core.analytics.impl.",
+                    "com.core.data.",
                     "com.core.networks.",
+                    "com.ndev.android.smart.feed.",
                 ),
-            reason = "core-database must remain a persistence adapter, not an app, feature, or network consumer.",
+            reason =
+                "core-database is a Room aggregator. It may import storage-schema " +
+                    "modules only, not feature API/impl, data, network, app, or UI.",
         )
     }
 
