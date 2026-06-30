@@ -1,5 +1,7 @@
 package com.feature.feed.di
 
+import com.feature.feed.list.DefaultFeedListComponentFactory
+import com.feature.feed.list.FeedListComponent
 import com.feature.feed.root.FeedRootComponent
 import com.feature.feed.root.FeedRootComponentImpl
 import dagger.Binds
@@ -14,4 +16,7 @@ abstract class FeedModule {
     abstract fun bindFeedRootFactory(
         factory: FeedRootComponentImpl.FeedRootComponentFactory,
     ): FeedRootComponent.Factory
+
+    @Binds
+    abstract fun bindFeedListComponentFactory(factory: DefaultFeedListComponentFactory): FeedListComponent.Factory
 }

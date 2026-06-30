@@ -82,9 +82,9 @@ class FeedListComponentImpl(
         onItemClick(itemId)
     }
 
-    fun updateQuery(newQuery: Query) {
-        if (newQuery != currentQuery) {
-            currentQuery = newQuery
+    override fun updateQuery(query: Query) {
+        if (query != currentQuery) {
+            currentQuery = query
             loadContent(currentQuery)
         }
     }

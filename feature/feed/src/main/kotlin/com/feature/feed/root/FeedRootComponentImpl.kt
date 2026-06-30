@@ -14,16 +14,15 @@ import com.core.domain.model.ContentId
 import com.core.domain.repository.ContentItemRepository
 import com.core.domain.service.AnalyticsService
 import com.core.domain.usecase.content.GetContentItemUseCase
-import com.core.domain.usecase.content.GetContentUseCase
 import com.core.domain.usecase.recommendation.RecommendForArticleUseCase
 import com.core.domain.usecase.recommendation.RecommendForUserUseCase
-import com.core.domain.usecase.sync.SyncContentUseCase
 import com.core.observers.ConnectivityRepository
 import com.feature.feed.article.ArticleItemComponent
 import com.feature.feed.article.ArticleItemComponentImpl
 import com.feature.feed.bottombar.BottomBarComponent
 import com.feature.feed.bottombar.BottomBarComponentImpl
 import com.feature.feed.bottombar.model.BottomBarState
+import com.feature.feed.list.FeedListComponent
 import com.feature.feed.master.FeedMasterComponent
 import com.feature.feed.master.FeedMasterComponentImpl
 import com.feature.feed.recommendation.RecommendationListComponent
@@ -42,8 +41,7 @@ class FeedRootComponentImpl
     constructor(
         @Assisted componentContext: ComponentContext,
         private val contentItemRepository: ContentItemRepository,
-        private val getContentUseCase: GetContentUseCase,
-        private val syncContentUseCase: SyncContentUseCase,
+        private val feedListComponentFactory: FeedListComponent.Factory,
         private val getContentItemUseCase: GetContentItemUseCase,
         private val analyticsService: AnalyticsService,
         private val recommendForUserUseCase: RecommendForUserUseCase,
@@ -121,9 +119,7 @@ class FeedRootComponentImpl
             FeedMasterComponentImpl(
                 componentContext = componentContext,
                 contentItemRepository = contentItemRepository,
-                getContentUseCase = getContentUseCase,
-                syncContentUseCase = syncContentUseCase,
-                connectivityRepository = connectivityRepository,
+                feedListComponentFactory = feedListComponentFactory,
                 onListItemClick = {
                     navigation.pushToFront(Config.ArticleScreenConfig(itemId = it.value))
                 },

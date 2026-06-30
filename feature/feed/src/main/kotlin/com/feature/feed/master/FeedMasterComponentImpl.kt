@@ -10,13 +10,9 @@ import com.core.domain.model.Tags
 import com.core.domain.repository.ContentItemRepository
 import com.core.domain.repository.ContentItemsSortedType
 import com.core.domain.repository.Query
-import com.core.domain.usecase.content.GetContentUseCase
-import com.core.domain.usecase.sync.SyncContentUseCase
-import com.core.observers.ConnectivityRepository
 import com.feature.feed.filter.FilterSortComponent
 import com.feature.feed.filter.FilterSortComponentImpl
 import com.feature.feed.list.FeedListComponent
-import com.feature.feed.list.FeedListComponentImpl
 
 /**
  * FeedRootComponent implementation.
@@ -26,9 +22,7 @@ import com.feature.feed.list.FeedListComponentImpl
 class FeedMasterComponentImpl(
     componentContext: ComponentContext,
     private val contentItemRepository: ContentItemRepository,
-    private val getContentUseCase: GetContentUseCase,
-    private val syncContentUseCase: SyncContentUseCase,
-    private val connectivityRepository: ConnectivityRepository,
+    private val feedListComponentFactory: FeedListComponent.Factory,
     onListItemClick: (ContentId) -> Unit,
     initialSortType: ContentItemsSortedType = ContentItemsSortedType.ByDateNewestFirst,
     initialTags: Tags = Tags(),
@@ -70,11 +64,8 @@ class FeedMasterComponentImpl(
             )
 
         feedListComponent =
-            FeedListComponentImpl(
-                componentContext = componentContext,
-                getContentUseCase = getContentUseCase,
-                syncContentUseCase = syncContentUseCase,
-                connectivityRepository = connectivityRepository,
+            feedListComponentFactory(
+                componentContext = childContext(key = "feedList"),
                 initialQuery = initialQuery,
                 onItemClick = { itemId ->
                     onListItemClick(itemId)
@@ -101,8 +92,6 @@ class FeedMasterComponentImpl(
                 tags = _state.value.selectedTags,
                 sortedBy = _state.value.selectedSortType,
             )
-        if (feedListComponent is FeedListComponentImpl) {
-            feedListComponent.updateQuery(query)
-        }
+        feedListComponent.updateQuery(query)
     }
 }

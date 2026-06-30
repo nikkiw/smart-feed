@@ -25,6 +25,7 @@ import com.core.observers.ConnectivityRepository
 import com.feature.feed.bottombar.BottomBarComponent
 import com.feature.feed.bottombar.BottomBarComponentImpl
 import com.feature.feed.bottombar.model.BottomBarState
+import com.feature.feed.list.DefaultFeedListComponentFactory
 import com.feature.feed.root.FeedRootComponent
 import com.feature.feed.root.FeedRootComponentImpl
 import com.google.common.truth.FailureMetadata
@@ -171,8 +172,12 @@ object FeedTestDataBuilder {
         return FeedRootComponentImpl(
             componentContext = componentContext,
             contentItemRepository = dependencies.contentItemRepository,
-            getContentUseCase = dependencies.getContentUseCase,
-            syncContentUseCase = dependencies.syncContentUseCase,
+            feedListComponentFactory =
+                DefaultFeedListComponentFactory(
+                    getContentUseCase = dependencies.getContentUseCase,
+                    syncContentUseCase = dependencies.syncContentUseCase,
+                    connectivityRepository = dependencies.connectivityRepository,
+                ),
             getContentItemUseCase = dependencies.getContentItemUseCase,
             analyticsService = dependencies.analyticsService,
             recommendForUserUseCase = dependencies.recommendForUserUseCase,

@@ -313,8 +313,23 @@ class AdvancedFeedRootComponentTest {
 
     @Test
     fun `analytics service should be injected into article component`() {
+        // Arrange: article initialization launches content loading immediately.
+        val articleId = "analytics-test"
+        val article =
+            Article(
+                id = ContentId(articleId),
+                updatedAt = UpdatedAt.now(),
+                mainImageUrl = ImageUrl("https://example.com/img.png"),
+                tags = Tags(listOf("analytics")),
+                title = Title("Analytics Test"),
+                short = ShortDescription("Analytics test article"),
+                content = Content("Article content"),
+            )
+        coEvery { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) } returns
+            Result.success(article)
+
         // Given: the Article screen config
-        val articleConfig = FeedRootComponent.Config.ArticleScreenConfig("analytics-test")
+        val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
 
         // When: create the ArticleScreen child
         val child = feedRootComponent.createChild(articleConfig, testContext.componentContext)
