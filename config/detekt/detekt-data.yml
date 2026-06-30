@@ -1,0 +1,13 @@
+# Data/infrastructure profile: allow framework adapter shape, keep size checks active.
+
+complexity:
+  LongParameterList:
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 9
+  LongMethod:
+    active: true
+    threshold: 90
+  LargeClass:
+    active: true
+    threshold: 300

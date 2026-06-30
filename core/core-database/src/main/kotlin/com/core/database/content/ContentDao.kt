@@ -23,7 +23,6 @@ import com.core.database.content.entity.ContentWithDetails
  */
 @Dao
 interface ContentDao {
-
     /**
      * Returns a [PagingSource] for paginated access to content previews with article details,
      * using a raw SQL query constructed externally.
@@ -38,8 +37,8 @@ interface ContentDao {
     @RawQuery(
         observedEntities = [
             ContentEntity::class,
-            ArticleAttributesEntity::class
-        ]
+            ArticleAttributesEntity::class,
+        ],
     )
     fun getContent(query: RoomRawQuery): PagingSource<Int, ContentPreviewWithDetails>
 
@@ -103,7 +102,7 @@ interface ContentDao {
     @Transaction
     suspend fun insertContentUpdateWithDetails(
         contentUpdate: ContentEntity,
-        article: ArticleAttributesEntity? = null
+        article: ArticleAttributesEntity? = null,
     ) {
         insertContentUpdate(contentUpdate)
         article?.let { insertArticleAttributes(it) }

@@ -17,7 +17,7 @@ data class ContentPreviewWithDetails(
         parentColumn = "id",
         entityColumn = "contentId",
         entity = ArticleAttributesEntity::class,
-        projection = ["contentId", "title", "shortDescription"]
+        projection = ["contentId", "title", "shortDescription"],
     )
-    val article: ArticlePreviewAttributes?
+    val article: ArticlePreviewAttributes?,
 )

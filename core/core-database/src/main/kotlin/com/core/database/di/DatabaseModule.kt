@@ -13,25 +13,24 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.runBlocking
 import javax.inject.Singleton
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
-
     @Singleton
     @Provides
     fun provideDatabase(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): AppDatabase {
         val dbName = "app_database"
 
-        val db = Room.databaseBuilder(
-            context.applicationContext,
-            AppDatabase::class.java,
-            dbName
-        )
-            .setDriver(BundledSQLiteDriver())
-            .build()
+        val db =
+            Room.databaseBuilder(
+                context.applicationContext,
+                AppDatabase::class.java,
+                dbName,
+            )
+                .setDriver(BundledSQLiteDriver())
+                .build()
 
         runBlocking {
             createTrigger(db)

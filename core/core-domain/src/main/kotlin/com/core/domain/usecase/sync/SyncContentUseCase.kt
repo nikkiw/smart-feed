@@ -17,7 +17,6 @@ package com.core.domain.usecase.sync
  * ```
  */
 interface SyncContentUseCase {
-
     /**
      * Synchronizes content from a remote source into the app's local data store.
      *

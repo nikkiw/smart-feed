@@ -1,6 +1,5 @@
 package com.core.data.work
 
-
 import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.WorkerFactory
@@ -11,21 +10,21 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 
 object HiltWorkerFactoryForTest {
-
     fun create(context: Context): WorkerFactory {
-        val entryPoint = EntryPointAccessors.fromApplication(
-            context.applicationContext,
-            HiltWorkerFactoryEntryPoint::class.java
-        )
+        val entryPoint =
+            EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                HiltWorkerFactoryEntryPoint::class.java,
+            )
         return object : WorkerFactory() {
             override fun createWorker(
                 appContext: Context,
                 workerClassName: String,
-                workerParameters: WorkerParameters
+                workerParameters: WorkerParameters,
             ) = entryPoint.hiltWorkerFactory().createWorker(
                 appContext,
                 workerClassName,
-                workerParameters
+                workerParameters,
             )
         }
     }

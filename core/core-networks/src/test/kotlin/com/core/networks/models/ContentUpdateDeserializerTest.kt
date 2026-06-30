@@ -14,27 +14,29 @@ class ContentUpdateDeserializerTest {
 
     @Before
     fun setUp() {
-        gson = GsonBuilder()
-            .registerTypeAdapter(ContentUpdate::class.java, contentUpdateDeserializer)
-            .create()
+        gson =
+            GsonBuilder()
+                .registerTypeAdapter(ContentUpdate::class.java, contentUpdateDeserializer)
+                .create()
     }
 
     @Test
     fun `deserializes article type correctly`() {
-        val json = """
-        {
-          "id": "123",
-          "type": "article",
-          "action": "upsert",
-          "updatedAt": "2025-06-01T12:00:00Z",
-          "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
-          "tags": ["tag1", "tag2"],
-          "attributes": {
-            "title": "Test Article",
-            "content": "This is a test."
-          }
-        }
-        """.trimIndent()
+        val json =
+            """
+            {
+              "id": "123",
+              "type": "article",
+              "action": "upsert",
+              "updatedAt": "2025-06-01T12:00:00Z",
+              "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
+              "tags": ["tag1", "tag2"],
+              "attributes": {
+                "title": "Test Article",
+                "content": "This is a test."
+              }
+            }
+            """.trimIndent()
 
         val update = gson.fromJson(json, ContentUpdate::class.java)
         Assert.assertNotNull(update)
@@ -52,19 +54,20 @@ class ContentUpdateDeserializerTest {
 
     @Test
     fun `deserializes quiz type correctly`() {
-        val json = """
-        {
-          "id": "456",
-          "type": "quiz",
-          "action": "upsert",
-          "updatedAt": "2025-06-01T13:00:00Z",
-          "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
-          "tags": ["tag1", "tag2"],
-          "attributes": {
-            "questions": ["Q1", "Q2", "Q3"]
-          }
-        }
-        """.trimIndent()
+        val json =
+            """
+            {
+              "id": "456",
+              "type": "quiz",
+              "action": "upsert",
+              "updatedAt": "2025-06-01T13:00:00Z",
+              "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
+              "tags": ["tag1", "tag2"],
+              "attributes": {
+                "questions": ["Q1", "Q2", "Q3"]
+              }
+            }
+            """.trimIndent()
 
         val update = gson.fromJson(json, ContentUpdate::class.java)
         Assert.assertNotNull(update)
@@ -81,19 +84,20 @@ class ContentUpdateDeserializerTest {
 
     @Test
     fun `handles unknown content type with null attributes`() {
-        val json = """
-        {
-          "id": "789",
-          "type": "unknown",
-          "action": "delete",
-          "updatedAt": "2025-06-01T14:00:00Z",
-          "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
-          "tags": ["tag1", "tag2"],
-          "attributes": {
-            "someField": "someValue"
-          }
-        }
-        """.trimIndent()
+        val json =
+            """
+            {
+              "id": "789",
+              "type": "unknown",
+              "action": "delete",
+              "updatedAt": "2025-06-01T14:00:00Z",
+              "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
+              "tags": ["tag1", "tag2"],
+              "attributes": {
+                "someField": "someValue"
+              }
+            }
+            """.trimIndent()
 
         val update = gson.fromJson(json, ContentUpdate::class.java)
         Assert.assertNotNull(update)
@@ -106,40 +110,41 @@ class ContentUpdateDeserializerTest {
 
     @Test
     fun `deserializes updates response containing data and meta`() {
-        val json = """
-        {
-          "data": [
+        val json =
+            """
             {
-              "id": "123",
-              "type": "article",
-              "action": "upsert",
-              "updatedAt": "2025-06-01T12:00:00Z",
-              "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
-              "tags": ["tag1", "tag2"],
-              "attributes": {
-                "title": "Test Article",
-                "content": "This is a test.",
-                "tags": ["tag1", "tag2"]
-              }
-            },
-            {
-              "id": "456",
-              "type": "quiz",
-              "action": "upsert",
-              "updatedAt": "2025-06-01T13:00:00Z",
-              "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
-              "tags": ["tag1", "tag2"],
-              "attributes": {
-                "questions": ["Q1", "Q2"]
+              "data": [
+                {
+                  "id": "123",
+                  "type": "article",
+                  "action": "upsert",
+                  "updatedAt": "2025-06-01T12:00:00Z",
+                  "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
+                  "tags": ["tag1", "tag2"],
+                  "attributes": {
+                    "title": "Test Article",
+                    "content": "This is a test.",
+                    "tags": ["tag1", "tag2"]
+                  }
+                },
+                {
+                  "id": "456",
+                  "type": "quiz",
+                  "action": "upsert",
+                  "updatedAt": "2025-06-01T13:00:00Z",
+                  "mainImageUrl": "https://res.soft24hours.com/images/tst/boxer.webp",
+                  "tags": ["tag1", "tag2"],
+                  "attributes": {
+                    "questions": ["Q1", "Q2"]
+                  }
+                }
+              ],
+              "meta": {
+                "nextSince": "2025-06-02T00:00:00Z",
+                "hasMore": true
               }
             }
-          ],
-          "meta": {
-            "nextSince": "2025-06-02T00:00:00Z",
-            "hasMore": true
-          }
-        }
-        """.trimIndent()
+            """.trimIndent()
 
         val response = gson.fromJson(json, UpdatesResponse::class.java)
         Assert.assertNotNull(response)

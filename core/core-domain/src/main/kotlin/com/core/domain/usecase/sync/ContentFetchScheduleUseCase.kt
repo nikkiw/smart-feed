@@ -12,7 +12,6 @@ package com.core.domain.usecase.sync
  * ```
  */
 interface ContentFetchScheduleUseCase {
-
     /**
      * Schedules background content fetching or synchronization.
      *

@@ -15,72 +15,54 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object DaoModule {
-
     @Singleton
     @Provides
-    fun provideContentDao(
-        db: AppDatabase
-    ): ContentDao {
+    fun provideContentDao(db: AppDatabase): ContentDao {
         return db.contentDao()
     }
 
     @Singleton
     @Provides
-    fun provideUpdatesMetaDao(
-        db: AppDatabase
-    ): UpdatesMetaDao {
+    fun provideUpdatesMetaDao(db: AppDatabase): UpdatesMetaDao {
         return db.updatesMetaDao()
     }
 
     @Singleton
     @Provides
-    fun provideContentTagsDao(
-        db: AppDatabase
-    ): ContentTagsDao {
+    fun provideContentTagsDao(db: AppDatabase): ContentTagsDao {
         return db.contentTagsDao()
     }
 
     @Singleton
     @Provides
-    fun provideUserProfileDao(
-        db: AppDatabase
-    ): UserProfileDao {
+    fun provideUserProfileDao(db: AppDatabase): UserProfileDao {
         return db.userProfileDao()
     }
 
     @Singleton
     @Provides
-    fun provideArticleEmbeddingDao(
-        db: AppDatabase
-    ): ArticleEmbeddingDao {
+    fun provideArticleEmbeddingDao(db: AppDatabase): ArticleEmbeddingDao {
         return db.articleEmbeddingDao()
     }
 
     @Singleton
     @Provides
-    fun provideArticleInteractionStatsDao(
-        db: AppDatabase
-    ): ContentInteractionStatsDao {
+    fun provideArticleInteractionStatsDao(db: AppDatabase): ContentInteractionStatsDao {
         return db.articleInteractionStatsDao()
     }
 
     @Singleton
     @Provides
-    fun provideEventLogDao(
-        db: AppDatabase
-    ): EventLogDao {
+    fun provideEventLogDao(db: AppDatabase): EventLogDao {
         return db.eventLogDao()
     }
 
     @Singleton
     @Provides
-    fun provideRecommendationDao(
-        db: AppDatabase
-    ): RecommendationDao {
+    fun provideRecommendationDao(db: AppDatabase): RecommendationDao {
         return db.recommendationDao()
     }
 }

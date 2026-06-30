@@ -22,7 +22,9 @@ sealed class ImageSource {
      *
      * @property resId The resource ID of the drawable to load.
      */
-    data class Resource(@DrawableRes val resId: Int) : ImageSource()
+    data class Resource(
+        @DrawableRes val resId: Int,
+    ) : ImageSource()
 
     /**
      * Local file path on device storage.

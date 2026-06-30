@@ -13,13 +13,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
     @Provides
     @Singleton
     fun provideNetworkDataSource(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): NetworkDataSource {
         return DevStaticJsonTestNetworkDataSource(context)
     }
-
 }

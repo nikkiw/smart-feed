@@ -5,7 +5,6 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
 
-
 /**
  * Represents vector embeddings associated with content, used for similarity search.
  *
@@ -17,7 +16,7 @@ import com.google.gson.annotations.SerializedName
 data class Embeddings(
     @SerializedName("typeName") val typeName: String,
     @SerializedName("size") val size: Int,
-    @SerializedName("data") val data: List<Double>
+    @SerializedName("data") val data: List<Double>,
 )
 
 /**
@@ -26,7 +25,6 @@ data class Embeddings(
  */
 @Keep
 sealed class ContentAttributes {
-
     /**
      * Attributes for an article content update.
      *
@@ -40,7 +38,7 @@ sealed class ContentAttributes {
         @SerializedName("title") val title: String,
         @SerializedName("shortDescription") val shortDescription: String,
         @SerializedName("content") val content: String,
-        @SerializedName("embeddings") val embeddings: Embeddings
+        @SerializedName("embeddings") val embeddings: Embeddings,
     ) : ContentAttributes()
 
     /**
@@ -50,9 +48,8 @@ sealed class ContentAttributes {
      */
     @Keep
     data class Quiz(
-        @SerializedName("questions") val questions: List<String>
+        @SerializedName("questions") val questions: List<String>,
     ) : ContentAttributes()
-
 }
 
 /**
@@ -75,7 +72,7 @@ data class ContentUpdate(
     @SerializedName("updatedAt") val updatedAt: String,
     @SerializedName("mainImageUrl") val mainImageUrl: String,
     @SerializedName("tags") val tags: List<String>,
-    @SerializedName("attributes") val attributes: ContentAttributes?
+    @SerializedName("attributes") val attributes: ContentAttributes?,
 )
 
 /**
@@ -87,9 +84,8 @@ data class ContentUpdate(
 @Keep
 data class UpdatesMeta(
     @SerializedName("nextSince") val nextSince: String,
-    @SerializedName("hasMore") val hasMore: Boolean
+    @SerializedName("hasMore") val hasMore: Boolean,
 )
-
 
 /**
  * Response wrapper for a list of content updates and associated metadata.
@@ -100,36 +96,43 @@ data class UpdatesMeta(
 @Keep
 data class UpdatesResponse(
     @SerializedName("data") val data: List<ContentUpdate>,
-    @SerializedName("meta") val meta: UpdatesMeta
+    @SerializedName("meta") val meta: UpdatesMeta,
 )
-
 
 /**
  * Custom Gson deserializer for [ContentUpdate], choosing the correct
  * [ContentAttributes] subtype based on the `type` field.
  */
-val contentUpdateDeserializer = JsonDeserializer { json: JsonElement, typeOfT, context ->
-    val obj = json.asJsonObject
-    val id = obj.get("id").asString
-    val type = obj.get("type").asString
-    val action = obj.get("action").asString
-    val updatedAt = obj.get("updatedAt").asString
-    val mainImageUrl = obj.get("mainImageUrl").asString
-    val tags = obj.getAsJsonArray("tags").map { it.asString }
-    val attributesElement = if (obj.has("attributes") && !obj.get("attributes").isJsonNull)
-        obj.get("attributes") else null
+val contentUpdateDeserializer =
+    JsonDeserializer { json: JsonElement, typeOfT, context ->
+        val obj = json.asJsonObject
+        val id = obj.get("id").asString
+        val type = obj.get("type").asString
+        val action = obj.get("action").asString
+        val updatedAt = obj.get("updatedAt").asString
+        val mainImageUrl = obj.get("mainImageUrl").asString
+        val tags = obj.getAsJsonArray("tags").map { it.asString }
+        val attributesElement =
+            if (obj.has("attributes") && !obj.get("attributes").isJsonNull) {
+                obj.get("attributes")
+            } else {
+                null
+            }
 
-    val attributes: ContentAttributes? = when (type) {
-        "article" -> attributesElement?.let {
-            context.deserialize(it, ContentAttributes.Article::class.java)
-        }
+        val attributes: ContentAttributes? =
+            when (type) {
+                "article" ->
+                    attributesElement?.let {
+                        context.deserialize(it, ContentAttributes.Article::class.java)
+                    }
 
-        "quiz" -> attributesElement?.let {
-            context.deserialize(it, ContentAttributes.Quiz::class.java)
-        }
+                "quiz" ->
+                    attributesElement?.let {
+                        context.deserialize(it, ContentAttributes.Quiz::class.java)
+                    }
 
-        else -> null
+                else -> null
+            }
+
+        ContentUpdate(id, type, action, updatedAt, mainImageUrl, tags, attributes)
     }
-
-    ContentUpdate(id, type, action, updatedAt, mainImageUrl, tags, attributes)
-}

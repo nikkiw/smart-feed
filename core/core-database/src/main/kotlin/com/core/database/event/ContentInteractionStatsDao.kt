@@ -12,7 +12,6 @@ import com.core.database.event.entity.ContentInteractionStats
  */
 @Dao
 interface ContentInteractionStatsDao {
-
     /**
      * Retrieves a list of all distinct article IDs that have recorded reading statistics.
      *

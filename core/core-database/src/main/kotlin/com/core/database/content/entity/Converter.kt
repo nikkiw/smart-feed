@@ -33,6 +33,7 @@ class Converter {
      * Converts a [FloatArray] to a [ByteArray] using little-endian byte order.
      */
     @TypeConverter
+    @Suppress("ReturnCount")
     fun fromFloatArray(floats: FloatArray?): ByteArray? {
         if (floats == null) return null
         if (floats.isEmpty()) return ByteArray(0)
@@ -49,6 +50,7 @@ class Converter {
      * @throws IllegalArgumentException if the byte array size is invalid.
      */
     @TypeConverter
+    @Suppress("ReturnCount")
     fun toFloatArray(bytes: ByteArray?): FloatArray? {
         if (bytes == null) return null
         if (bytes.isEmpty()) return FloatArray(0)

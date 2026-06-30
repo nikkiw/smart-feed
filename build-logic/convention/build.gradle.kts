@@ -18,6 +18,8 @@ dependencies {
     implementation(libs.kotlin.gradlePlugin)
     implementation(libs.ksp.gradlePlugin)
     implementation(libs.hilt.gradlePlugin)
+    implementation(libs.detekt.gradlePlugin)
+    implementation(libs.spotless.gradlePlugin)
 }
 
 gradlePlugin {
@@ -47,6 +49,16 @@ gradlePlugin {
         register("androidFeature") {
             id = libs.plugins.smart.feed.android.feature.get().pluginId
             implementationClass = "com.ndev.convention.AndroidFeatureConventionPlugin"
+        }
+
+        register("detektConvention") {
+            id = "smart.feed.detekt"
+            implementationClass = "com.ndev.convention.DetektConventionPlugin"
+        }
+
+        register("spotlessConvention") {
+            id = "smart.feed.spotless"
+            implementationClass = "com.ndev.convention.SpotlessConventionPlugin"
         }
 
     }

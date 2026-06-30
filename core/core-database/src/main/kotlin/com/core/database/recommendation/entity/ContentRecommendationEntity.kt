@@ -27,22 +27,22 @@ import com.core.database.content.entity.ContentEntity
             parentColumns = ["id"],
             childColumns = ["contentId"],
             onDelete = ForeignKey.CASCADE,
-            onUpdate = ForeignKey.CASCADE
+            onUpdate = ForeignKey.CASCADE,
         ),
         ForeignKey(
             entity = ContentEntity::class,
             parentColumns = ["id"],
             childColumns = ["recommendedContentId"],
             onDelete = ForeignKey.CASCADE,
-            onUpdate = ForeignKey.CASCADE
-        )
+            onUpdate = ForeignKey.CASCADE,
+        ),
     ],
     indices = [
         Index(value = ["recommendedContentId"]),
-    ]
+    ],
 )
 data class ContentRecommendationEntity(
     val contentId: String,
     val recommendedContentId: String,
-    val score: Float
+    val score: Float,
 )

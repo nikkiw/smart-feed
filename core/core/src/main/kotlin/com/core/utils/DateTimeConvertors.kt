@@ -10,7 +10,6 @@ import java.util.TimeZone
  * Utility object for parsing ISO 8601 date-time strings into Java [Date] objects or epoch milliseconds.
  */
 object DateTimeConvertors {
-
     /**
      * Parses an ISO 8601 date-time string into a [Date].
      *
@@ -26,24 +25,25 @@ object DateTimeConvertors {
      * @return A [Date] representing the parsed moment, or `null` if none of the patterns match.
      */
     fun parseIsoToDate(isoString: String): Date? {
-            val patterns = arrayOf(
+        val patterns =
+            arrayOf(
                 "yyyy-MM-dd'T'HH:mm:ss",
                 "yyyy-MM-dd'T'HH:mm:ss'Z'",
                 "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
                 "yyyy-MM-dd'T'HH:mm:ssXXX",
-                "yyyy-MM-dd'T'HH:mm:ss"
+                "yyyy-MM-dd'T'HH:mm:ss",
             )
-            for (pat in patterns) {
-                try {
-                    val sdf = SimpleDateFormat(pat, Locale.getDefault())
-                    if (pat.endsWith("'Z'")) {
-                        sdf.timeZone = TimeZone.getTimeZone("UTC")
-                    }
-                    return sdf.parse(isoString)
-                } catch (_: ParseException) {
-                    // игнорируем, пробуем следующий шаблон
+        for (pat in patterns) {
+            try {
+                val sdf = SimpleDateFormat(pat, Locale.getDefault())
+                if (pat.endsWith("'Z'")) {
+                    sdf.timeZone = TimeZone.getTimeZone("UTC")
                 }
+                return sdf.parse(isoString)
+            } catch (_: ParseException) {
+                // игнорируем, пробуем следующий шаблон
             }
+        }
         return null
     }
 

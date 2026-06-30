@@ -1,10 +1,7 @@
 package com.core.domain.repository
 
-
-import androidx.paging.PagingData
-import com.core.domain.model.ContentItem
 import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItemPreview
+import com.core.domain.model.ContentItem
 import com.core.domain.model.ContentType
 import com.core.domain.model.Tags
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +28,7 @@ enum class ContentItemsSortedType {
     /**
      * Sort content items by date, oldest first.
      */
-    ByDateOldestFirst
+    ByDateOldestFirst,
 }
 
 /**
@@ -44,25 +41,13 @@ enum class ContentItemsSortedType {
 data class Query(
     val types: List<ContentType>,
     val tags: Tags,
-    val sortedBy: ContentItemsSortedType
+    val sortedBy: ContentItemsSortedType,
 )
 
 /**
  * Repository interface responsible for fetching and persisting content updates.
  */
 interface ContentItemRepository {
-
-    /**
-     * Returns a Flow of paginated content items based on the provided query.
-     *
-     * This method is typically used for UI components that need to display
-     * large sets of data efficiently using Paging.
-     *
-     * @param query Filtering and sorting criteria for the content.
-     * @return A Flow of [PagingData] containing [ContentItemPreview] objects.
-     */
-    fun flowContent(query: Query): Flow<PagingData<ContentItemPreview>>
-
     /**
      * Fetches a single content item by its ID.
      *

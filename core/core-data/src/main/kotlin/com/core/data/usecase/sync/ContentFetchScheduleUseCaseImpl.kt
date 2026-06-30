@@ -18,14 +18,15 @@ import javax.inject.Inject
  * @param contentFetchScheduler Scheduler responsible for setting up background work.
  * @see ContentFetchScheduleUseCase for interface definition
  */
-class ContentFetchScheduleUseCaseImpl @Inject constructor(
-    private val contentFetchScheduler: ContentFetchScheduler
-) : ContentFetchScheduleUseCase {
-
-    /**
-     * Schedules background content fetching by delegating to [ContentFetchScheduler].
-     */
-    override fun schedule() {
-        contentFetchScheduler.schedule()
+class ContentFetchScheduleUseCaseImpl
+    @Inject
+    constructor(
+        private val contentFetchScheduler: ContentFetchScheduler,
+    ) : ContentFetchScheduleUseCase {
+        /**
+         * Schedules background content fetching by delegating to [ContentFetchScheduler].
+         */
+        override fun schedule() {
+            contentFetchScheduler.schedule()
+        }
     }
-}

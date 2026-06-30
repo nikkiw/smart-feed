@@ -1,0 +1,17 @@
+# UI profile: pragmatic thresholds for Android Views and Decompose wiring.
+
+complexity:
+  LongParameterList:
+    active: true
+    functionThreshold: 10
+    constructorThreshold: 10
+  LongMethod:
+    active: true
+    threshold: 100
+  LargeClass:
+    active: true
+    threshold: 350
+
+style:
+  MagicNumber:
+    active: false

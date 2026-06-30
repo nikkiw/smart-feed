@@ -51,7 +51,10 @@ class EmbeddingIndex {
      * @param unitVector The already-normalized embedding vector (unit length). If not normalized,
      *                   consider calling [normalize] first to ensure correct similarity.
      */
-    fun add(id: String, unitVector: FloatArray) {
+    fun add(
+        id: String,
+        unitVector: FloatArray,
+    ) {
         embeddings.add(ArticleEmbedding(id, unitVector))
     }
 
@@ -78,13 +81,17 @@ class EmbeddingIndex {
      * @param k Number of nearest neighbors to retrieve.
      * @return A list of pairs (contentId, similarityScore), sorted descending by similarity.
      */
-    fun search(queryUnit: FloatArray, k: Int): List<ArticleScore> {
-
+    fun search(
+        queryUnit: FloatArray,
+        k: Int,
+    ): List<ArticleScore> {
         // Min-heap to store top-k results; root has the smallest similarity in the heap
-        val pq = PriorityQueue<ArticleScore>(
-            /* initialCapacity = */ k.coerceAtLeast(1),
-            Comparator { o1, o2 -> o1.second.compareTo(o2.second) }
-        )
+        val pq =
+            PriorityQueue<ArticleScore>(
+                // initialCapacity =
+                k.coerceAtLeast(1),
+                Comparator { o1, o2 -> o1.second.compareTo(o2.second) },
+            )
 
         for (emb in embeddings) {
             // Compute cosine similarity = dot product of unit vectors
@@ -143,7 +150,10 @@ class EmbeddingIndex {
          * @param b Second vector.
          * @return The dot product sum(a[i] * b[i]).
          */
-        fun dot(a: FloatArray, b: FloatArray): Float {
+        fun dot(
+            a: FloatArray,
+            b: FloatArray,
+        ): Float {
             var sum = 0f
             for (i in a.indices) sum += a[i] * b[i]
             return sum

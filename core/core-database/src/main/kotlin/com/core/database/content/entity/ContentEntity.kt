@@ -21,8 +21,8 @@ import androidx.room.TypeConverters
     tableName = "content",
     indices = [
         Index(value = ["type"]),
-        Index(value = ["updatedAt"])
-    ]
+        Index(value = ["updatedAt"]),
+    ],
 )
 data class ContentEntity(
     @PrimaryKey val id: String,
@@ -31,5 +31,5 @@ data class ContentEntity(
     val updatedAt: Long,
     val mainImageUrl: String,
     @TypeConverters(Converter::class)
-    val tags: List<String>
+    val tags: List<String>,
 )

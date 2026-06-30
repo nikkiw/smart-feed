@@ -3,7 +3,6 @@ package com.core.domain.usecase.recommendation
 import com.core.domain.model.ContentId
 import com.core.domain.model.ContentItemPreview
 
-
 /**
  * Use case interface for retrieving content recommendations based on a specific article.
  *
@@ -19,7 +18,6 @@ import com.core.domain.model.ContentItemPreview
  * ```
  */
 interface RecommendForArticleUseCase {
-
     /**
      * Retrieves a list of recommended content items related to the specified article.
      *

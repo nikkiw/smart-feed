@@ -14,6 +14,8 @@ class AndroidLibraryWithHiltConventionPlugin : Plugin<Project> {
             pluginManager.apply("org.jetbrains.kotlin.android")
             pluginManager.apply("com.google.devtools.ksp")
             pluginManager.apply("com.google.dagger.hilt.android")
+            pluginManager.apply("smart.feed.detekt")
+            pluginManager.apply("smart.feed.spotless")
 
             extensions.configure<LibraryExtension> {
                 configureAndroidLibrary(target)

@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface RecommendationDao {
-
     /**
      * Replace all user recommendations.
      *
@@ -58,7 +57,6 @@ interface RecommendationDao {
      */
     @Query("DELETE FROM user_recommendations")
     suspend fun deleteUserRecommendations()
-
 
     /**
      * Replace all content recommendations for a specific content ID.

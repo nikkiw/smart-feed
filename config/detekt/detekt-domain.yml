@@ -1,0 +1,13 @@
+# Domain profile: keep pure Kotlin/domain code tighter than UI and data adapters.
+
+complexity:
+  LongParameterList:
+    active: true
+    functionThreshold: 7
+    constructorThreshold: 8
+  LongMethod:
+    active: true
+    threshold: 70
+  LargeClass:
+    active: true
+    threshold: 220

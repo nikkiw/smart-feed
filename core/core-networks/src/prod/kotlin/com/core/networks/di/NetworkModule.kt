@@ -12,8 +12,8 @@ import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -24,7 +24,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
     /**
      * Базовый URL вашего сервера.
      * Можно вынести в BuildConfig или local.properties и прокинуть через BuildConfig.BASE_URL.
@@ -35,14 +34,15 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideGson(): Gson = GsonBuilder()
-        .serializeNulls()
-        .create()
+    fun provideGson(): Gson =
+        GsonBuilder()
+            .serializeNulls()
+            .create()
 
     @Provides
     @Singleton
     fun provideSharedPreferences(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     @Provides
@@ -54,9 +54,10 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
-        val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
+        val logging =
+            HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            }
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(logging)
@@ -68,7 +69,7 @@ object NetworkModule {
     fun provideRetrofit(
         @Named("BASE_URL") baseUrl: String,
         gson: Gson,
-        okHttpClient: OkHttpClient
+        okHttpClient: OkHttpClient,
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
@@ -88,9 +89,5 @@ object NetworkModule {
      */
     @Provides
     @Singleton
-    fun provideNetworkDataSource(
-        prodImpl: ProdNetworkDataSource
-    ): NetworkDataSource = prodImpl
+    fun provideNetworkDataSource(prodImpl: ProdNetworkDataSource): NetworkDataSource = prodImpl
 }
-
-

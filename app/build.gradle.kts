@@ -4,10 +4,10 @@ plugins {
 }
 
 android {
-    namespace = com.config.Config.NAMESPACE
+    namespace = com.ndev.convention.common.Config.NAMESPACE
 
     defaultConfig {
-        applicationId = com.config.Config.APPLICATION_ID
+        applicationId = com.ndev.convention.common.Config.APPLICATION_ID
 
         versionCode = 1
         versionName = "1.0"
@@ -18,7 +18,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -37,10 +37,11 @@ dependencies {
     implementation(projects.core.coreData)
     implementation(projects.core.coreDomain)
     implementation(projects.core.imageGlide)
-    implementation(projects.feature.feed)
+    implementation(projects.feature.feed.impl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.material)
     implementation(libs.bundles.decompose.libs)
 
@@ -49,6 +50,9 @@ dependencies {
     implementation(libs.hilt.work)
 
     testImplementation(libs.junit4)
+    testImplementation(libs.kotlin.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.robolectric)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -9,5 +9,5 @@ package com.core.domain.model
  */
 data class Recommendation(
     val articleId: ContentId,
-    val score: Float
+    val score: Float,
 )

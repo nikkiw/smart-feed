@@ -15,7 +15,7 @@ data class ContentWithDetails(
     @Embedded val contentUpdate: ContentEntity,
     @Relation(
         parentColumn = "id",
-        entityColumn = "contentId"
+        entityColumn = "contentId",
     )
     val article: ArticleAttributesEntity?,
 )

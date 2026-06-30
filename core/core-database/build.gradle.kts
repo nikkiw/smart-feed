@@ -14,7 +14,6 @@ android {
         testInstrumentationRunner = "com.core.database.HiltCustomTestRunner"
     }
 
-
     packaging {
         resources {
             excludes += setOf("DebugProbesKt.bin", "META-INF/LICENSE", "META-INF/NOTICE")
@@ -22,7 +21,6 @@ android {
         }
     }
 }
-
 
 dependencies {
     implementation(projects.core.core)

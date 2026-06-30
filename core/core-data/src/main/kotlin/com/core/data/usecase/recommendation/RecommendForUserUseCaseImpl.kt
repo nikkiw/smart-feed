@@ -29,33 +29,35 @@ import javax.inject.Inject
  * @param contentItemRepository Repository used to fetch full content items and convert them to previews.
  * @see RecommendForUserUseCase for interface definition
  */
-class RecommendForUserUseCaseImpl @Inject constructor(
-    private val recommendationRepository: RecommendationRepository,
-    private val contentItemRepository: ContentItemRepository
-) : RecommendForUserUseCase {
-
-    /**
-     * Retrieves a [Flow] of recommended content items for the current user.
-     *
-     * 1. Fetches a flow of raw [com.core.domain.model.Recommendation] objects via [RecommendationRepository.recommendForUser].
-     * 2. For each list of recommendations, maps them to previewable content items.
-     * 3. Skips any articles that cannot be fetched or converted to previews.
-     *
-     * Uses [mapLatest] to ensure only the most recent set of recommendations is processed,
-     * cancelling any previous transformations.
-     *
-     * @return A [Flow] emitting lists of [ContentItemPreview] objects.
-     *         Returns empty lists if no recommendations can be retrieved or mapped.
-     */
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override operator fun invoke(): Flow<List<ContentItemPreview>> =
-        recommendationRepository.recommendForUser()
-            .mapLatest { recommendations ->
-                recommendations.mapNotNull { rec ->
-                    contentItemRepository
-                        .getContentById(rec.articleId)
-                        .getOrNull()
-                        ?.toContentItemPreview()
+class RecommendForUserUseCaseImpl
+    @Inject
+    constructor(
+        private val recommendationRepository: RecommendationRepository,
+        private val contentItemRepository: ContentItemRepository,
+    ) : RecommendForUserUseCase {
+        /**
+         * Retrieves a [Flow] of recommended content items for the current user.
+         *
+         * 1. Fetches a flow of raw [com.core.domain.model.Recommendation] objects
+         *    via [RecommendationRepository.recommendForUser].
+         * 2. For each list of recommendations, maps them to previewable content items.
+         * 3. Skips any articles that cannot be fetched or converted to previews.
+         *
+         * Uses [mapLatest] to ensure only the most recent set of recommendations is processed,
+         * cancelling any previous transformations.
+         *
+         * @return A [Flow] emitting lists of [ContentItemPreview] objects.
+         *         Returns empty lists if no recommendations can be retrieved or mapped.
+         */
+        @OptIn(ExperimentalCoroutinesApi::class)
+        override operator fun invoke(): Flow<List<ContentItemPreview>> =
+            recommendationRepository.recommendForUser()
+                .mapLatest { recommendations ->
+                    recommendations.mapNotNull { rec ->
+                        contentItemRepository
+                            .getContentById(rec.articleId)
+                            .getOrNull()
+                            ?.toContentItemPreview()
+                    }
                 }
-            }
-}
+    }

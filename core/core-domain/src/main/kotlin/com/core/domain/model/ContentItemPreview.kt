@@ -1,6 +1,5 @@
 package com.core.domain.model
 
-
 /**
  * Base sealed class representing a preview of a content item.
  *
@@ -20,7 +19,6 @@ sealed class ContentItemPreview {
     abstract val mainImageUrl: ImageUrl
     abstract val tags: Tags
 
-
     /**
      * Represents a preview of an article content type.
      *
@@ -37,7 +35,7 @@ sealed class ContentItemPreview {
         override val mainImageUrl: ImageUrl,
         override val tags: Tags,
         val title: Title,
-        val short: ShortDescription
+        val short: ShortDescription,
     ) : ContentItemPreview() {
         override val type: ContentType = ContentType.ARTICLE
     }
@@ -56,7 +54,7 @@ sealed class ContentItemPreview {
         override val updatedAt: UpdatedAt,
         override val mainImageUrl: ImageUrl,
         override val tags: Tags,
-        val rawType: String
+        val rawType: String,
     ) : ContentItemPreview() {
         override val type: ContentType = ContentType.UNKNOWN
     }

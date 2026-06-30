@@ -18,6 +18,8 @@ import androidx.room.PrimaryKey
 data class ContentInteractionStats(
     @PrimaryKey val contentId: String,
     val readCount: Int,
-    val avgReadingTime: Double, // Average reading time in milliseconds
-    val avgReadPercentage: Double // Average read percentage (0.0 to 1.0)
+    // Average reading time in milliseconds
+    val avgReadingTime: Double,
+    // Average read percentage (0.0 to 1.0)
+    val avgReadPercentage: Double,
 )

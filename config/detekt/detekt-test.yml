@@ -1,0 +1,21 @@
+# JVM unit tests: test readability and fixtures can be larger than production code.
+
+complexity:
+  LongParameterList:
+    active: false
+  LongMethod:
+    active: true
+    threshold: 180
+  LargeClass:
+    active: true
+    threshold: 700
+
+naming:
+  FunctionNaming:
+    active: true
+    functionPattern: '([a-zA-Z][a-zA-Z0-9]*)|(`.*`)'
+    excludeClassPattern: '.*Test$'
+
+style:
+  MagicNumber:
+    active: false

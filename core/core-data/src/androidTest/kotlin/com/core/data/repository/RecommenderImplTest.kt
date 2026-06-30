@@ -27,10 +27,8 @@ import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-
 @RunWith(AndroidJUnit4::class)
 class RecommenderImplTest {
-
     private lateinit var networkDataSource: DevStaticJsonTestNetworkDataSource
     private lateinit var db: AppDatabase
     private lateinit var userProfileRepository: UserProfileRepository
@@ -55,37 +53,41 @@ class RecommenderImplTest {
         networkDataSource = DevStaticJsonTestNetworkDataSource(context)
         db = AppDatabase.Companion.getTestDatabase(context)
 
-        userProfileRepository = UserProfileRepositoryImpl(
-            embeddingDao = db.articleEmbeddingDao(),
-            contentInteractionStatsDao = db.articleInteractionStatsDao(),
-            userProfileDao = db.userProfileDao(),
-            ioDispatcher = testDispatcher
-        )
-        contentRepo = ContentItemRepositoryImpl(
-            contentDao = db.contentDao(),
-            contentTagsDao = db.contentTagsDao(),
-            updatesMetaDao = db.updatesMetaDao(),
-            networkDataSource = networkDataSource,
-            ioDispatcher = testDispatcher
-        )
-        recommender = RecommenderImpl(
-            userProfileRepository = userProfileRepository,
-            contentInteractionStatsDao = db.articleInteractionStatsDao(),
-            contentDao = db.contentDao(),
-            articleEmbeddingDao = db.articleEmbeddingDao(),
-            recommendationDao = db.recommendationDao(),
-            ioDispatcher = testDispatcher,
-            defaultDispatcher = testDispatcher,
-            applicationScope = applicationScope,
-            topK = topK,
-            coldK = coldK,
-            mmrK = mmrK,
-            lambda = lambda
-        )
-        recommendationRepository = RecommendationRepositoryImpl(
-            recommendationDao = db.recommendationDao(),
-            ioDispatcher = testDispatcher
-        )
+        userProfileRepository =
+            UserProfileRepositoryImpl(
+                embeddingDao = db.articleEmbeddingDao(),
+                contentInteractionStatsDao = db.articleInteractionStatsDao(),
+                userProfileDao = db.userProfileDao(),
+                ioDispatcher = testDispatcher,
+            )
+        contentRepo =
+            ContentItemRepositoryImpl(
+                contentDao = db.contentDao(),
+                contentTagsDao = db.contentTagsDao(),
+                updatesMetaDao = db.updatesMetaDao(),
+                networkDataSource = networkDataSource,
+                ioDispatcher = testDispatcher,
+            )
+        recommender =
+            RecommenderImpl(
+                userProfileRepository = userProfileRepository,
+                contentInteractionStatsDao = db.articleInteractionStatsDao(),
+                contentDao = db.contentDao(),
+                articleEmbeddingDao = db.articleEmbeddingDao(),
+                recommendationDao = db.recommendationDao(),
+                ioDispatcher = testDispatcher,
+                defaultDispatcher = testDispatcher,
+                applicationScope = applicationScope,
+                topK = topK,
+                coldK = coldK,
+                mmrK = mmrK,
+                lambda = lambda,
+            )
+        recommendationRepository =
+            RecommendationRepositoryImpl(
+                recommendationDao = db.recommendationDao(),
+                ioDispatcher = testDispatcher,
+            )
     }
 
     @After
@@ -94,58 +96,58 @@ class RecommenderImplTest {
     }
 
     @Test
-    fun testRecommendForUser_for_empty_profile() = runTest {
-        // когда нет никакого профиля, возвращается 5 последний загруженных статей
-        // Act
-        val result = contentRepo.syncContent()
+    fun testRecommendForUser_for_empty_profile() =
+        runTest {
+            // когда нет никакого профиля, возвращается 5 последний загруженных статей
+            // Act
+            val result = contentRepo.syncContent()
 
-        // Assert: проверьте, что результат успешен
-        Assert.assertTrue(result.isSuccess)
+            // Assert: проверьте, что результат успешен
+            Assert.assertTrue(result.isSuccess)
 
-        var expectedRecommendations =
-            db.contentDao().getRecentContent(mmrK).map { it.contentUpdate.id }
+            var expectedRecommendations =
+                db.contentDao().getRecentContent(mmrK).map { it.contentUpdate.id }
 
+            recommender.updateRecommendationsForUser()
 
-        recommender.updateRecommendationsForUser()
+            val actualRecommendations =
+                recommendationRepository.recommendForUser().first().map { it.articleId.value }
 
-        val actualRecommendations =
-            recommendationRepository.recommendForUser().first().map { it.articleId.value }
-
-        assertEquals(expectedRecommendations, actualRecommendations)
-    }
+            assertEquals(expectedRecommendations, actualRecommendations)
+        }
 
     @Test
-    fun testRecommendForUser_recommendation_after_on_article_read() = runTest {
-        // когда нет никакого профиля, возвращается 5 последний загруженных статей
-        // Act
-        val result = contentRepo.syncContent()
+    fun testRecommendForUser_recommendation_after_on_article_read() =
+        runTest {
+            // когда нет никакого профиля, возвращается 5 последний загруженных статей
+            // Act
+            val result = contentRepo.syncContent()
 
-        // Assert: проверьте, что результат успешен
-        Assert.assertTrue(result.isSuccess)
+            // Assert: проверьте, что результат успешен
+            Assert.assertTrue(result.isSuccess)
 
-        var articleRead =
-            db.contentDao().getRecentContent(1).first()
+            var articleRead =
+                db.contentDao().getRecentContent(1).first()
 
-        db.eventLogDao().insertEvent(
-            EventLog(
-                contentId = articleRead.contentUpdate.id,
-                eventType = EventType.READ,
-                readPercentage = 0.3f,
-                readingTimeMillis = 2000,
+            db.eventLogDao().insertEvent(
+                EventLog(
+                    contentId = articleRead.contentUpdate.id,
+                    eventType = EventType.READ,
+                    readPercentage = 0.3f,
+                    readingTimeMillis = 2000,
+                ),
             )
-        )
 
-        userProfileRepository.onArticleVisited(ContentId(articleRead.contentUpdate.id))
+            userProfileRepository.onArticleVisited(ContentId(articleRead.contentUpdate.id))
 
+            var expectedRecommendations =
+                db.contentDao().getRecentContent(mmrK).map { it.contentUpdate.id }
 
-        var expectedRecommendations =
-            db.contentDao().getRecentContent(mmrK).map { it.contentUpdate.id }
+            recommender.updateRecommendationsForUser()
 
-        recommender.updateRecommendationsForUser()
+            val actualRecommendations =
+                recommendationRepository.recommendForUser().first().map { it.articleId.value }
 
-        val actualRecommendations =
-            recommendationRepository.recommendForUser().first().map { it.articleId.value }
-
-        assertNotEquals(expectedRecommendations, actualRecommendations)
-    }
+            assertNotEquals(expectedRecommendations, actualRecommendations)
+        }
 }

@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
  * such as visited articles.
  */
 interface UserProfileRepository {
-
     /**
      * Updates the user profile based on a visited article and returns the updated embedding (if available).
      *

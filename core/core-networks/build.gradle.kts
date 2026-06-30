@@ -5,9 +5,7 @@ plugins {
 
 android {
     namespace = "com.core.networks"
-
 }
-
 
 dependencies {
     implementation(projects.core.core)

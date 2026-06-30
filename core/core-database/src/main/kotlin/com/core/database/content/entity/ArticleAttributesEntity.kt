@@ -17,19 +17,21 @@ import androidx.room.PrimaryKey
  */
 @Entity(
     tableName = "article_attributes",
-    foreignKeys = [ForeignKey(
-        entity = ContentEntity::class,
-        parentColumns = ["id"],
-        childColumns = ["contentId"],
-        onDelete = ForeignKey.CASCADE
-    )]
+    foreignKeys = [
+        ForeignKey(
+            entity = ContentEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["contentId"],
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
 )
 data class ArticleAttributesEntity(
     @PrimaryKey val contentId: String,
     val title: String,
     val content: String,
     val shortDescription: String,
-    val unitEmbedding: FloatArray
+    val unitEmbedding: FloatArray,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -38,9 +40,9 @@ data class ArticleAttributesEntity(
         other as ArticleAttributesEntity
 
         return contentId == other.contentId &&
-                title == other.title &&
-                content == other.content &&
-                shortDescription == other.shortDescription
+            title == other.title &&
+            content == other.content &&
+            shortDescription == other.shortDescription
     }
 
     override fun hashCode(): Int {

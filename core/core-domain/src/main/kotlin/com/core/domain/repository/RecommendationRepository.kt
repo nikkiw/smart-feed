@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
  * (personalized or general) or for a specific article (related content).
  */
 interface RecommendationRepository {
-
     /**
      * Returns a Flow of recommended content items for the current or specified user.
      *

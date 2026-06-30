@@ -12,6 +12,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -29,7 +32,10 @@ include(":mock-server")
 include(":core:core")
 include(":core:core-database")
 include(":core:core-networks")
+include(":core:core-paging")
 include(":core:core-data")
 include(":core:core-domain")
 include(":core:image-glide")
-include(":feature:feed")
+include(":feature:feed:api")
+include(":feature:feed:impl")
+include(":architecture-tests")

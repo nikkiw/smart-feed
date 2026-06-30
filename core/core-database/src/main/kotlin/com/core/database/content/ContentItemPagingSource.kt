@@ -6,7 +6,6 @@ import com.core.database.content.entity.ContentPreviewWithDetails
 import com.core.domain.repository.ContentItemsSortedType
 import com.core.domain.repository.Query
 
-
 /**
  * Builds a dynamic SQL query and returns a [PagingSource] for paginated content previews.
  *
@@ -42,9 +41,10 @@ import com.core.domain.repository.Query
  * )
  * ```
  */
+@Suppress("CyclomaticComplexMethod")
 fun contentItemPagingSource(
     query: Query,
-    contentDao: ContentDao
+    contentDao: ContentDao,
 ): PagingSource<Int, ContentPreviewWithDetails> {
     val sqlBuilder = StringBuilder()
     val args = mutableListOf<Any>()
@@ -53,12 +53,12 @@ fun contentItemPagingSource(
         """
         SELECT DISTINCT content.*
         FROM content
-        LEFT JOIN content_tags 
+        LEFT JOIN content_tags
           ON  content.id = content_tags.contentId
         LEFT JOIN article_attributes
           ON content.id = article_attributes.contentId
         WHERE content.action <> 'delete'
-    """.trimIndent()
+        """.trimIndent(),
     )
 
     // WHERE clauses
@@ -105,24 +105,24 @@ fun contentItemPagingSource(
         }
     }
 
-    val rawQuery = RoomRawQuery(
-        sql = sqlBuilder.toString(),
-        onBindStatement = { bind ->
-            for ((index, arg) in args.withIndex()) {
-                val bindIndex = index + 1
-                when (arg) {
-                    is String -> bind.bindText(bindIndex, arg)
-                    is Long -> bind.bindLong(bindIndex, arg)
-                    is Int -> bind.bindLong(bindIndex, arg.toLong())
-                    is Double -> bind.bindDouble(bindIndex, arg)
-                    is Float -> bind.bindDouble(bindIndex, arg.toDouble())
-                    is ByteArray -> bind.bindBlob(bindIndex, arg)
-                    else -> bind.bindText(bindIndex, arg.toString())
+    val rawQuery =
+        RoomRawQuery(
+            sql = sqlBuilder.toString(),
+            onBindStatement = { bind ->
+                for ((index, arg) in args.withIndex()) {
+                    val bindIndex = index + 1
+                    when (arg) {
+                        is String -> bind.bindText(bindIndex, arg)
+                        is Long -> bind.bindLong(bindIndex, arg)
+                        is Int -> bind.bindLong(bindIndex, arg.toLong())
+                        is Double -> bind.bindDouble(bindIndex, arg)
+                        is Float -> bind.bindDouble(bindIndex, arg.toDouble())
+                        is ByteArray -> bind.bindBlob(bindIndex, arg)
+                        else -> bind.bindText(bindIndex, arg.toString())
+                    }
                 }
-            }
-        }
-    )
-
+            },
+        )
 
     return contentDao.getContent(rawQuery)
 }

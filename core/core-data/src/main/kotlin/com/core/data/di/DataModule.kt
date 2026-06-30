@@ -22,6 +22,7 @@ import com.core.domain.repository.UserProfileRepository
 import com.core.domain.service.AnalyticsService
 import com.core.domain.service.Recommender
 import com.core.networks.datasource.NetworkDataSource
+import com.core.paging.ContentPagingRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,31 +31,38 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
-
     @Singleton
     @Provides
-    fun provideContentItemRepository(
+    fun provideContentItemRepositoryImpl(
         contentDao: ContentDao,
         contentTagsDao: ContentTagsDao,
         updatesMetaDao: UpdatesMetaDao,
         networkDataSource: NetworkDataSource,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
-    ): ContentItemRepository {
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): ContentItemRepositoryImpl {
         return ContentItemRepositoryImpl(
             contentDao = contentDao,
             contentTagsDao = contentTagsDao,
             updatesMetaDao = updatesMetaDao,
             networkDataSource = networkDataSource,
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
         )
     }
 
     @Singleton
     @Provides
+    fun provideContentItemRepository(repository: ContentItemRepositoryImpl): ContentItemRepository = repository
+
+    @Singleton
+    @Provides
+    fun provideContentPagingRepository(repository: ContentItemRepositoryImpl): ContentPagingRepository = repository
+
+    @Singleton
+    @Provides
+    @Suppress("LongParameterList")
     fun provideRecommender(
         userProfileRepository: UserProfileRepository,
         contentInteractionStatsDao: ContentInteractionStatsDao,
@@ -63,7 +71,7 @@ object DataModule {
         recommendationDao: RecommendationDao,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher,
-        @ApplicationScope applicationScope: CoroutineScope
+        @ApplicationScope applicationScope: CoroutineScope,
     ): Recommender {
         return RecommenderImpl(
             userProfileRepository = userProfileRepository,
@@ -77,7 +85,7 @@ object DataModule {
             topK = 10,
             coldK = 4,
             mmrK = 5,
-            lambda = 0.5f
+            lambda = 0.5f,
         )
     }
 
@@ -87,16 +95,15 @@ object DataModule {
         embeddingDao: ArticleEmbeddingDao,
         contentInteractionStatsDao: ContentInteractionStatsDao,
         userProfileDao: UserProfileDao,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): UserProfileRepository {
         return UserProfileRepositoryImpl(
             embeddingDao = embeddingDao,
             contentInteractionStatsDao = contentInteractionStatsDao,
             userProfileDao = userProfileDao,
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
         )
     }
-
 
     @Singleton
     @Provides
@@ -105,29 +112,26 @@ object DataModule {
         userProfileRepository: UserProfileRepository,
         @ApplicationScope applicationScope: CoroutineScope,
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): AnalyticsService {
         return AnalyticsServiceImpl(
             eventLogDao = eventLogDao,
             userProfileRepository = userProfileRepository,
             applicationScope = applicationScope,
             defaultDispatcher = defaultDispatcher,
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
         )
     }
-
 
     @Singleton
     @Provides
     fun provideRecommendationRepository(
         recommendationDao: RecommendationDao,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): RecommendationRepository {
         return RecommendationRepositoryImpl(
             recommendationDao = recommendationDao,
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
         )
     }
-
-
 }

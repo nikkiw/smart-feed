@@ -9,7 +9,6 @@ import javax.inject.Named
 @Module
 @InstallIn(SingletonComponent::class)
 object SchedulerModule {
-
     @Provides
     @Named("workName")
     fun provideWorkName(): String = "ContentFetchWork"

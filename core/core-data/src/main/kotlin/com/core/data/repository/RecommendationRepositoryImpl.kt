@@ -13,25 +13,25 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class RecommendationRepositoryImpl @Inject constructor(
-    private val recommendationDao: RecommendationDao,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
-) : RecommendationRepository {
-    override fun recommendForUser(): Flow<List<Recommendation>> =
-        recommendationDao.getUserRecommendations()
-            .map { listEntities ->
-                listEntities.map {
-                    it.toRecommendation()
+class RecommendationRepositoryImpl
+    @Inject
+    constructor(
+        private val recommendationDao: RecommendationDao,
+        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    ) : RecommendationRepository {
+        override fun recommendForUser(): Flow<List<Recommendation>> =
+            recommendationDao.getUserRecommendations()
+                .map { listEntities ->
+                    listEntities.map {
+                        it.toRecommendation()
+                    }
                 }
-            }
-            .flowOn(ioDispatcher)
+                .flowOn(ioDispatcher)
 
-    override suspend fun recommendForArticle(contentId: ContentId): List<Recommendation> {
-        return recommendationDao.getContentRecommendations(contentId.value)
-            .flowOn(ioDispatcher)
-            .first()
-            .map { it.toRecommendation() }
+        override suspend fun recommendForArticle(contentId: ContentId): List<Recommendation> {
+            return recommendationDao.getContentRecommendations(contentId.value)
+                .flowOn(ioDispatcher)
+                .first()
+                .map { it.toRecommendation() }
+        }
     }
-}
-
-

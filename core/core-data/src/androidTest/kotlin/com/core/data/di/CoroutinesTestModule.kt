@@ -18,18 +18,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import javax.inject.Singleton
 
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [CoroutinesModule::class]
+    replaces = [CoroutinesModule::class],
 )
 object CoroutinesTestModule {
-
+    //    val testDispatcher = UnconfinedTestDispatcher()
     @OptIn(ExperimentalCoroutinesApi::class)
-//    val testDispatcher = UnconfinedTestDispatcher()
     val testDispatcher = StandardTestDispatcher()
 
     @Provides
@@ -56,7 +54,7 @@ object CoroutinesTestModule {
             Log.e(
                 "AppCoroutinesTestModule",
                 "coroutineExceptionHandler error: ${exception.localizedMessage}",
-                exception
+                exception,
             )
         }
     }
@@ -66,7 +64,7 @@ object CoroutinesTestModule {
     @Provides
     fun providesCoroutineScope(
         @DefaultDispatcher dispatcher: CoroutineDispatcher,
-        @AppCoroutineExceptionHandler coroutineExceptionHandler: CoroutineExceptionHandler
+        @AppCoroutineExceptionHandler coroutineExceptionHandler: CoroutineExceptionHandler,
     ): CoroutineScope {
         return CoroutineScope(SupervisorJob() + dispatcher + coroutineExceptionHandler)
     }
