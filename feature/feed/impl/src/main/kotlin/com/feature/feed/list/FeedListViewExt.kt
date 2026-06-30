@@ -91,6 +91,26 @@ fun ViewContext.FeedListView(component: FeedListComponent): View {
     }
     recyclerView.adapter = adapter
 
+    recyclerView.addOnScrollListener(
+        object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(
+                recyclerView: RecyclerView,
+                dx: Int,
+                dy: Int,
+            ) {
+                super.onScrolled(recyclerView, dx, dy)
+                val bottomMenuView = recyclerView.rootView?.findViewById<View>(R.id.bottom_menu_view)
+                if (bottomMenuView != null) {
+                    if (dy > 0 && bottomMenuView.translationY == 0f) {
+                        bottomMenuView.animate().translationY(bottomMenuView.height.toFloat()).setDuration(200).start()
+                    } else if (dy < 0 && bottomMenuView.translationY != 0f) {
+                        bottomMenuView.animate().translationY(0f).setDuration(200).start()
+                    }
+                }
+            }
+        },
+    )
+
     // Setting up the listener for attaching/unpinning the View
     view.addOnAttachStateChangeListener(
         object : View.OnAttachStateChangeListener {

@@ -2,9 +2,9 @@ package com.feature.feed.article
 
 import android.view.View
 import android.widget.ImageView
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.widget.NestedScrollView
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.extensions.android.child
@@ -45,7 +45,7 @@ fun ViewContext.ArticleItemView(
     }
 
     val scrollView =
-        view.findViewById<ScrollView>(R.id.articleScrollView).apply {
+        view.findViewById<NestedScrollView>(R.id.articleScrollView).apply {
             transitionName = "transition_content_${component.itemId}"
         }
     val allContent = view.findViewById<CardView>(R.id.contentItem)
@@ -129,27 +129,47 @@ fun ViewContext.ArticleItemView(
                         chip.isClickable = false
                         tagGroup.addView(chip)
                     }
-                    scrollView.setOnScrollChangeListener {
-                            v: View,
-                            scrollX: Int,
-                            scrollY: Int,
-                            oldScrollX: Int,
-                            oldScrollY: Int,
-                        ->
-                        val contentHeight = allContent.height
-                        val scrollViewHeight = scrollView.height
-                        val percentSeen =
-                            ((scrollY + scrollViewHeight).toFloat() / contentHeight).coerceIn(
-                                0f,
-                                1f,
-                            )
-
-                        component.logPercentRead(percentSeen)
-                    }
+                    setupArticleScrollListener(scrollView, allContent, component)
                 }
             }
         }
     }
 
     return view
+}
+
+private fun setupArticleScrollListener(
+    scrollView: NestedScrollView,
+    allContent: CardView,
+    component: ArticleItemComponent,
+) {
+    scrollView.setOnScrollChangeListener {
+            v: View,
+            scrollX: Int,
+            scrollY: Int,
+            oldScrollX: Int,
+            oldScrollY: Int,
+        ->
+        val contentHeight = allContent.height
+        val scrollViewHeight = scrollView.height
+        val percentSeen =
+            ((scrollY + scrollViewHeight).toFloat() / contentHeight).coerceIn(
+                0f,
+                1f,
+            )
+
+        component.logPercentRead(percentSeen)
+
+        val bottomMenuView = v.rootView?.findViewById<View>(R.id.bottom_menu_view)
+        val dy = scrollY - oldScrollY
+        if (bottomMenuView != null) {
+            if (dy > 0 && bottomMenuView.translationY == 0f) {
+                bottomMenuView.animate().translationY(
+                    bottomMenuView.height.toFloat(),
+                ).setDuration(200).start()
+            } else if (dy < 0 && bottomMenuView.translationY != 0f) {
+                bottomMenuView.animate().translationY(0f).setDuration(200).start()
+            }
+        }
+    }
 }
