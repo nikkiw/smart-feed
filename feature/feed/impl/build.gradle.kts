@@ -15,6 +15,8 @@ android {
 }
 
 dependencies {
+    api(projects.feature.feed.api)
+
     implementation(projects.core.core)
     implementation(projects.core.coreDomain)
     implementation(projects.core.corePaging)

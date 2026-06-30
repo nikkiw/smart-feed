@@ -37,7 +37,7 @@ dependencies {
     implementation(projects.core.coreData)
     implementation(projects.core.coreDomain)
     implementation(projects.core.imageGlide)
-    implementation(projects.feature.feed)
+    implementation(projects.feature.feed.impl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

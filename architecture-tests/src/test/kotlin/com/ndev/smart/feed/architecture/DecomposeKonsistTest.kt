@@ -6,7 +6,7 @@ class DecomposeKonsistTest {
     @Test
     fun `component implementations use ComponentImpl suffix`() {
         val invalidFiles =
-            sourceFilesUnder("feature/feed/src/main")
+            sourceFilesUnder("feature/feed/impl/src/main")
                 .filter { it.relativePath.endsWith("ComponentImpl.kt") }
                 .filterNot { it.fileName().removeSuffix(".kt").endsWith("ComponentImpl") }
 
@@ -20,7 +20,11 @@ class DecomposeKonsistTest {
 
     @Test
     fun `each ComponentImpl has a matching Component contract file`() {
-        val files = sourceFilesUnder("feature/feed/src/main")
+        val files =
+            sourceFilesUnder(
+                "feature/feed/api/src/main",
+                "feature/feed/impl/src/main",
+            )
         val contractNames =
             files
                 .filter { it.relativePath.endsWith("Component.kt") }
@@ -29,6 +33,7 @@ class DecomposeKonsistTest {
 
         val missingContracts =
             files
+                .filter { it.relativePath.startsWith("feature/feed/impl/") }
                 .filter { it.relativePath.endsWith("ComponentImpl.kt") }
                 .map { it.fileName().removeSuffix("Impl.kt") }
                 .filterNot { it in contractNames }

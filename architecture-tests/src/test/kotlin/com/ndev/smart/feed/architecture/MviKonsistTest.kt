@@ -6,7 +6,7 @@ class MviKonsistTest {
     @Test
     fun `mvi declarations live in store packages`() {
         val misplacedFiles =
-            sourceFilesUnder("feature/feed/src/main")
+            sourceFilesUnder("feature/feed/impl/src/main")
                 .filter {
                     val name = it.fileName().removeSuffix(".kt")
                     name.endsWith("Store") || name.endsWith("StoreFactory") || name.endsWith("Reducer")
@@ -23,7 +23,7 @@ class MviKonsistTest {
 
     @Test
     fun `reducers stay pure`() {
-        sourceFilesUnder("feature/feed/src/main")
+        sourceFilesUnder("feature/feed/impl/src/main")
             .filter { it.relativePath.endsWith("Reducer.kt") }
             .assertNoImports(
                 forbiddenPrefixes =
@@ -46,7 +46,7 @@ class MviKonsistTest {
 
     @Test
     fun `view extensions do not import store internals`() {
-        sourceFilesUnder("feature/feed/src/main")
+        sourceFilesUnder("feature/feed/impl/src/main")
             .filter { it.relativePath.endsWith("ViewExt.kt") }
             .assertNoImports(
                 forbiddenPrefixes = listOf("com.feature.feed.store."),

@@ -4,9 +4,51 @@ import kotlin.test.Test
 
 class FeatureBoundaryKonsistTest {
     @Test
+    fun `feed api module exposes contracts without depending on implementation`() {
+        val apiFiles = sourceFilesUnder("feature/feed/api/src/main")
+        val implFiles = sourceFilesUnder("feature/feed/impl/src/main")
+
+        check(apiFiles.isNotEmpty()) {
+            "feature/feed/api must exist and contain public feed contracts after module split."
+        }
+        check(implFiles.isNotEmpty()) {
+            "feature/feed/impl must exist and contain feed implementation after module split."
+        }
+
+        apiFiles.assertNoImports(
+            forbiddenPrefixes =
+                listOf(
+                    "com.feature.feed.impl.",
+                    "android.view.",
+                    "android.widget.",
+                    "androidx.recyclerview.",
+                    "com.google.android.material.",
+                    "io.noties.markwon.",
+                    "com.bumptech.glide.",
+                    "com.image.glide.",
+                    "com.core.data.",
+                    "com.core.database.",
+                    "com.core.networks.",
+                ),
+            reason = "Feed API module must expose contracts without implementation or UI dependencies.",
+        )
+
+        apiFiles
+            .filter { it.fileName().removeSuffix(".kt").endsWith("Impl") }
+            .let { implNamedApiFiles ->
+                check(implNamedApiFiles.isEmpty()) {
+                    buildString {
+                        appendLine("Feed API module must not contain implementation classes.")
+                        implNamedApiFiles.forEach { appendLine("- ${it.relativePath}") }
+                    }
+                }
+            }
+    }
+
+    @Test
     fun `feed component contracts do not import implementation or Android view details`() {
         val contractFiles =
-            sourceFilesUnder("feature/feed/src/main")
+            sourceFilesUnder("feature/feed/api/src/main")
                 .filter { it.relativePath.endsWith("Component.kt") }
 
         contractFiles.assertNoImports(
@@ -23,7 +65,7 @@ class FeatureBoundaryKonsistTest {
                     "com.core.database.",
                     "com.core.networks.",
                 ),
-            reason = "Feed component contracts must stay usable as feature API contracts before module split.",
+            reason = "Feed component contracts must stay usable as feature API contracts.",
         )
 
         val implImports =
@@ -42,7 +84,7 @@ class FeatureBoundaryKonsistTest {
 
     @Test
     fun `feed view extensions do not reach stores reducers repositories or data implementations`() {
-        sourceFilesUnder("feature/feed/src/main")
+        sourceFilesUnder("feature/feed/impl/src/main")
             .filter { it.relativePath.endsWith("ViewExt.kt") }
             .assertNoImports(
                 forbiddenPrefixes =
@@ -92,7 +134,7 @@ class FeatureBoundaryKonsistTest {
 
     @Test
     fun `feed coordination does not cast contracts to implementations`() {
-        sourceFilesUnder("feature/feed/src/main")
+        sourceFilesUnder("feature/feed/impl/src/main")
             .filter { it.relativePath.endsWith("ComponentImpl.kt") }
             .assertTextDoesNotContain(
                 forbiddenSnippets =
