@@ -1,6 +1,5 @@
-package com.core.data.service
+package com.ndev.android.smart.feed.startup
 
-import com.core.domain.service.AppBootstrapper
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.usecase.sync.ContentFetchScheduleUseCase
 import com.feature.feed.domain.usecase.sync.SyncContentUseCase
@@ -11,7 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Implementation of [AppBootstrapper] that runs idempotent startup tasks.
+ * App-level implementation of [AppBootstrapper] that runs idempotent startup tasks.
  *
  * AppStartupCoordinator may be recreated on configuration changes. Startup stays safe because
  * the initial sync is guarded by an empty-database check and scheduling is handled idempotently.

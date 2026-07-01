@@ -76,6 +76,17 @@ class LayerDependencyKonsistTest {
     }
 
     @Test
+    fun `core domain does not own app startup contracts`() {
+        sourceFilesUnder("core/core-domain/src/main").assertTextDoesNotContain(
+            forbiddenSnippets =
+                listOf(
+                    "interface AppBootstrapper",
+                ),
+            reason = "App startup contracts must live in the app startup package.",
+        )
+    }
+
+    @Test
     fun `core data does not own feed implementations`() {
         sourceFilesUnder("core/core-data/src/main").assertTextDoesNotContain(
             forbiddenSnippets =
@@ -115,6 +126,18 @@ class LayerDependencyKonsistTest {
             reason =
                 "User profile implementation must live in feature/userprofile/impl " +
                     "and analytics in core/analytics/impl.",
+        )
+    }
+
+    @Test
+    fun `core data does not own app startup bootstrap wiring`() {
+        sourceFilesUnder("core/core-data/src/main").assertTextDoesNotContain(
+            forbiddenSnippets =
+                listOf(
+                    "AppBootstrapperImpl",
+                    "bindAppBootstrapper",
+                ),
+            reason = "App startup bootstrap wiring must live in the app startup package.",
         )
     }
 

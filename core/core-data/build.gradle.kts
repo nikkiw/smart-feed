@@ -19,23 +19,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.core)
-    implementation(projects.core.coreDomain)
     implementation(projects.core.corePaging)
-    implementation(projects.core.coreNetworks)
-    implementation(projects.core.coreDatabase)
-    implementation(projects.core.coroutines)
-    implementation(projects.core.content.api)
-    implementation(projects.feature.feed.api)
-    implementation(projects.feature.feed.local)
-    implementation(projects.feature.recommendation.api)
-    implementation(projects.feature.recommendation.local)
-
-    // Pagging
-    implementation(libs.room.paging)
-    implementation(libs.androidx.pagging.ktx)
-
-    implementation(libs.gson)
 
     // Testing dependencies
     // Unit tests

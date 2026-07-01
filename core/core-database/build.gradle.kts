@@ -24,7 +24,6 @@ android {
 
 dependencies {
     implementation(projects.core.core)
-    implementation(projects.core.coreDomain)
     implementation(projects.core.analytics.local)
     implementation(projects.feature.feed.local)
     implementation(projects.feature.recommendation.local)

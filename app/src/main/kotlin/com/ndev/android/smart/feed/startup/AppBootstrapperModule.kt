@@ -1,7 +1,5 @@
-package com.core.data.di
+package com.ndev.android.smart.feed.startup
 
-import com.core.data.service.AppBootstrapperImpl
-import com.core.domain.service.AppBootstrapper
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -10,7 +8,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ServiceModule {
+abstract class AppBootstrapperModule {
     @Singleton
     @Binds
     abstract fun bindAppBootstrapper(appBootstrapperImpl: AppBootstrapperImpl): AppBootstrapper

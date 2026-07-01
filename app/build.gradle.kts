@@ -35,7 +35,6 @@ dependencies {
     implementation(projects.core.coreNetworks)
     implementation(projects.core.coreDatabase)
     implementation(projects.core.coreData)
-    implementation(projects.core.coreDomain)
     implementation(projects.core.coroutines)
     implementation(projects.core.lifecycle)
     implementation(projects.core.connectivity)

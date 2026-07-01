@@ -1,4 +1,4 @@
-package com.core.domain.service
+package com.ndev.android.smart.feed.startup
 
 /**
  * Interface for application bootstrapping logic.
