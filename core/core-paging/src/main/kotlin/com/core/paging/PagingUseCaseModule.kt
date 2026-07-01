@@ -1,7 +1,5 @@
-package com.core.data.di
+package com.core.paging
 
-import com.core.paging.GetPagedContentUseCase
-import com.core.paging.GetPagedContentUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -10,7 +8,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class UseCaseModule {
+abstract class PagingUseCaseModule {
     @Singleton
     @Binds
     abstract fun bindGetPagedContentUseCase(

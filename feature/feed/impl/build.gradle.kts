@@ -22,7 +22,6 @@ dependencies {
     implementation(projects.core.content.api)
     implementation(projects.core.coroutines)
     implementation(projects.core.coreDatabase)
-    implementation(projects.core.coreDomain)
     implementation(projects.core.coreNetworks)
     implementation(projects.core.corePaging)
     implementation(projects.core.connectivity)
