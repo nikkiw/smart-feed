@@ -16,7 +16,7 @@ data class SourceFile(
     val relativePath: String = projectRoot.relativize(path).invariantSeparatorsPathString
 }
 
-private val projectRoot: Path =
+internal val projectRoot: Path =
     Path.of(
         checkNotNull(System.getProperty("smartFeed.rootDir")) {
             "smartFeed.rootDir test system property must point to the repository root."

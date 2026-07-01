@@ -1,4 +1,4 @@
-package com.feature.feed.data.usecase.sync
+package com.feature.feed.data.usecase.content
 
 import android.content.Context
 import androidx.paging.testing.asSnapshot
@@ -8,10 +8,8 @@ import com.core.content.model.ContentType
 import com.core.content.model.Tags
 import com.core.database.AppDatabase
 import com.core.networks.datasource.dev.DevStaticJsonTestNetworkDataSource
-import com.core.paging.ContentPagingRepository
-import com.core.paging.GetPagedContentUseCase
-import com.core.paging.GetPagedContentUseCaseImpl
 import com.feature.feed.data.repository.ContentItemRepositoryImpl
+import com.feature.feed.data.repository.ContentPagingRepository
 import com.feature.feed.domain.repository.ContentItemsSortedType
 import com.feature.feed.domain.repository.Query
 import com.feature.feed.local.content.entity.ArticleAttributesEntity
@@ -33,7 +31,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
-class GetPagedContentUseCaseImplTest {
+class GetPagedContentUseCaseTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var db: AppDatabase
@@ -55,7 +53,7 @@ class GetPagedContentUseCaseImplTest {
                 networkDataSource = DevStaticJsonTestNetworkDataSource(context),
                 ioDispatcher = testDispatcher,
             )
-        useCase = GetPagedContentUseCaseImpl(repository)
+        useCase = GetPagedContentUseCase(repository)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

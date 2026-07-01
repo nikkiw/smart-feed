@@ -1,10 +1,10 @@
-package com.core.paging
+package com.feature.feed.data.repository
 
 import androidx.paging.PagingData
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.Query
 import kotlinx.coroutines.flow.Flow
 
-interface GetPagedContentUseCase {
-    operator fun invoke(query: Query): Flow<PagingData<ContentItemPreview>>
+interface ContentPagingRepository {
+    fun flowContent(query: Query): Flow<PagingData<ContentItemPreview>>
 }

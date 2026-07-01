@@ -23,7 +23,6 @@ dependencies {
     implementation(projects.core.coroutines)
     implementation(projects.core.coreDatabase)
     implementation(projects.core.coreNetworks)
-    implementation(projects.core.corePaging)
     implementation(projects.core.connectivity)
     implementation(projects.core.image.api)
     implementation(projects.feature.feed.local)
