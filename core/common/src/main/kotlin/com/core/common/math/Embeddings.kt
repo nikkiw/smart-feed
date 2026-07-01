@@ -1,4 +1,4 @@
-package com.core.math
+package com.core.common.math
 
 import kotlin.math.sqrt
 

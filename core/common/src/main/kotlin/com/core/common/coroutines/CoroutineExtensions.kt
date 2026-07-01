@@ -1,4 +1,4 @@
-package com.core
+package com.core.common.coroutines
 
 import kotlinx.coroutines.CancellationException
 

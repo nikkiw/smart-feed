@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.core.analytics.local.entity.EventLog
 import com.core.analytics.local.entity.EventType
+import com.core.common.time.DateTimeConvertors
 import com.core.content.model.ContentId
 import com.core.content.model.ContentType
 import com.core.database.AppDatabase
-import com.core.utils.DateTimeConvertors
 import com.feature.feed.local.content.entity.ArticleAttributesEntity
 import com.feature.feed.local.content.entity.ContentEntity
 import com.feature.userprofile.data.di.CoroutinesTestModule

@@ -29,7 +29,7 @@ rootProject.name = "SmartFeedMVP"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
 include(":mock-server")
-include(":core:core")
+include(":core:common")
 include(":core:core-database")
 include(":core:core-networks")
 include(":core:core-paging")

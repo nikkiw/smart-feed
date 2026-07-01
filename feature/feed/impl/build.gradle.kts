@@ -17,7 +17,7 @@ android {
 dependencies {
     api(projects.feature.feed.api)
 
-    implementation(projects.core.core)
+    implementation(projects.core.common)
     implementation(projects.core.analytics.api)
     implementation(projects.core.content.api)
     implementation(projects.core.coroutines)

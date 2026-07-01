@@ -31,7 +31,7 @@ android {
 dependencies {
     debugImplementation(libs.leakcanary)
 
-    implementation(projects.core.core)
+    implementation(projects.core.common)
     implementation(projects.core.coreNetworks)
     implementation(projects.core.coreDatabase)
     implementation(projects.core.coroutines)

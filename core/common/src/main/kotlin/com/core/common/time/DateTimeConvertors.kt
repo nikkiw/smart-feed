@@ -1,4 +1,4 @@
-package com.core.utils
+package com.core.common.time
 
 import java.text.ParseException
 import java.text.SimpleDateFormat

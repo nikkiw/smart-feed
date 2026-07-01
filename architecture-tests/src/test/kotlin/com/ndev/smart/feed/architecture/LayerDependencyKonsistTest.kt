@@ -4,8 +4,8 @@ import kotlin.test.Test
 
 class LayerDependencyKonsistTest {
     @Test
-    fun `domain layer stays framework and implementation independent`() {
-        sourceFilesUnder("core/core-domain/src/main").assertNoImports(
+    fun `common module stays framework and implementation independent`() {
+        sourceFilesUnder("core/common/src/main").assertNoImports(
             forbiddenPrefixes =
                 listOf(
                     "android.",
@@ -19,141 +19,20 @@ class LayerDependencyKonsistTest {
                     "com.arkivanov.decompose.",
                     "com.arkivanov.essenty.",
                     "com.arkivanov.mvikotlin.",
-                    "com.core.data.",
                     "com.core.database.",
                     "com.core.networks.",
+                    "com.core.analytics.",
+                    "com.core.connectivity.",
+                    "com.core.lifecycle.",
+                    "com.core.image.",
+                    "com.core.paging.",
+                    "com.core.coroutines.",
                     "com.feature.",
                     "com.ndev.android.smart.feed.",
                 ),
-            reason = "core-domain must stay pure and must not depend on frameworks or implementation layers.",
-        )
-    }
-
-    @Test
-    fun `core domain does not own feed content contracts`() {
-        sourceFilesUnder("core/core-domain/src/main").assertTextDoesNotContain(
-            forbiddenSnippets =
-                listOf(
-                    "ContentItemRepository",
-                    "ContentItemPreview",
-                    "data class Query",
-                    "enum class ContentItemsSortedType",
-                    "interface GetContentItemUseCase",
-                    "interface SyncContentUseCase",
-                    "interface ContentFetchScheduleUseCase",
-                ),
-            reason = "Feed content contracts must be owned by feature/feed/api.",
-        )
-    }
-
-    @Test
-    fun `core domain does not own recommendation contracts`() {
-        sourceFilesUnder("core/core-domain/src/main").assertTextDoesNotContain(
-            forbiddenSnippets =
-                listOf(
-                    "data class Recommendation",
-                    "interface RecommendationRepository",
-                    "interface Recommender",
-                    "interface RecommendForArticleUseCase",
-                    "interface RecommendForUserUseCase",
-                ),
-            reason = "Recommendation contracts must be owned by feature/recommendation/api.",
-        )
-    }
-
-    @Test
-    fun `core domain does not own user profile or analytics contracts`() {
-        sourceFilesUnder("core/core-domain/src/main").assertTextDoesNotContain(
-            forbiddenSnippets =
-                listOf(
-                    "interface UserProfileRepository",
-                    "interface AnalyticsService",
-                ),
             reason =
-                "User profile contracts must live in feature/userprofile/api " +
-                    "and analytics contracts in core/analytics/api.",
-        )
-    }
-
-    @Test
-    fun `core domain does not own app startup contracts`() {
-        sourceFilesUnder("core/core-domain/src/main").assertTextDoesNotContain(
-            forbiddenSnippets =
-                listOf(
-                    "interface AppBootstrapper",
-                ),
-            reason = "App startup contracts must live in the app startup package.",
-        )
-    }
-
-    @Test
-    fun `core data does not own feed implementations`() {
-        sourceFilesUnder("core/core-data/src/main").assertTextDoesNotContain(
-            forbiddenSnippets =
-                listOf(
-                    "ContentItemRepositoryImpl",
-                    "GetContentItemUseCaseImpl",
-                    "SyncContentUseCaseImpl",
-                    "ContentFetchWorker",
-                    "ContentFetchScheduler",
-                ),
-            reason = "Feed data implementations must live in feature/feed/impl.",
-        )
-    }
-
-    @Test
-    fun `core data does not own recommendation implementations`() {
-        sourceFilesUnder("core/core-data/src/main").assertTextDoesNotContain(
-            forbiddenSnippets =
-                listOf(
-                    "RecommendationRepositoryImpl",
-                    "RecommendForArticleUseCaseImpl",
-                    "RecommendForUserUseCaseImpl",
-                    "RecommenderImpl",
-                ),
-            reason = "Recommendation data implementations must live in feature/recommendation/impl.",
-        )
-    }
-
-    @Test
-    fun `core data does not own user profile or analytics implementations`() {
-        sourceFilesUnder("core/core-data/src/main").assertTextDoesNotContain(
-            forbiddenSnippets =
-                listOf(
-                    "UserProfileRepositoryImpl",
-                    "AnalyticsServiceImpl",
-                ),
-            reason =
-                "User profile implementation must live in feature/userprofile/impl " +
-                    "and analytics in core/analytics/impl.",
-        )
-    }
-
-    @Test
-    fun `core data does not own app startup bootstrap wiring`() {
-        sourceFilesUnder("core/core-data/src/main").assertTextDoesNotContain(
-            forbiddenSnippets =
-                listOf(
-                    "AppBootstrapperImpl",
-                    "bindAppBootstrapper",
-                ),
-            reason = "App startup bootstrap wiring must live in the app startup package.",
-        )
-    }
-
-    @Test
-    fun `data layer does not depend on app or feature packages`() {
-        sourceFilesUnder(
-            "core/core-data/src/main",
-            "core/core-data/src/dev",
-            "core/core-data/src/prod",
-        ).assertNoImports(
-            forbiddenPrefixes =
-                listOf(
-                    "com.feature.",
-                    "com.ndev.android.smart.feed.",
-                ),
-            reason = "core-data can orchestrate data sources but must not depend on app or feature UI.",
+                "core-common must stay pure and must not depend on frameworks, " +
+                    "app, feature, or other core modules.",
         )
     }
 
@@ -174,13 +53,12 @@ class LayerDependencyKonsistTest {
                     "com.feature.userprofile.impl.",
                     "com.core.analytics.api.",
                     "com.core.analytics.impl.",
-                    "com.core.data.",
                     "com.core.networks.",
                     "com.ndev.android.smart.feed.",
                 ),
             reason =
                 "core-database is a Room aggregator. It may import storage-schema " +
-                    "modules only, not feature API/impl, data, network, app, or UI.",
+                    "modules only, not feature API/impl, network, app, or UI.",
         )
     }
 
@@ -196,11 +74,10 @@ class LayerDependencyKonsistTest {
                     "com.feature.",
                     "com.ndev.android.smart.feed.",
                     "com.core.database.",
-                    "com.core.data.",
                 ),
             reason =
                 "core-networks must remain a network adapter and not depend on " +
-                    "persistence, data orchestration, app, or feature UI.",
+                    "persistence, app, or feature UI.",
         )
     }
 
@@ -213,11 +90,10 @@ class LayerDependencyKonsistTest {
                     "com.ndev.android.smart.feed.",
                     "com.core.database.",
                     "com.core.networks.",
-                    "com.core.data.",
                 ),
             reason =
                 "image-glide must remain an image loading adapter and not depend " +
-                    "on app, feature, persistence, network, or data orchestration.",
+                    "on app, feature, persistence, or network code.",
         )
     }
 }

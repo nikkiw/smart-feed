@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.core)
+    implementation(projects.core.common)
     implementation(projects.core.coroutines)
     // Network - Retrofit
     implementation(libs.retrofit)

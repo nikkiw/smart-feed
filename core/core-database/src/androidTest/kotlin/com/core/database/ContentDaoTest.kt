@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.paging.PagingSource
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.core.common.time.DateTimeConvertors
 import com.core.content.model.ContentType
 import com.core.content.model.Tags
-import com.core.utils.DateTimeConvertors
 import com.feature.feed.domain.repository.ContentItemsSortedType
 import com.feature.feed.domain.repository.Query
 import com.feature.feed.local.content.contentItemPagingSource

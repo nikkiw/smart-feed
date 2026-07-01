@@ -27,7 +27,7 @@ dependencies {
     implementation(projects.feature.userprofile.local)
 
     androidTestImplementation(projects.core.analytics.local)
-    androidTestImplementation(projects.core.core)
+    androidTestImplementation(projects.core.common)
     androidTestImplementation(projects.core.coreDatabase)
     androidTestImplementation(projects.feature.feed.local)
     androidTestImplementation(libs.room.runtime)
