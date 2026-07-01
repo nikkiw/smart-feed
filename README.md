@@ -7,9 +7,8 @@
 
 **Smart Feed** is a showcase Android application demonstrating modern, production-grade architectural patterns. It features a modular, offline-first article feed, dynamic filtering/sorting, and an on-device recommendation engine powered by text embeddings.
 
-This repository serves as a showcase of senior-level engineering skills, focusing on **Feature-Driven Vertical Slice Architecture**, **decoupled navigation (Decompose)**, **strict 3-module feature boundaries (API / Local / Impl)**, **executable architecture guards (Konsist)**, and **composable static quality gates (Detekt 2 / Spotless)**.
+A reference project demonstrating scalable Android architecture. The core focus is on building predictable systems using **Feature-Driven Vertical Slices** with strict modular boundaries (API / Local / Impl). It utilizes **Decompose** for lifecycle-aware navigation, while architectural constraints and code quality are automatically enforced via **Konsist**, **Detekt 2**, and **Spotless**."
 
----
 
 ## 🎥 Demo
 
@@ -50,6 +49,38 @@ For a complete breakdown, see the [Architecture Documentation](docs/architecture
 
 ---
 
+## 🧠 On-Device Recommendation Engine
+
+Smart Feed includes a **fully local recommendation pipeline** based on article text embeddings.
+No reading behavior leaves the device.
+
+```text
+User reads article
+      ↓
+engagementWeight = 0.5×readPercentage + 0.5×normalizedTime
+      ↓
+Weighted moving average updates user interest vector
+(old_vec×visitCount + article_vec×weight) / (visitCount+1)
+      ↓
+Article embeddings (FloatArray, unit-norm) loaded from Room
+Already-read articles fully excluded
+      ↓
+top-K candidates (highest cosine similarity to user vector)
+cold-K candidates (opposite vector → diversity / serendipity)
+      ↓
+MMR diversification: λ×sim(candidate,profile) − (1−λ)×max_sim_to_selected
+      ↓
+Ranked recommendations persisted to Room → displayed in feed
+```
+
+The algorithm lives entirely in `:feature:recommendation:impl` — **isolated, independently
+testable, and offline-first**. Room schema is owned by `:feature:recommendation:local`.
+Public contracts (use cases, repository interfaces) live in `:feature:recommendation:api`.
+
+For full details, see [Recommendation Engine](docs/recommendation_engine.md).
+
+---
+
 ## 📁 Project Structure
 
 ```plaintext
@@ -82,9 +113,13 @@ smart-feed/
     │   └── impl/           #   UI views, XML layouts, Hilt modules, repository impls,
     │                       #   Paging 3 (ContentPagingRepository, GetPagedContentUseCase)
     ├── recommendation/     # Recommendation engine — full vertical slice
-    │   ├── api/            #   Recommendation model, RecommendationRepository contract
-    │   ├── local/          #   Recommendation Room entities and DAOs
-    │   └── impl/           #   Recommender, EmbeddingIndex (cosine similarity), Hilt modules
+    │   ├── api/            #   Recommendation contracts, models (Recommendation, Recommender,
+    │   │                   #   RecommendationRepository, RecommendForUserUseCase, RecommendForArticleUseCase)
+    │   ├── local/          #   Room schema: ArticleEmbedding, ArticleEmbeddingDao,
+    │   │                   #   ContentInteractionStats, ContentInteractionStatsDao,
+    │   │                   #   UserRecommendationEntity, ContentRecommendationEntity, RecommendationDao
+    │   └── impl/           #   RecommenderImpl (cosine similarity + MMR + cold-picks),
+    │                       #   EmbeddingIndex, RecommendationRepositoryImpl, Hilt modules
     └── userprofile/        # User identity — vertical slice
         ├── api/            #   UserProfile model, UserProfileRepository contract
         ├── impl/           #   Repository impl, Hilt module

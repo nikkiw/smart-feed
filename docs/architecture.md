@@ -95,11 +95,49 @@ Every feature follows a strict 3-module pattern:
 |--------|----------|--------------|
 | `:feature:<name>:api` | Domain models, repository interfaces, component contracts (Decompose), state objects | Pure Kotlin only — no Android, no Hilt |
 | `:feature:<name>:local` | Room `@Entity` classes, `@Dao` interfaces, TypeConverters for this feature | `:feature:<name>:api` only |
-| `:feature:<name>:impl` | UI layouts (XML/Compose), component implementations, repository implementations, Hilt modules, feature-owned Paging adapters | `:api`, `:local`, `:core:core-database`, `:core:image:api`, etc. |
+| `:feature:<name>:impl` | UI layouts (XML/Compose), component implementations, repository implementations, Hilt modules | `:api`, `:local`, `:core:core-database`, `:core:image:api`, etc. |
 
 ---
 
-## 4. Core Infrastructure Modules
+## 4. On-Device Recommendation Pipeline
+
+The recommendation feature is a fully local, privacy-first vertical slice:
+
+```text
+Article read event
+      ↓
+engagementWeight = 0.5×avgReadPercentage + 0.5×normalizedTime
+      ↓
+User interest vector (weighted moving average, stored in UserProfileEntity)
+      ↓
+ArticleEmbedding index loaded from :feature:recommendation:local
+Already-read IDs excluded via ContentInteractionStatsDao.getAllReadContentIds()
+      ↓
+top-K: highest cosine similarity to user vector
+cold-K: highest similarity to opposite(userVector) → diversity / serendipity
+      ↓
+MMR diversification: λ×sim(c,profile) − (1−λ)×max_sim_to_selected
+      ↓
+UserRecommendationEntity persisted to Room → served via RecommendationRepository
+```
+
+Content-to-content recommendations follow the same pipeline with the article’s own embedding
+acting as the query instead of the user profile vector.
+
+**Architecture invariant:**
+
+| Boundary | Rule |
+|----------|------|
+| `:feature:recommendation:api` | Contracts only. No Room, Hilt, Android SDK. |
+| `:feature:recommendation:local` | Room schema only. No ranking algorithm. |
+| `:feature:recommendation:impl` | Ranking algorithm and Hilt DI. |
+| `:core:core-database` | May depend on `:feature:recommendation:local`. Must never depend on `:api` or `:impl`. |
+
+For a detailed description, see [Recommendation Engine](recommendation_engine.md).
+
+---
+
+## 5. Core Infrastructure Modules
 
 `core` modules provide only **cross-cutting infrastructure**. They contain no business logic:
 
@@ -141,7 +179,7 @@ graph TD
 * **`FeedMasterComponent`**: Orchestrates filter/sort state and coordinates feed list loading.
 * **`FeedListComponent`**: Encapsulates Paging 3 data loading, loading/error/empty state tracking, and swipe-to-refresh.
 * **`ArticleItemComponent`**: Renders Markdown content (Markwon), tracks read-percentage analytics, and loads contextual article recommendations.
-* **`RecommendationListComponent`**: Displays recommendations ranked by cosine similarity of content embeddings.
+* **`RecommendationListComponent`**: Displays locally ranked recommendations based on article embeddings, user interaction stats (`ContentInteractionStats`), cosine similarity scoring, cold-pick diversity, and MMR diversification. All computation runs on-device in `:feature:recommendation:impl`.
 
 ---
 
