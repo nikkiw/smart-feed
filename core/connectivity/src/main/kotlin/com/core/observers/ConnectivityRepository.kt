@@ -1,17 +1,13 @@
 package com.core.observers
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.os.Build
+import android.net.NetworkRequest
 import android.util.Log
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -48,23 +44,13 @@ class ConnectivityRepositoryImpl
     @Inject
     constructor(
         private val context: Context,
-    ) : LifecycleObserver, ConnectivityRepository {
+    ) : DefaultLifecycleObserver, ConnectivityRepository {
         // Backing StateFlow for network connectivity status
         private val _isConnected = MutableStateFlow(false)
         override val isConnected: StateFlow<Boolean> = _isConnected
+        private var isCallbackRegistered = false
 
         override fun isInternetAvailable(): Boolean = _isConnected.value
-
-        // BroadcastReceiver for API levels 21-22
-        private val networkReceiver =
-            object : BroadcastReceiver() {
-                override fun onReceive(
-                    context: Context,
-                    intent: Intent,
-                ) {
-                    updateConnectivityStatus()
-                }
-            }
 
         init {
             // Initialize connectivity status on creation
@@ -74,62 +60,53 @@ class ConnectivityRepositoryImpl
         /**
          * Checks the current network state and updates [_isConnected].
          *
-         * For API 23+ uses [ConnectivityManager.getNetworkCapabilities],
-         * for older versions uses [ConnectivityManager.getActiveNetworkInfo].
+         * Uses [ConnectivityManager.getNetworkCapabilities] because the app minSdk is 23.
          */
         private fun updateConnectivityStatus() {
             Log.d(TAG, "updateConnectivityStatus start")
             val connectivityManager =
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val activeNetwork = connectivityManager.activeNetwork
-                val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-                _isConnected.value =
-                    capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-            } else {
-                val networkInfo = connectivityManager.activeNetworkInfo
-                _isConnected.value = networkInfo?.isConnected == true
-            }
+            val activeNetwork = connectivityManager.activeNetwork
+            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+            _isConnected.value =
+                capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
             Log.d(TAG, "updateConnectivityStatus end ${_isConnected.value}")
         }
 
         /**
          * Called when the application moves to the foreground.
-         * Registers network callbacks or broadcast receivers depending on API level.
+         * Registers network callbacks while the application is foregrounded.
          */
-        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun onStart() {
+        override fun onStart(owner: LifecycleOwner) {
             Log.d(TAG, "onStart start")
+            if (isCallbackRegistered) return
+
             val connectivityManager =
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                connectivityManager.registerDefaultNetworkCallback(networkCallback)
-            } else {
-                val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-                context.registerReceiver(networkReceiver, filter)
-            }
+            connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+            isCallbackRegistered = true
         }
 
         /**
          * Called when the application moves to the background.
-         * Unregisters network callbacks or broadcast receivers depending on API level.
+         * Unregisters network callbacks while the application is backgrounded.
          */
-        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        fun onStop() {
+        override fun onStop(owner: LifecycleOwner) {
             Log.d(TAG, "onStop start")
+            if (!isCallbackRegistered) return
+
             val connectivityManager =
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                connectivityManager.unregisterNetworkCallback(networkCallback)
-            } else {
-                context.unregisterReceiver(networkReceiver)
-            }
+            connectivityManager.unregisterNetworkCallback(networkCallback)
+            isCallbackRegistered = false
         }
 
-        // NetworkCallback for API 24+
+        private val networkRequest =
+            NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build()
+
         private val networkCallback =
             object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {

@@ -6,14 +6,14 @@ complexity:
     active: false
   LongParameterList:
     active: true
-    functionThreshold: 8
-    constructorThreshold: 8
+    allowedFunctionParameters: 8
+    allowedConstructorParameters: 8
   LongMethod:
     active: true
-    threshold: 80
+    allowedLines: 80
   LargeClass:
     active: true
-    threshold: 250
+    allowedLines: 250
 
 naming:
   FunctionNaming:
@@ -29,7 +29,15 @@ style:
     active: false
   WildcardImport:
     active: false
-  UnusedPrivateMember:
+  UnusedPrivateClass:
+    active: true
+  UnusedPrivateFunction:
+    active: true
+    allowedNames: '(_|ignored|expected)'
+  UnusedPrivateProperty:
+    active: true
+    allowedNames: '(_|ignored|expected)'
+  UnusedVariable:
     active: true
     allowedNames: '(_|ignored|expected)'
   FunctionOnlyReturningConstant:

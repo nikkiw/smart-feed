@@ -5,10 +5,10 @@ complexity:
     active: false
   LongMethod:
     active: true
-    threshold: 180
+    allowedLines: 180
   LargeClass:
     active: true
-    threshold: 700
+    allowedLines: 700
 
 naming:
   FunctionNaming:

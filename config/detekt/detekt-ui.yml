@@ -3,14 +3,14 @@
 complexity:
   LongParameterList:
     active: true
-    functionThreshold: 10
-    constructorThreshold: 10
+    allowedFunctionParameters: 10
+    allowedConstructorParameters: 10
   LongMethod:
     active: true
-    threshold: 100
+    allowedLines: 100
   LargeClass:
     active: true
-    threshold: 350
+    allowedLines: 350
 
 style:
   MagicNumber:

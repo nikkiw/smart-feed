@@ -1,33 +1,24 @@
 package com.ndev.convention
 
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import com.android.build.api.dsl.ApplicationExtension
 import com.ndev.convention.common.Config
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 
-/**
- * Плагин-конвенция для Android Application с Hilt.
- * В зависимости от версии Android Gradle Plugin (AGP), может использоваться либо
- * AppExtension (для AGP < 7), либо BaseAppModuleExtension (AGP 7+).
- */
 class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            // 1) Применяем плагины
             pluginManager.apply("com.android.application")
-            pluginManager.apply("org.jetbrains.kotlin.android")
             pluginManager.apply("com.google.devtools.ksp")
             pluginManager.apply("com.google.dagger.hilt.android")
             pluginManager.apply("smart.feed.detekt")
             pluginManager.apply("smart.feed.spotless")
-            // 2) Конфигурируем Android Application Extension
-            //    Для AGP 7 и выше: BaseAppModuleExtension
-            //    Для более старых AGP: AppExtension
-            extensions.configure<BaseAppModuleExtension> {
+
+            extensions.configure<ApplicationExtension> {
                 configureAndroidApplication(this, target)
             }
-            // 3) Дополнительные зависимости (Hilt, тесты и т.д.)
+
             configureDependenciesHilt()
             configureDependenciesUnitTests()
             configureDependenciesAndroidTests()
@@ -36,11 +27,11 @@ class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
     }
 
     private fun configureAndroidApplication(
-        extension: BaseAppModuleExtension,
-        project: Project
+        extension: ApplicationExtension,
+        project: Project,
     ) {
         extension.apply {
-            compileSdkVersion(Config.COMPILE_SDK)
+            compileSdk = Config.COMPILE_SDK
             defaultConfig {
                 minSdk = Config.MIN_SDK
                 targetSdk = Config.TARGET_SDK
@@ -84,7 +75,7 @@ class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
                     isMinifyEnabled = true
                     proguardFiles(
                         getDefaultProguardFile("proguard-android-optimize.txt"),
-                        "proguard-rules.pro"
+                        "proguard-rules.pro",
                     )
                     buildConfigField("String", "BUILD_VARIANT", "\"release\"")
                     // Для dev release тоже используем debug ключ
@@ -98,6 +89,9 @@ class AndroidApplicationWithHiltConventionPlugin : Plugin<Project> {
             }
             buildFeatures {
                 buildConfig = true
+            }
+            packaging {
+                jniLibs.keepDebugSymbols += "**/libsqliteJni.so"
             }
             // viewBinding { isEnabled = true }
             // dataBinding { isEnabled = true }
