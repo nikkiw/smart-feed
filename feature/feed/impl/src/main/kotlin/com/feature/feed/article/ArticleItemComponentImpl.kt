@@ -6,8 +6,8 @@ import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
+import com.core.analytics.api.AnalyticsService
 import com.core.content.model.ContentId
-import com.core.domain.service.AnalyticsService
 import com.feature.feed.articlerecommendation.ArticleRecommendationsComponent
 import com.feature.feed.articlerecommendation.ArticleRecommendationsComponentImpl
 import com.feature.feed.domain.usecase.GetContentItemUseCase

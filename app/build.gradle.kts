@@ -39,10 +39,12 @@ dependencies {
     implementation(projects.core.coroutines)
     implementation(projects.core.lifecycle)
     implementation(projects.core.connectivity)
+    implementation(projects.core.analytics.impl)
     implementation(projects.core.image.api)
     implementation(projects.core.imageGlide)
     implementation(projects.feature.feed.impl)
     implementation(projects.feature.recommendation.impl)
+    implementation(projects.feature.userprofile.impl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

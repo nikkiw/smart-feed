@@ -3,7 +3,6 @@ package com.feature.recommendation.data.di
 import com.core.di.ApplicationScope
 import com.core.di.DefaultDispatcher
 import com.core.di.IoDispatcher
-import com.core.domain.repository.UserProfileRepository
 import com.feature.feed.local.content.ContentDao
 import com.feature.recommendation.data.repository.RecommendationRepositoryImpl
 import com.feature.recommendation.data.service.RecommenderImpl
@@ -16,6 +15,7 @@ import com.feature.recommendation.domain.usecase.RecommendForUserUseCase
 import com.feature.recommendation.local.embedding.ArticleEmbeddingDao
 import com.feature.recommendation.local.event.ContentInteractionStatsDao
 import com.feature.recommendation.local.recommendation.RecommendationDao
+import com.feature.userprofile.domain.repository.UserProfileRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

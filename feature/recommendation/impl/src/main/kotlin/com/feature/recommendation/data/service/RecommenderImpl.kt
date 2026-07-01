@@ -5,7 +5,6 @@ import com.core.content.model.ContentId
 import com.core.di.ApplicationScope
 import com.core.di.DefaultDispatcher
 import com.core.di.IoDispatcher
-import com.core.domain.repository.UserProfileRepository
 import com.feature.feed.local.content.ContentDao
 import com.feature.recommendation.domain.model.Recommendation
 import com.feature.recommendation.domain.service.Recommender
@@ -14,6 +13,7 @@ import com.feature.recommendation.local.event.ContentInteractionStatsDao
 import com.feature.recommendation.local.recommendation.RecommendationDao
 import com.feature.recommendation.local.recommendation.entity.ContentRecommendationEntity
 import com.feature.recommendation.local.recommendation.entity.UserRecommendationEntity
+import com.feature.userprofile.domain.repository.UserProfileRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

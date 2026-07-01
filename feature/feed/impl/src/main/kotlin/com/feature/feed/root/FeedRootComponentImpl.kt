@@ -10,8 +10,8 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushToFront
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
+import com.core.analytics.api.AnalyticsService
 import com.core.content.model.ContentId
-import com.core.domain.service.AnalyticsService
 import com.core.observers.ConnectivityRepository
 import com.feature.feed.article.ArticleItemComponent
 import com.feature.feed.article.ArticleItemComponentImpl

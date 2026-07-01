@@ -62,6 +62,20 @@ class LayerDependencyKonsistTest {
     }
 
     @Test
+    fun `core domain does not own user profile or analytics contracts`() {
+        sourceFilesUnder("core/core-domain/src/main").assertTextDoesNotContain(
+            forbiddenSnippets =
+                listOf(
+                    "interface UserProfileRepository",
+                    "interface AnalyticsService",
+                ),
+            reason =
+                "User profile contracts must live in feature/userprofile/api " +
+                    "and analytics contracts in core/analytics/api.",
+        )
+    }
+
+    @Test
     fun `core data does not own feed implementations`() {
         sourceFilesUnder("core/core-data/src/main").assertTextDoesNotContain(
             forbiddenSnippets =
@@ -87,6 +101,20 @@ class LayerDependencyKonsistTest {
                     "RecommenderImpl",
                 ),
             reason = "Recommendation data implementations must live in feature/recommendation/impl.",
+        )
+    }
+
+    @Test
+    fun `core data does not own user profile or analytics implementations`() {
+        sourceFilesUnder("core/core-data/src/main").assertTextDoesNotContain(
+            forbiddenSnippets =
+                listOf(
+                    "UserProfileRepositoryImpl",
+                    "AnalyticsServiceImpl",
+                ),
+            reason =
+                "User profile implementation must live in feature/userprofile/impl " +
+                    "and analytics in core/analytics/impl.",
         )
     }
 
@@ -119,6 +147,8 @@ class LayerDependencyKonsistTest {
                     "com.feature.feed.recommendation.",
                     "com.feature.recommendation.api.",
                     "com.feature.recommendation.impl.",
+                    "com.feature.userprofile.api.",
+                    "com.feature.userprofile.impl.",
                     "com.core.analytics.api.",
                     "com.core.analytics.impl.",
                     "com.core.data.",

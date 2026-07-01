@@ -10,10 +10,10 @@ import com.arkivanov.essenty.lifecycle.create
 import com.arkivanov.essenty.lifecycle.destroy
 import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
+import com.core.analytics.api.AnalyticsService
 import com.core.content.model.ContentId
 import com.core.content.model.ShortDescription
 import com.core.content.model.Title
-import com.core.domain.service.AnalyticsService
 import com.core.observers.ConnectivityRepository
 import com.core.paging.GetPagedContentUseCase
 import com.feature.feed.bottombar.BottomBarComponent

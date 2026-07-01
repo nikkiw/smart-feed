@@ -23,10 +23,10 @@ dependencies {
 
     implementation(projects.core.content.api)
     implementation(projects.core.coroutines)
-    implementation(projects.core.coreDomain)
     implementation(projects.feature.feed.api)
     implementation(projects.feature.feed.local)
     implementation(projects.feature.recommendation.local)
+    implementation(projects.feature.userprofile.api)
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
@@ -35,7 +35,9 @@ dependencies {
 
     androidTestImplementation(projects.core.coreNetworks)
     androidTestImplementation(projects.core.coreDatabase)
+    androidTestImplementation(projects.core.analytics.local)
     androidTestImplementation(projects.feature.feed.local)
+    androidTestImplementation(projects.feature.userprofile.api)
     androidTestImplementation(libs.room.testing)
     androidTestImplementation(libs.androidx.test.core.ktx)
     androidTestImplementation(libs.google.truth)

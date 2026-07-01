@@ -3,8 +3,8 @@ package com.core.database
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.core.database.userprofile.UserProfileDao
-import com.core.database.userprofile.UserProfileEntity
+import com.feature.userprofile.local.UserProfileDao
+import com.feature.userprofile.local.UserProfileEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest

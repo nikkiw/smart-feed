@@ -145,6 +145,67 @@ class FeatureBoundaryKonsistTest {
     }
 
     @Test
+    fun `user profile local module owns Room schema without depending on implementation`() {
+        val localFiles = sourceFilesUnder("feature/userprofile/local/src/main")
+
+        check(localFiles.isNotEmpty()) {
+            "feature/userprofile/local must exist and own user profile Room entities and DAOs."
+        }
+
+        localFiles.assertNoImports(
+            forbiddenPrefixes =
+                listOf(
+                    "com.feature.userprofile.impl.",
+                    "com.feature.userprofile.data.",
+                    "com.core.database.",
+                    "com.core.data.",
+                    "com.core.networks.",
+                    "com.ndev.android.smart.feed.",
+                    "android.view.",
+                    "android.widget.",
+                    "androidx.recyclerview.",
+                    "androidx.work.",
+                    "retrofit2.",
+                    "okhttp3.",
+                ),
+            reason =
+                "feature:userprofile:local is a storage schema module. It may use Room annotations, " +
+                    "but must not depend on runtime implementation, app, network, WorkManager, or UI code.",
+        )
+    }
+
+    @Test
+    fun `analytics local module owns event schema without depending on implementation`() {
+        val localFiles = sourceFilesUnder("core/analytics/local/src/main")
+
+        check(localFiles.isNotEmpty()) {
+            "core/analytics/local must exist and own analytics event Room entities and DAOs."
+        }
+
+        localFiles.assertNoImports(
+            forbiddenPrefixes =
+                listOf(
+                    "com.core.analytics.impl.",
+                    "com.core.analytics.api.",
+                    "com.core.database.",
+                    "com.core.data.",
+                    "com.core.networks.",
+                    "com.feature.",
+                    "com.ndev.android.smart.feed.",
+                    "android.view.",
+                    "android.widget.",
+                    "androidx.recyclerview.",
+                    "androidx.work.",
+                    "retrofit2.",
+                    "okhttp3.",
+                ),
+            reason =
+                "core:analytics:local is a storage schema module. It may use Room annotations, " +
+                    "but must not depend on runtime implementation, app, network, WorkManager, or UI code.",
+        )
+    }
+
+    @Test
     fun `feed view extensions do not reach stores reducers repositories or data implementations`() {
         sourceFilesUnder("feature/feed/impl/src/main")
             .filter { it.relativePath.endsWith("ViewExt.kt") }

@@ -3,13 +3,12 @@ package com.feature.recommendation.data.repository
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.core.analytics.local.entity.EventLog
+import com.core.analytics.local.entity.EventType
 import com.core.content.embedding.EmbeddingIndex
 import com.core.content.model.ContentId
 import com.core.content.model.Embeddings
 import com.core.database.AppDatabase
-import com.core.database.event.entity.EventLog
-import com.core.database.event.entity.EventType
-import com.core.domain.repository.UserProfileRepository
 import com.core.networks.datasource.dev.DevStaticJsonTestNetworkDataSource
 import com.core.networks.models.ContentAttributes
 import com.feature.feed.local.content.entity.ArticleAttributesEntity
@@ -17,6 +16,7 @@ import com.feature.feed.local.content.entity.ContentEntity
 import com.feature.recommendation.data.service.RecommenderImpl
 import com.feature.recommendation.domain.repository.RecommendationRepository
 import com.feature.recommendation.domain.service.Recommender
+import com.feature.userprofile.domain.repository.UserProfileRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob

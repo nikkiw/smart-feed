@@ -8,11 +8,9 @@ import androidx.room.TypeConverters
 import androidx.room.execSQL
 import androidx.room.useWriterConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import com.core.database.event.EventLogDao
-import com.core.database.event.entity.EventLog
-import com.core.database.event.entity.EventType
-import com.core.database.userprofile.UserProfileDao
-import com.core.database.userprofile.UserProfileEntity
+import com.core.analytics.local.EventLogDao
+import com.core.analytics.local.entity.EventLog
+import com.core.analytics.local.entity.EventType
 import com.feature.feed.local.content.ContentDao
 import com.feature.feed.local.content.ContentTagsDao
 import com.feature.feed.local.content.UpdatesMetaDao
@@ -27,6 +25,8 @@ import com.feature.recommendation.local.event.entity.ContentInteractionStats
 import com.feature.recommendation.local.recommendation.RecommendationDao
 import com.feature.recommendation.local.recommendation.entity.ContentRecommendationEntity
 import com.feature.recommendation.local.recommendation.entity.UserRecommendationEntity
+import com.feature.userprofile.local.UserProfileDao
+import com.feature.userprofile.local.UserProfileEntity
 import kotlinx.coroutines.runBlocking
 
 /**
