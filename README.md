@@ -40,7 +40,7 @@ For a complete breakdown, see the [Architecture Documentation](docs/architecture
 | **Build**        | Android Gradle Plugin **9.2.1**, Gradle **9.4.1**, KSP **2.3.9**, composite `build-logic`        |
 | **Navigation**   | [Decompose](https://github.com/arkivanov/Decompose) **3.3.0** with Android ViewContext extensions |
 | **State**        | MVIKotlin **4.2.0** (next milestone: MVI feed slice)                                              |
-| **Database**     | Room **2.7.1** with float-array embedding converters, per-feature entity/DAO modules (`:local`)   |
+| **Database**     | Room **2.7.1** with float-array embedding converters, per-feature entity/DAO modules (`:local`), Paging 3 (`PagingData`, `GetPagedContentUseCase`) owned by `:feature:feed:impl` |
 | **Background**   | WorkManager with Hilt worker scheduling                                                           |
 | **DI**           | Dagger Hilt **2.60** (assisted factories, interface binds, per-feature Hilt modules)              |
 | **Images**       | Glide behind a pure Kotlin `ImageLoader` contract (`:core:image:api`)                             |
@@ -68,7 +68,6 @@ smart-feed/
 │   ├── content/api/        # Shared content value objects used across features
 │   ├── core-database/      # RoomDatabase orchestrator, cross-feature schema migrations
 │   ├── core-networks/      # Retrofit/Ktor config, prod & dev network data sources
-│   ├── core-paging/        # PagingData infrastructure — isolates AndroidX Paging from domain
 │   ├── coroutines/         # Coroutine Dispatchers DI module
 │   ├── image/api/          # Pure Kotlin ImageLoader contract (KMP-portable)
 │   ├── image-glide/        # Glide implementation of ImageLoader
@@ -80,7 +79,8 @@ smart-feed/
     ├── feed/               # Article feed — full vertical slice
     │   ├── api/            #   Component contracts, ContentItem domain model, repository API
     │   ├── local/          #   ContentEntity, ContentDao (feed-owned Room storage)
-    │   └── impl/           #   UI views, XML layouts, Hilt modules, repository impls, Paging
+    │   └── impl/           #   UI views, XML layouts, Hilt modules, repository impls,
+    │                       #   Paging 3 (ContentPagingRepository, GetPagedContentUseCase)
     ├── recommendation/     # Recommendation engine — full vertical slice
     │   ├── api/            #   Recommendation model, RecommendationRepository contract
     │   ├── local/          #   Recommendation Room entities and DAOs
@@ -102,9 +102,9 @@ smart-feed/
 | **2** | Build logic consolidation (`buildSrc` → `build-logic`), AGP 9.2.1, Kotlin 2.3.21, KSP 2.3.9, Detekt 2 | ✅ Done |
 | **3** | Konsist architecture enforcement module (`:architecture-tests`) | ✅ Done |
 | **4** | `MainActivity` decoupling — `AppStartupCoordinator`, `SystemBarsController`, `FeedRootViewHost` | ✅ Done |
-| **5** | AndroidX Paging dependency inversion — `:core:core-paging` | ✅ Done |
+| **5** | AndroidX Paging dependency inversion — extracted to `:core:core-paging`, then **co-located into `:feature:feed:impl`** (sole consumer) | ✅ Done |
 | **6** | Feature API/Impl split — `:feature:feed:api` and `:feature:feed:impl` | ✅ Done |
-| **7** | **Core Layer Modularization** — 3-module feature slices (`api/local/impl`), `:core:core` → `:core:common`, eliminated `core-domain` / `core-data` monoliths, build noise cleanup | ✅ **Done** |
+| **7** | **Core Layer Modularization** — 3-module feature slices (`api/local/impl`), `:core:core` → `:core:common`, eliminated `core-domain` / `core-data` / `core-paging` monoliths, build noise cleanup | ✅ **Done** |
 | **8** | MVI slice — `FeedState`, `FeedIntent`, `FeedEffect`, pure JVM Reducer tests | 🔜 Next |
 | **9** | Jetpack Compose Card Island — `ArticleCard` in XML RecyclerView ViewHolder | 🔜 Planned |
 

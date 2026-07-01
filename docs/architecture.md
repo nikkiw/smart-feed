@@ -47,7 +47,6 @@ graph TD
         CoreCommon[":core:common (pure Kotlin utils)"]
         CoreDB[":core:core-database"]
         CoreNet[":core:core-networks"]
-        CorePaging[":core:core-paging"]
         ImageApi[":core:image:api"]
         ImageGlide[":core:image-glide"]
         Analytics[":core:analytics:api"]
@@ -64,7 +63,6 @@ graph TD
     FeedImpl --> FeedApi
     FeedImpl --> FeedLocal
     FeedImpl --> CoreDB
-    FeedImpl --> CorePaging
     FeedImpl --> ImageApi
     FeedImpl --> Connectivity
 
@@ -97,7 +95,7 @@ Every feature follows a strict 3-module pattern:
 |--------|----------|--------------|
 | `:feature:<name>:api` | Domain models, repository interfaces, component contracts (Decompose), state objects | Pure Kotlin only — no Android, no Hilt |
 | `:feature:<name>:local` | Room `@Entity` classes, `@Dao` interfaces, TypeConverters for this feature | `:feature:<name>:api` only |
-| `:feature:<name>:impl` | UI layouts (XML/Compose), component implementations, repository implementations, Hilt modules | `:api`, `:local`, `:core:core-database`, `:core:core-paging`, `:core:image:api`, etc. |
+| `:feature:<name>:impl` | UI layouts (XML/Compose), component implementations, repository implementations, Hilt modules, feature-owned Paging adapters | `:api`, `:local`, `:core:core-database`, `:core:image:api`, etc. |
 
 ---
 
@@ -110,7 +108,6 @@ Every feature follows a strict 3-module pattern:
 | `:core:common` | Pure Kotlin shared utilities: coroutine extensions, embedding math, time converters. _(Renamed from `:core:core` — Android manifest removed, pure JVM module)_ |
 | `:core:core-database` | `RoomDatabase` orchestrator, cross-feature schema migrations |
 | `:core:core-networks` | Retrofit/Ktor client configuration, dev/prod network data sources |
-| `:core:core-paging` | `PagingData` infrastructure abstractions, isolating AndroidX Paging from domain |
 | `:core:image:api` | Pure Kotlin `ImageLoader` interface (KMP-portable, no Glide dependency) |
 | `:core:image-glide` | Glide implementation of `ImageLoader` |
 | `:core:analytics:api` | `AnalyticsService` interface |
@@ -118,6 +115,8 @@ Every feature follows a strict 3-module pattern:
 | `:core:connectivity` | `ConnectivityRepository` — network state monitoring (modern observer-based implementation) |
 | `:core:lifecycle` | `AppLifecycleObserver` |
 | `:core:coroutines` | Coroutine `Dispatchers` DI module, Flow extension utilities |
+
+> **Note on Paging**: `AndroidX Paging` (`PagingData`, `GetPagedContentUseCase`, `ContentPagingRepository`) was initially extracted into `:core:core-paging` to decouple it from domain. It has since been **moved into `:feature:feed:impl`** — the only consumer — eliminating an unnecessary intermediate module and keeping Paging concerns co-located with the feature that owns them.
 
 ---
 

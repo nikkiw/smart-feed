@@ -12,7 +12,6 @@ import com.core.content.model.Tags
 import com.core.di.IoDispatcher
 import com.core.networks.datasource.NetworkDataSource
 import com.core.networks.models.ContentAttributes
-import com.core.paging.ContentPagingRepository
 import com.feature.feed.data.mapper.toContentItem
 import com.feature.feed.data.mapper.toContentPreview
 import com.feature.feed.domain.model.ContentItem

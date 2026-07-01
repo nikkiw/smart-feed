@@ -2,8 +2,8 @@ package com.feature.feed.data.di
 
 import com.core.di.IoDispatcher
 import com.core.networks.datasource.NetworkDataSource
-import com.core.paging.ContentPagingRepository
 import com.feature.feed.data.repository.ContentItemRepositoryImpl
+import com.feature.feed.data.repository.ContentPagingRepository
 import com.feature.feed.data.usecase.content.GetContentItemUseCaseImpl
 import com.feature.feed.data.usecase.sync.ContentFetchScheduleUseCaseImpl
 import com.feature.feed.data.usecase.sync.SyncContentUseCaseImpl

@@ -15,10 +15,10 @@ import com.core.content.model.ContentId
 import com.core.content.model.ShortDescription
 import com.core.content.model.Title
 import com.core.observers.ConnectivityRepository
-import com.core.paging.GetPagedContentUseCase
 import com.feature.feed.bottombar.BottomBarComponent
 import com.feature.feed.bottombar.BottomBarComponentImpl
 import com.feature.feed.bottombar.model.BottomBarState
+import com.feature.feed.data.usecase.content.GetPagedContentUseCase
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.usecase.GetContentItemUseCase
