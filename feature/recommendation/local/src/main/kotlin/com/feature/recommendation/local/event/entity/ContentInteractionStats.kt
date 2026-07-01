@@ -1,4 +1,4 @@
-package com.core.database.event.entity
+package com.feature.recommendation.local.event.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

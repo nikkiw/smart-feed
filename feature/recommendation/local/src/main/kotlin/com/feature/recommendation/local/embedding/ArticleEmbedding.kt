@@ -1,4 +1,4 @@
-package com.core.database.embeding
+package com.feature.recommendation.local.embedding
 
 /**
  * Represents an article embedding with its unique ID and associated vector.

@@ -77,6 +77,20 @@ class LayerDependencyKonsistTest {
     }
 
     @Test
+    fun `core data does not own recommendation implementations`() {
+        sourceFilesUnder("core/core-data/src/main").assertTextDoesNotContain(
+            forbiddenSnippets =
+                listOf(
+                    "RecommendationRepositoryImpl",
+                    "RecommendForArticleUseCaseImpl",
+                    "RecommendForUserUseCaseImpl",
+                    "RecommenderImpl",
+                ),
+            reason = "Recommendation data implementations must live in feature/recommendation/impl.",
+        )
+    }
+
+    @Test
     fun `data layer does not depend on app or feature packages`() {
         sourceFilesUnder(
             "core/core-data/src/main",

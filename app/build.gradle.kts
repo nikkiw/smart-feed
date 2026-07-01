@@ -42,6 +42,7 @@ dependencies {
     implementation(projects.core.image.api)
     implementation(projects.core.imageGlide)
     implementation(projects.feature.feed.impl)
+    implementation(projects.feature.recommendation.impl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

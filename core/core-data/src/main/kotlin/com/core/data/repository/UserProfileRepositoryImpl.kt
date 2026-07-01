@@ -3,12 +3,12 @@ package com.core.data.repository
 import androidx.annotation.VisibleForTesting
 import com.core.content.model.ContentId
 import com.core.content.model.Embeddings
-import com.core.database.embeding.ArticleEmbeddingDao
-import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.userprofile.UserProfileDao
 import com.core.database.userprofile.UserProfileEntity
 import com.core.di.IoDispatcher
 import com.core.domain.repository.UserProfileRepository
+import com.feature.recommendation.local.embedding.ArticleEmbeddingDao
+import com.feature.recommendation.local.event.ContentInteractionStatsDao
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

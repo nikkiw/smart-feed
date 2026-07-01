@@ -29,6 +29,7 @@ dependencies {
     implementation(projects.feature.feed.api)
     implementation(projects.feature.feed.local)
     implementation(projects.feature.recommendation.api)
+    implementation(projects.feature.recommendation.local)
 
     // Pagging
     implementation(libs.room.paging)
@@ -47,4 +48,5 @@ dependencies {
     androidTestImplementation(libs.androidx.test.core.ktx)
     androidTestImplementation(libs.google.truth)
     androidTestImplementation(projects.core.image.api)
+    androidTestImplementation(projects.feature.recommendation.local)
 }

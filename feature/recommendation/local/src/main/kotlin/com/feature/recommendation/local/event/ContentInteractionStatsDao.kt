@@ -1,8 +1,8 @@
-package com.core.database.event
+package com.feature.recommendation.local.event
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.core.database.event.entity.ContentInteractionStats
+import com.feature.recommendation.local.event.entity.ContentInteractionStats
 
 /**
  * DAO interface for accessing and managing article interaction statistics.

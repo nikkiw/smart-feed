@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.core.content.model.ContentType
-import com.core.database.embeding.ArticleEmbedding
 import com.core.utils.DateTimeConvertors
 import com.feature.feed.local.content.entity.ArticleAttributesEntity
 import com.feature.feed.local.content.entity.ContentEntity
+import com.feature.recommendation.local.embedding.ArticleEmbedding
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before

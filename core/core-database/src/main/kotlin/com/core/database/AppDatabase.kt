@@ -8,15 +8,9 @@ import androidx.room.TypeConverters
 import androidx.room.execSQL
 import androidx.room.useWriterConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import com.core.database.embeding.ArticleEmbeddingDao
-import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.event.EventLogDao
-import com.core.database.event.entity.ContentInteractionStats
 import com.core.database.event.entity.EventLog
 import com.core.database.event.entity.EventType
-import com.core.database.recommendation.RecommendationDao
-import com.core.database.recommendation.entity.ContentRecommendationEntity
-import com.core.database.recommendation.entity.UserRecommendationEntity
 import com.core.database.userprofile.UserProfileDao
 import com.core.database.userprofile.UserProfileEntity
 import com.feature.feed.local.content.ContentDao
@@ -27,6 +21,12 @@ import com.feature.feed.local.content.entity.ContentEntity
 import com.feature.feed.local.content.entity.ContentTag
 import com.feature.feed.local.content.entity.Converter
 import com.feature.feed.local.content.entity.UpdatesMetaEntity
+import com.feature.recommendation.local.embedding.ArticleEmbeddingDao
+import com.feature.recommendation.local.event.ContentInteractionStatsDao
+import com.feature.recommendation.local.event.entity.ContentInteractionStats
+import com.feature.recommendation.local.recommendation.RecommendationDao
+import com.feature.recommendation.local.recommendation.entity.ContentRecommendationEntity
+import com.feature.recommendation.local.recommendation.entity.UserRecommendationEntity
 import kotlinx.coroutines.runBlocking
 
 /**

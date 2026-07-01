@@ -1,11 +1,11 @@
-package com.core.data.repository
+package com.feature.recommendation.data.repository
 
 import com.core.content.model.ContentId
-import com.core.data.dto.toRecommendation
-import com.core.database.recommendation.RecommendationDao
 import com.core.di.IoDispatcher
+import com.feature.recommendation.data.mapper.toRecommendation
 import com.feature.recommendation.domain.model.Recommendation
 import com.feature.recommendation.domain.repository.RecommendationRepository
+import com.feature.recommendation.local.recommendation.RecommendationDao
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

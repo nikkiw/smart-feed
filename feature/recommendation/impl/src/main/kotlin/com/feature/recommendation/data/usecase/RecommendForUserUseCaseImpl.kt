@@ -1,4 +1,4 @@
-package com.core.data.usecase.recommendation
+package com.feature.recommendation.data.usecase
 
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.model.toContentItemPreview

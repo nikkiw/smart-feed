@@ -5,8 +5,8 @@ import androidx.test.core.app.ApplicationProvider
 import com.core.content.model.ContentId
 import com.core.data.di.CoroutinesTestModule
 import com.core.database.AppDatabase
-import com.core.database.event.ContentInteractionStatsDao
 import com.core.domain.service.AnalyticsService
+import com.feature.recommendation.local.event.ContentInteractionStatsDao
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

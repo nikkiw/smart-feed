@@ -1,4 +1,4 @@
-package com.core.database.recommendation.entity
+package com.feature.recommendation.local.recommendation.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey

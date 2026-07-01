@@ -114,6 +114,37 @@ class FeatureBoundaryKonsistTest {
     }
 
     @Test
+    fun `recommendation local module owns Room schema without depending on implementation`() {
+        val localFiles = sourceFilesUnder("feature/recommendation/local/src/main")
+
+        check(localFiles.isNotEmpty()) {
+            "feature/recommendation/local must exist and own recommendation Room entities and DAOs."
+        }
+
+        localFiles.assertNoImports(
+            forbiddenPrefixes =
+                listOf(
+                    "com.feature.recommendation.impl.",
+                    "com.feature.recommendation.data.",
+                    "com.core.database.",
+                    "com.core.data.",
+                    "com.core.networks.",
+                    "com.ndev.android.smart.feed.",
+                    "android.view.",
+                    "android.widget.",
+                    "androidx.recyclerview.",
+                    "androidx.work.",
+                    "retrofit2.",
+                    "okhttp3.",
+                    "io.noties.markwon.",
+                ),
+            reason =
+                "feature:recommendation:local is a storage schema module. It may use Room annotations, " +
+                    "but must not depend on runtime implementation, app, network, WorkManager, or UI code.",
+        )
+    }
+
+    @Test
     fun `feed view extensions do not reach stores reducers repositories or data implementations`() {
         sourceFilesUnder("feature/feed/impl/src/main")
             .filter { it.relativePath.endsWith("ViewExt.kt") }

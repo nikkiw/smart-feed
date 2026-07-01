@@ -26,6 +26,7 @@ dependencies {
     implementation(projects.core.core)
     implementation(projects.core.coreDomain)
     implementation(projects.feature.feed.local)
+    implementation(projects.feature.recommendation.local)
 
     // Sqlite
     implementation(libs.sqlite.ktx)
@@ -48,4 +49,5 @@ dependencies {
     androidTestImplementation(libs.room.testing)
     androidTestImplementation(libs.google.truth)
     androidTestImplementation(projects.feature.feed.api)
+    androidTestImplementation(projects.feature.recommendation.local)
 }

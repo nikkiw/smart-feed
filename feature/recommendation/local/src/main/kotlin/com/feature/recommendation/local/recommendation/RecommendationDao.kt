@@ -1,12 +1,12 @@
-package com.core.database.recommendation
+package com.feature.recommendation.local.recommendation
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.core.database.recommendation.entity.ContentRecommendationEntity
-import com.core.database.recommendation.entity.UserRecommendationEntity
+import com.feature.recommendation.local.recommendation.entity.ContentRecommendationEntity
+import com.feature.recommendation.local.recommendation.entity.UserRecommendationEntity
 import kotlinx.coroutines.flow.Flow
 
 /**

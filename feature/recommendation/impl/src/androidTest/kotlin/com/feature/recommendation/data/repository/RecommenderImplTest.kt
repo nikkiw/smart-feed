@@ -1,25 +1,27 @@
-package com.core.data.repository
+package com.feature.recommendation.data.repository
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.core.content.embedding.EmbeddingIndex
 import com.core.content.model.ContentId
-import com.core.data.service.RecommenderImpl
+import com.core.content.model.Embeddings
 import com.core.database.AppDatabase
 import com.core.database.event.entity.EventLog
 import com.core.database.event.entity.EventType
 import com.core.domain.repository.UserProfileRepository
 import com.core.networks.datasource.dev.DevStaticJsonTestNetworkDataSource
 import com.core.networks.models.ContentAttributes
-import com.core.utils.DateTimeConvertors
 import com.feature.feed.local.content.entity.ArticleAttributesEntity
 import com.feature.feed.local.content.entity.ContentEntity
+import com.feature.recommendation.data.service.RecommenderImpl
 import com.feature.recommendation.domain.repository.RecommendationRepository
 import com.feature.recommendation.domain.service.Recommender
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -28,6 +30,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
@@ -35,7 +38,7 @@ import kotlin.test.assertNotEquals
 class RecommenderImplTest {
     private lateinit var networkDataSource: DevStaticJsonTestNetworkDataSource
     private lateinit var db: AppDatabase
-    private lateinit var userProfileRepository: UserProfileRepository
+    private lateinit var userProfileRepository: FakeUserProfileRepository
     private lateinit var recommender: Recommender
     private lateinit var recommendationRepository: RecommendationRepository
     private lateinit var applicationScope: CoroutineScope
@@ -56,13 +59,7 @@ class RecommenderImplTest {
         networkDataSource = DevStaticJsonTestNetworkDataSource(context)
         db = AppDatabase.Companion.getTestDatabase(context)
 
-        userProfileRepository =
-            UserProfileRepositoryImpl(
-                embeddingDao = db.articleEmbeddingDao(),
-                contentInteractionStatsDao = db.articleInteractionStatsDao(),
-                userProfileDao = db.userProfileDao(),
-                ioDispatcher = testDispatcher,
-            )
+        userProfileRepository = FakeUserProfileRepository(db)
         recommender =
             RecommenderImpl(
                 userProfileRepository = userProfileRepository,
@@ -148,7 +145,7 @@ class RecommenderImplTest {
                     id = update.id,
                     type = update.type,
                     action = update.action,
-                    updatedAt = DateTimeConvertors.parseIsoToLongMs(update.updatedAt),
+                    updatedAt = Instant.parse(update.updatedAt).toEpochMilli(),
                     mainImageUrl = update.mainImageUrl,
                     tags = update.tags,
                 )
@@ -168,5 +165,23 @@ class RecommenderImplTest {
                 }
             db.contentDao().insertContentUpdateWithDetails(entity, articleEntity)
         }
+    }
+
+    private class FakeUserProfileRepository(
+        private val db: AppDatabase,
+    ) : UserProfileRepository {
+        private val profile = MutableStateFlow<Embeddings?>(null)
+
+        override suspend fun onArticleVisited(artileId: ContentId): Embeddings? {
+            val embeddings =
+                db.articleEmbeddingDao()
+                    .getEmbeddings(artileId.value)
+                    ?.unitEmbedding
+                    ?.let(::Embeddings)
+            profile.value = embeddings
+            return embeddings
+        }
+
+        override suspend fun getUserProfileEmbeddings(): Flow<Embeddings?> = profile
     }
 }

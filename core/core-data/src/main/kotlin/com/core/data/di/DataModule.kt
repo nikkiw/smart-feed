@@ -1,22 +1,16 @@
 package com.core.data.di
 
-import com.core.data.repository.RecommendationRepositoryImpl
 import com.core.data.repository.UserProfileRepositoryImpl
 import com.core.data.service.AnalyticsServiceImpl
-import com.core.data.service.RecommenderImpl
-import com.core.database.embeding.ArticleEmbeddingDao
-import com.core.database.event.ContentInteractionStatsDao
 import com.core.database.event.EventLogDao
-import com.core.database.recommendation.RecommendationDao
 import com.core.database.userprofile.UserProfileDao
 import com.core.di.ApplicationScope
 import com.core.di.DefaultDispatcher
 import com.core.di.IoDispatcher
 import com.core.domain.repository.UserProfileRepository
 import com.core.domain.service.AnalyticsService
-import com.feature.feed.local.content.ContentDao
-import com.feature.recommendation.domain.repository.RecommendationRepository
-import com.feature.recommendation.domain.service.Recommender
+import com.feature.recommendation.local.embedding.ArticleEmbeddingDao
+import com.feature.recommendation.local.event.ContentInteractionStatsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,35 +22,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
-    @Singleton
-    @Provides
-    @Suppress("LongParameterList")
-    fun provideRecommender(
-        userProfileRepository: UserProfileRepository,
-        contentInteractionStatsDao: ContentInteractionStatsDao,
-        contentDao: ContentDao,
-        articleEmbeddingDao: ArticleEmbeddingDao,
-        recommendationDao: RecommendationDao,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher,
-        @DefaultDispatcher defaultDispatcher: CoroutineDispatcher,
-        @ApplicationScope applicationScope: CoroutineScope,
-    ): Recommender {
-        return RecommenderImpl(
-            userProfileRepository = userProfileRepository,
-            contentInteractionStatsDao = contentInteractionStatsDao,
-            contentDao = contentDao,
-            articleEmbeddingDao = articleEmbeddingDao,
-            recommendationDao = recommendationDao,
-            ioDispatcher = ioDispatcher,
-            defaultDispatcher = defaultDispatcher,
-            applicationScope = applicationScope,
-            topK = 10,
-            coldK = 4,
-            mmrK = 5,
-            lambda = 0.5f,
-        )
-    }
-
     @Singleton
     @Provides
     fun provideUserProfileRepository(
@@ -87,18 +52,6 @@ object DataModule {
             userProfileRepository = userProfileRepository,
             applicationScope = applicationScope,
             defaultDispatcher = defaultDispatcher,
-            ioDispatcher = ioDispatcher,
-        )
-    }
-
-    @Singleton
-    @Provides
-    fun provideRecommendationRepository(
-        recommendationDao: RecommendationDao,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    ): RecommendationRepository {
-        return RecommendationRepositoryImpl(
-            recommendationDao = recommendationDao,
             ioDispatcher = ioDispatcher,
         )
     }

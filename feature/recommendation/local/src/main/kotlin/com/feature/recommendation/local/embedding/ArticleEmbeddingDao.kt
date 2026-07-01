@@ -1,4 +1,4 @@
-package com.core.database.embeding
+package com.feature.recommendation.local.embedding
 
 import androidx.room.Dao
 import androidx.room.Query
