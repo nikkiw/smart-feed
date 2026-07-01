@@ -4,8 +4,8 @@ import kotlin.test.Test
 
 class LayerDependencyKonsistTest {
     @Test
-    fun `domain layer stays framework and implementation independent`() {
-        sourceFilesUnder("core/core-domain/src/main").assertNoImports(
+    fun `common module stays framework and implementation independent`() {
+        sourceFilesUnder("core/common/src/main").assertNoImports(
             forbiddenPrefixes =
                 listOf(
                     "android.",
@@ -19,42 +19,46 @@ class LayerDependencyKonsistTest {
                     "com.arkivanov.decompose.",
                     "com.arkivanov.essenty.",
                     "com.arkivanov.mvikotlin.",
-                    "com.core.data.",
                     "com.core.database.",
                     "com.core.networks.",
+                    "com.core.analytics.",
+                    "com.core.connectivity.",
+                    "com.core.lifecycle.",
+                    "com.core.image.",
+                    "com.core.paging.",
+                    "com.core.coroutines.",
                     "com.feature.",
                     "com.ndev.android.smart.feed.",
                 ),
-            reason = "core-domain must stay pure and must not depend on frameworks or implementation layers.",
+            reason =
+                "core-common must stay pure and must not depend on frameworks, " +
+                    "app, feature, or other core modules.",
         )
     }
 
     @Test
-    fun `data layer does not depend on app or feature packages`() {
-        sourceFilesUnder(
-            "core/core-data/src/main",
-            "core/core-data/src/dev",
-            "core/core-data/src/prod",
-        ).assertNoImports(
-            forbiddenPrefixes =
-                listOf(
-                    "com.feature.",
-                    "com.ndev.android.smart.feed.",
-                ),
-            reason = "core-data can orchestrate data sources but must not depend on app or feature UI.",
-        )
-    }
-
-    @Test
-    fun `database layer does not depend on app feature or network packages`() {
+    fun `database aggregator depends only on feature local storage schemas`() {
         sourceFilesUnder("core/core-database/src/main").assertNoImports(
             forbiddenPrefixes =
                 listOf(
-                    "com.feature.",
-                    "com.ndev.android.smart.feed.",
+                    "com.feature.feed.impl.",
+                    "com.feature.feed.root.",
+                    "com.feature.feed.list.",
+                    "com.feature.feed.master.",
+                    "com.feature.feed.article.",
+                    "com.feature.feed.recommendation.",
+                    "com.feature.recommendation.api.",
+                    "com.feature.recommendation.impl.",
+                    "com.feature.userprofile.api.",
+                    "com.feature.userprofile.impl.",
+                    "com.core.analytics.api.",
+                    "com.core.analytics.impl.",
                     "com.core.networks.",
+                    "com.ndev.android.smart.feed.",
                 ),
-            reason = "core-database must remain a persistence adapter, not an app, feature, or network consumer.",
+            reason =
+                "core-database is a Room aggregator. It may import storage-schema " +
+                    "modules only, not feature API/impl, network, app, or UI.",
         )
     }
 
@@ -70,11 +74,10 @@ class LayerDependencyKonsistTest {
                     "com.feature.",
                     "com.ndev.android.smart.feed.",
                     "com.core.database.",
-                    "com.core.data.",
                 ),
             reason =
                 "core-networks must remain a network adapter and not depend on " +
-                    "persistence, data orchestration, app, or feature UI.",
+                    "persistence, app, or feature UI.",
         )
     }
 
@@ -87,11 +90,10 @@ class LayerDependencyKonsistTest {
                     "com.ndev.android.smart.feed.",
                     "com.core.database.",
                     "com.core.networks.",
-                    "com.core.data.",
                 ),
             reason =
                 "image-glide must remain an image loading adapter and not depend " +
-                    "on app, feature, persistence, network, or data orchestration.",
+                    "on app, feature, persistence, or network code.",
         )
     }
 }

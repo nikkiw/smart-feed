@@ -3,11 +3,11 @@
 complexity:
   LongParameterList:
     active: true
-    functionThreshold: 7
-    constructorThreshold: 8
+    allowedFunctionParameters: 7
+    allowedConstructorParameters: 8
   LongMethod:
     active: true
-    threshold: 70
+    allowedLines: 70
   LargeClass:
     active: true
-    threshold: 220
+    allowedLines: 220

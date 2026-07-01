@@ -3,9 +3,9 @@ package com.feature.feed.list
 import androidx.paging.PagingData
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItemPreview
-import com.core.domain.repository.Query
+import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItemPreview
+import com.feature.feed.domain.repository.Query
 
 /**
  *A component for displaying a feed of articles with support for Paging and Pull-to-Refresh.

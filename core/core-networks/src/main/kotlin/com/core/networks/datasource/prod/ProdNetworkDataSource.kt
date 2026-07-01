@@ -2,11 +2,11 @@ package com.core.networks.datasource.prod
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.core.common.coroutines.runSuspendCatching
 import com.core.di.IoDispatcher
 import com.core.networks.datasource.NetworkDataSource
 import com.core.networks.models.ContentUpdate
 import com.core.networks.models.UpdatesResponse
-import com.core.runSuspendCatching
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

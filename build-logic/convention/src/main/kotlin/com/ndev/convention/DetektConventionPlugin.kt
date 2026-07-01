@@ -1,7 +1,7 @@
 package com.ndev.convention
 
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import dev.detekt.gradle.Detekt
+import dev.detekt.gradle.extensions.DetektExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -15,7 +15,7 @@ import org.gradle.kotlin.dsl.withType
 class DetektConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply("io.gitlab.arturbosch.detekt")
+            pluginManager.apply("dev.detekt")
 
             val configDir = rootProject.layout.projectDirectory.dir("config/detekt")
             val commonConfig = configDir.file("detekt-common.yml")
@@ -24,11 +24,11 @@ class DetektConventionPlugin : Plugin<Project> {
             val androidTestConfig = configDir.file("detekt-android-test.yml")
 
             configure<DetektExtension> {
-                buildUponDefaultConfig = true
-                parallel = true
+                buildUponDefaultConfig.set(true)
+                parallel.set(true)
                 config.setFrom(files(commonConfig, productionConfig))
                 source.setFrom(files(productionSources() + testSources() + androidTestSources()))
-                basePath = rootProject.projectDir.absolutePath
+                basePath.set(rootProject.layout.projectDirectory)
             }
 
             registerLayeredDetektTask(
@@ -51,8 +51,8 @@ class DetektConventionPlugin : Plugin<Project> {
             )
 
             tasks.withType<Detekt>().configureEach {
-                jvmTarget = "17"
-                basePath = rootProject.projectDir.absolutePath
+                jvmTarget.set("17")
+                basePath.set(rootProject.projectDir.absolutePath)
                 if (name == "detekt") {
                     setSource(files())
                 }
@@ -73,8 +73,8 @@ class DetektConventionPlugin : Plugin<Project> {
         val configureTask: Detekt.() -> Unit = {
             group = "verification"
             this.description = description
-            buildUponDefaultConfig = true
-            parallel = true
+            buildUponDefaultConfig.set(true)
+            parallel.set(true)
             setSource(files(sourceDirs.map(::file).filter { it.exists() }))
             config.setFrom(files(configFiles.filter { it.exists() }))
             exclude("**/build/**")

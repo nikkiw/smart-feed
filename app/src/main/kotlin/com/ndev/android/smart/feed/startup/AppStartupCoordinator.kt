@@ -3,7 +3,6 @@ package com.ndev.android.smart.feed.startup
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.core.domain.service.AppBootstrapper
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job

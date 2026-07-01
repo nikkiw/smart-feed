@@ -1,76 +1,127 @@
 # Project Architecture Overview
 
-This document provides a comprehensive overview of the architecture of the **Smart Feed** application. The project is designed as a showcase of scalable, highly testable, and modular Android development practices using **Decompose** and **Kotlin Multiplatform-inspired** structuring.
+This document provides a comprehensive overview of the **Smart Feed** application architecture. The project is designed as a senior-level showcase of scalable, testable, and modular Android development using **Feature-Driven Vertical Slice Architecture**, **Decompose** navigation, and **Kotlin-first** patterns.
 
 ---
 
-## Architecture Diagram
+## 1. Core Architectural Philosophy
 
-Below is the conceptual architecture of the application, showing the separation of layers and dependency directions:
+The architecture has evolved from a **Horizontal Monolith** (shared global `core-domain` and `core-data` layers) to a **Vertical Feature Slice** model. Each feature now owns its entire stack — from domain contracts down to local database storage, while `:core:common` remains a small pure-Kotlin utility module for reusable helpers.
+
+This transition was driven by:
+- **Build performance**: Smaller, focused modules maximize Gradle's build cache and parallel compilation.
+- **Team scalability**: Feature boundaries prevent cross-team accidental coupling.
+- **Testability**: Isolated domain modules require no Android framework — pure JVM unit tests.
+- **KMP readiness**: Pure Kotlin `:api` modules are portable to Kotlin Multiplatform without modification.
+
+---
+
+## 2. Module Dependency Diagram
 
 ```mermaid
 graph TD
-    %% Presentation / Feature Layer
-    subgraph Feature Layer
-        FeedApi[":feature:feed:api"]
-        FeedImpl[":feature:feed:impl"]
+    App[":app"]
+
+    subgraph arch ["Architecture Tests"]
+        ArchTests[":architecture-tests (Konsist)"]
     end
 
-    %% Application Module
-    App[":app Application Root"]
+    subgraph features ["Feature Slices"]
+        subgraph feed ["feed"]
+            FeedApi[":feature:feed:api"]
+            FeedLocal[":feature:feed:local"]
+            FeedImpl[":feature:feed:impl"]
+        end
+        subgraph rec ["recommendation"]
+            RecApi[":feature:recommendation:api"]
+            RecLocal[":feature:recommendation:local"]
+            RecImpl[":feature:recommendation:impl"]
+        end
+        subgraph user ["userprofile"]
+            UserApi[":feature:userprofile:api"]
+            UserImpl[":feature:userprofile:impl"]
+        end
+    end
 
-    %% Core Layer
-    subgraph Core Layer
-        CoreDomain[":core:core-domain"]
-        CoreData[":core:core-data"]
+    subgraph core ["Core Infrastructure"]
+        CoreCommon[":core:common (pure Kotlin utils)"]
         CoreDB[":core:core-database"]
         CoreNet[":core:core-networks"]
-        CoreGlide[":core:image-glide"]
+        CorePaging[":core:core-paging"]
+        ImageApi[":core:image:api"]
+        ImageGlide[":core:image-glide"]
+        Analytics[":core:analytics:api"]
+        Connectivity[":core:connectivity"]
+        Coroutines[":core:coroutines"]
     end
 
-    %% Dependency Directions
     App --> FeedApi
     App --> FeedImpl
-    
+    App --> RecImpl
+    App --> UserImpl
+
+    FeedLocal --> FeedApi
     FeedImpl --> FeedApi
-    FeedImpl --> CoreDomain
-    FeedImpl --> CoreGlide
-    
-    FeedApi --> CoreDomain
-    
-    CoreData --> CoreDomain
-    CoreData --> CoreDB
-    CoreData --> CoreNet
-    
-    CoreDB --> CoreDomain
-    CoreNet --> CoreDomain
+    FeedImpl --> FeedLocal
+    FeedImpl --> CoreDB
+    FeedImpl --> CorePaging
+    FeedImpl --> ImageApi
+    FeedImpl --> Connectivity
+
+    RecLocal --> RecApi
+    RecImpl --> RecApi
+    RecImpl --> RecLocal
+    RecImpl --> FeedApi
+    RecImpl --> CoreDB
+
+    UserImpl --> UserApi
+    UserImpl --> CoreDB
+
+    CoreDB --> FeedLocal
+    CoreDB --> RecLocal
+    CoreDB --> UserApi
+
+    ImageGlide --> ImageApi
+    App --> ImageGlide
 ```
 
----
-
-## 1. Modularization Strategy
-
-To support clean separation of concerns and scalable build performance, the project uses a layered, multi-module configuration:
-
-1. **Application Module (`:app`)**:
-   - Serves as the composition root. It installs the Hilt Application classes, registers App Initializers, and initializes the root Decompose view controller (`MainActivity`).
-   - Only references public component contracts from the feature API modules for compile-time safety, injecting concrete implementations via Hilt binds.
-
-2. **Feature Layer (`:feature:xxx`)**:
-   - Separated into **API** (`:feature:xxx:api`) and **Implementation** (`:feature:xxx:impl`) submodules.
-   - **API Module**: Contains Decompose components (interfaces), configuration parameters, route configurations, and state definitions. This module has no dependencies on UI libraries or Hilt, enabling rapid unit testing and preventing circular dependencies.
-   - **Implementation Module**: Houses the UI layouts, XML view-bindings, Jetpack Compose layouts, assisted-inject component factories, and internal state engines (MVI Kotlin/Reducers).
-
-3. **Core Layer (`:core:xxx`)**:
-   - **`:core:core-domain`**: Pure Kotlin domain models, repository interfaces, and use cases. No Android-specific dependencies.
-   - **`:core:core-data`**: Implementations of repositories, fetching policies, and local/network sync logic.
-   - **`:core:core-database`**: Room Database declaration, entities, and converters.
-   - **`:core:core-networks`**: Network client configurations, API endpoints, and mock servers.
-   - **`:core:image-glide`**: Glide wrapper configuration for loading images in RecyclerView and custom views.
+> **Note on Room & Circular Dependency Prevention**: Room requires the `@Database` class to enumerate all `@Entity` types at compile time. If entities lived in `:feature:<name>:impl`, then `:core:core-database` would depend on `:feature:<name>:impl`, and `:feature:<name>:impl` on `:core:core-database` — creating a circular Gradle dependency. The `:feature:<name>:local` module breaks this loop: it has no dependency on `:core:core-database`, yet `:core:core-database` can safely depend on it to discover entities.
 
 ---
 
-## 2. Decompose Component Tree
+## 3. Feature 3-Module Structure
+
+Every feature follows a strict 3-module pattern:
+
+| Module | Contents | Dependencies |
+|--------|----------|--------------|
+| `:feature:<name>:api` | Domain models, repository interfaces, component contracts (Decompose), state objects | Pure Kotlin only — no Android, no Hilt |
+| `:feature:<name>:local` | Room `@Entity` classes, `@Dao` interfaces, TypeConverters for this feature | `:feature:<name>:api` only |
+| `:feature:<name>:impl` | UI layouts (XML/Compose), component implementations, repository implementations, Hilt modules | `:api`, `:local`, `:core:core-database`, `:core:core-paging`, `:core:image:api`, etc. |
+
+---
+
+## 4. Core Infrastructure Modules
+
+`core` modules provide only **cross-cutting infrastructure**. They contain no business logic:
+
+| Module | Responsibility |
+|--------|----------------|
+| `:core:common` | Pure Kotlin shared utilities: coroutine extensions, embedding math, time converters. _(Renamed from `:core:core` — Android manifest removed, pure JVM module)_ |
+| `:core:core-database` | `RoomDatabase` orchestrator, cross-feature schema migrations |
+| `:core:core-networks` | Retrofit/Ktor client configuration, dev/prod network data sources |
+| `:core:core-paging` | `PagingData` infrastructure abstractions, isolating AndroidX Paging from domain |
+| `:core:image:api` | Pure Kotlin `ImageLoader` interface (KMP-portable, no Glide dependency) |
+| `:core:image-glide` | Glide implementation of `ImageLoader` |
+| `:core:analytics:api` | `AnalyticsService` interface |
+| `:core:analytics:impl` | Analytics implementation |
+| `:core:connectivity` | `ConnectivityRepository` — network state monitoring (modern observer-based implementation) |
+| `:core:lifecycle` | `AppLifecycleObserver` |
+| `:core:coroutines` | Coroutine `Dispatchers` DI module, Flow extension utilities |
+
+---
+
+## 5. Decompose Component Tree
 
 The presentation layer is governed by a component tree managed by **Decompose**. Instead of relying on traditional Android Fragments/Activities, Decompose splits UI and business logic into lifecycle-aware **Components**:
 
@@ -79,21 +130,79 @@ graph TD
     Root[FeedRootComponent] -->|ChildStack| Master[FeedMasterComponent]
     Root -->|ChildStack| Details[ArticleItemComponent]
     Root -->|ChildStack| Recommendation[RecommendationListComponent]
-    
+
     Master -->|Sub-Component| FilterSort[FilterSortComponent]
     Master -->|Sub-Component| List[FeedListComponent]
+    
+    Details -->|Sub-Component| ArticleRec[ArticleRecommendationsComponent]
 ```
 
-### Component Details
-* **`FeedRootComponent`**: Manages the navigation stack (`ChildStack`) between the Main Feed list, Article Details, and Recommendations. It also handles transition animations (slide/fade and shared element bounds transforms).
-* **`FeedMasterComponent`**: Hosts the feed screen state, coordinating filtering/sorting updates and delegates list loading to `FeedListComponent`.
-* **`FeedListComponent`**: Encapsulates pagination (Paging 3) and data loading state (Loading/Error/Success).
-* **`ArticleItemComponent`**: Manages details view, rendering Markdown formatting (using Markwon), and displaying contextual recommendations.
+### Component Responsibilities
+* **`FeedRootComponent`**: Manages the `ChildStack` navigation between Feed, Details, and Recommendations. Handles shared-element transition registration via `TransitionRegistry`.
+* **`FeedMasterComponent`**: Orchestrates filter/sort state and coordinates feed list loading.
+* **`FeedListComponent`**: Encapsulates Paging 3 data loading, loading/error/empty state tracking, and swipe-to-refresh.
+* **`ArticleItemComponent`**: Renders Markdown content (Markwon), tracks read-percentage analytics, and loads contextual article recommendations.
+* **`RecommendationListComponent`**: Displays recommendations ranked by cosine similarity of content embeddings.
 
 ---
 
-## 3. Dependency Injection (DI)
+## 6. Dependency Injection (DI)
 
-We utilize **Dagger Hilt** for dependency injection. 
-- Component factories use `@AssistedInject` to allow Decompose to pass the `ComponentContext` and runtime parameters (like `itemId` for details screen) dynamically.
-- Concrete factories are bound to public API interfaces inside Hilt modules (e.g. `FeedModule.kt`), ensuring the `:app` module never couples compile-time logic directly to implementation classes.
+We use **Dagger Hilt** throughout.
+
+- Component factories use `@AssistedInject` to allow Decompose to pass `ComponentContext` and runtime parameters (e.g. `itemId` for the Details screen) dynamically.
+- Each feature's `:impl` module declares its own Hilt `@Module` with `@Binds` binding the implementation to the API interface.
+- The `:app` module only references public API contracts from feature modules. It never imports `*Impl` classes directly.
+
+---
+
+## 7. Executable Architecture Enforcement (Konsist)
+
+A dedicated JVM module `:architecture-tests` runs on every CI build via `./gradlew :architecture-tests:test`.
+
+Enforced rules:
+- `:feature:<name>:api` modules must not import Android platform APIs, Room, Retrofit, Hilt, or Decompose.
+- `:feature:<name>:impl` must not expose its implementation factories via the API contract.
+- Decompose component implementations must follow the naming suffix convention (`ComponentImpl`).
+- MVI Reducers must be pure functions — no side effects.
+
+---
+
+## 8. Static Quality Gate Pipeline
+
+Every commit is validated through a tiered gate:
+
+```bash
+# 1. Code formatting (Spotless + Ktlint)
+./gradlew spotlessCheck
+
+# 2. Static analysis (Detekt 2 — layered profiles per module type)
+./gradlew detekt
+
+# 3. Architecture consistency tests (Konsist)
+./gradlew :architecture-tests:test
+
+# 4. Unit tests
+./gradlew test
+```
+
+Detekt **2.0** profiles are layered per module type:
+- `detekt-common.yml` — base rules shared across all modules.
+- `detekt-domain.yml` — strictest. No complexity violations in business rules.
+- `detekt-data.yml` — moderate. Allows slightly larger classes for repository implementations.
+- `detekt-ui.yml` — relaxed on complexity (UI state machines are inherently complex).
+- `detekt-test.yml` — permissive. Readability over brevity in tests.
+- `detekt-android-test.yml` — rules for instrumented Android tests.
+
+---
+
+## 9. Build Noise Reduction
+
+The following recurring Gradle/toolchain warnings were resolved as part of Phase 7:
+
+- **Dokka Gradle plugin V2** migration helpers — disabled via `gradle.properties`.
+- **AGP deprecated APIs** (`applicationVariants`, `libraryVariants`) — migrated to `AndroidComponentsExtension`.
+- **Detekt migration to 2.x** — updated plugin coordinates (`io.gitlab.arturbosch.detekt` → `dev.detekt`), removed deprecated rule keys, updated config files.
+- **KSP / Kotlin version alignment** — upgraded to Kotlin **2.3.21** and KSP **2.3.9** to eliminate version mismatch warnings.
+- **ConnectivityRepository** — replaced legacy `NetworkCallback` approach with modern `NetworkObserver`-based implementation.
+- **`gradle.properties` cleanup** — removed obsolete feature flags that triggered deprecation warnings.

@@ -3,10 +3,11 @@
 [![Android CI](https://github.com/nikkiw/smart-feed/actions/workflows/android_ci.yml/badge.svg)](https://github.com/nikkiw/smart-feed/actions)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Decompose](https://img.shields.io/badge/Navigation-Decompose%203.3.0-orange.svg)](https://github.com/arkivanov/Decompose)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.21-purple.svg)](https://kotlinlang.org)
 
-**Smart Feed** is a showcase Android application demonstrating modern, production-grade architectural patterns. It features a modular, offline-first article feed, dynamic filtering/sorting, and an on-device recommendation engine powered by text embeddings. 
+**Smart Feed** is a showcase Android application demonstrating modern, production-grade architectural patterns. It features a modular, offline-first article feed, dynamic filtering/sorting, and an on-device recommendation engine powered by text embeddings.
 
-This repository serves as a showcase of senior-level engineering skills, focusing on **decoupled navigation (Decompose)**, **strict feature boundary separation (API vs. Impl)**, **composable linter rules (Detekt/Spotless)**, and **incremental migration patterns (XML to Jetpack Compose)**.
+This repository serves as a showcase of senior-level engineering skills, focusing on **Feature-Driven Vertical Slice Architecture**, **decoupled navigation (Decompose)**, **strict 3-module feature boundaries (API / Local / Impl)**, **executable architecture guards (Konsist)**, and **composable static quality gates (Detekt 2 / Spotless)**.
 
 ---
 
@@ -18,12 +19,14 @@ This repository serves as a showcase of senior-level engineering skills, focusin
 
 ## 🏗 Architecture & Design Highlights
 
-The project is structured under **Clean Architecture** guidelines with **Component-Driven UI** navigation, moving away from traditional Fragment-based or NavHost architectures:
+The project is structured under **Clean Architecture** guidelines with **Feature-Driven Vertical Slice** decomposition and **Component-Driven UI** navigation:
 
-1. **Decompose Navigation**: Pure Kotlin component tree controlling lifecycle, state preservation, and back-stack handling, completely decoupled from the Android framework. Read more in [ADR 0001: Adopting Decompose](docs/adr/0001-why-decompose.md).
-2. **Feature API/Impl Separation**: Compiles feature modules into separate lightweight `:api` contracts and heavy `:impl` assets. This decouples features and speeds up build compilation.
-3. **Consolidated Gradle Build-Logic**: Eliminates old `buildSrc` duplication. Uses a composite build logic (`build-logic`) running Android Gradle Plugin **`9.2.1`**, Java **`17`**, **Detekt** (`1.23.8`), and **Spotless/Ktlint** (`6.25.0`).
-4. **Incremental Compose Migration**: Rather than a full rewrite, Compose is introduced using "Compose Islands" inside existing layout viewholders. Read more in [ADR 0002: XML to Jetpack Compose Migration](docs/adr/0002-xml-to-compose-migration.md).
+1. **Vertical Feature Slices**: Each feature owns its full stack — domain contracts (`:api`), Room entities and DAOs (`:local`), and all UI and infrastructure implementations (`:impl`). This eliminates the "horizontal monolith" anti-pattern.
+2. **3-Module Feature Structure**: The `:local` module is a deliberate architectural solution to prevent circular Gradle dependencies caused by Room's `@Database` entity registration requirement. See [Architecture Documentation](docs/architecture.md).
+3. **Decompose Navigation**: Pure Kotlin component tree controlling lifecycle, state preservation, and back-stack handling — completely decoupled from the Android framework. See [ADR 0001](docs/adr/0001-why-decompose.md).
+4. **Executable Architecture Guards (Konsist)**: A dedicated `:architecture-tests` JVM module enforces module boundary rules on every CI build — preventing domain leakage, platform imports in API modules, and naming violations.
+5. **Consolidated Gradle Build-Logic**: Modern composite `build-logic` eliminating old `buildSrc`. Convention plugins handle per-module Detekt profiles, Spotless formatting, and toolchain configuration.
+6. **Incremental Compose Migration**: Compose is introduced via "Compose Islands" inside existing XML RecyclerView ViewHolders — no big-bang rewrite. See [ADR 0002](docs/adr/0002-xml-to-compose-migration.md).
 
 For a complete breakdown, see the [Architecture Documentation](docs/architecture.md).
 
@@ -31,15 +34,19 @@ For a complete breakdown, see the [Architecture Documentation](docs/architecture
 
 ## 🛠 Tech Stack
 
-| Layer        | Technologies                                                                                |
-|--------------|---------------------------------------------------------------------------------------------|
-| **Core**     | Kotlin Coroutines & Flows, Serialization                                                    |
-| **Navigation**| [Decompose](https://github.com/arkivanov/Decompose) with Android ViewContext extensions    |
-| **State**    | MVI Kotlin Store architecture (under migration)                                             |
-| **Database** | Room with custom SQLite bundled converters for float embeddings vectors                     |
-| **Background**| WorkManager with Hilt worker scheduling                                                     |
-| **DI**       | Dagger Hilt (assisted factories, interface binds)                                            |
-| **Linter**   | Spotless, Ktlint, Detekt static analysis                                                    |
+| Layer            | Technologies                                                                                      |
+|------------------|---------------------------------------------------------------------------------------------------|
+| **Language**     | Kotlin **2.3.21**, JVM 17 target                                                                  |
+| **Build**        | Android Gradle Plugin **9.2.1**, Gradle **9.4.1**, KSP **2.3.9**, composite `build-logic`        |
+| **Navigation**   | [Decompose](https://github.com/arkivanov/Decompose) **3.3.0** with Android ViewContext extensions |
+| **State**        | MVIKotlin **4.2.0** (next milestone: MVI feed slice)                                              |
+| **Database**     | Room **2.7.1** with float-array embedding converters, per-feature entity/DAO modules (`:local`)   |
+| **Background**   | WorkManager with Hilt worker scheduling                                                           |
+| **DI**           | Dagger Hilt **2.60** (assisted factories, interface binds, per-feature Hilt modules)              |
+| **Images**       | Glide behind a pure Kotlin `ImageLoader` contract (`:core:image:api`)                             |
+| **Static Lint**  | Detekt **2.0.0-alpha.5** (layered profiles), Spotless **6.25.0** / Ktlint                        |
+| **Arch Testing** | [Konsist](https://github.com/LemonAppDev/konsist) **0.17.3** — executable architecture guards    |
+| **Networking**   | Retrofit + OkHttp, Ktor local mock server for dev flavour                                         |
 
 ---
 
@@ -47,45 +54,59 @@ For a complete breakdown, see the [Architecture Documentation](docs/architecture
 
 ```plaintext
 smart-feed/
-├── app/             # Application entry point (Hilt components, AppInitializers, MainActivity)
-├── build-logic/     # Composite build logic (Convention plugins for API, Impl, Detekt, Spotless)
-├── core/            # Core horizontal layers
-│   ├── core/        # Common utilities, base behaviors
-│   ├── core-domain/ # Pure Kotlin domain models, interfaces, use cases
-│   ├── core-data/   # Repository implementations and sync orchestrators
-│   ├── core-database/# Room Database configuration and entities
-│   ├── core-networks/# Retrofit clients and Ktor local mock server
-│   └── image-glide/ # Glide configuration module
-├── docs/            # ADRs and spec documentation
-└── feature/         # Vertical features (e.g. split :feed:api and :feed:impl)
+├── app/                    # Composition root (Hilt, AppBootstrapper, MainActivity)
+├── architecture-tests/     # Konsist architecture enforcement tests (pure JVM, no Android)
+├── build-logic/            # Convention plugins: toolchain, Detekt, Spotless, feature config
+├── config/detekt/          # Layered Detekt rule profiles (domain, data, ui, test, common)
+├── core/
+│   ├── common/             # Pure Kotlin shared utilities: coroutine helpers, embedding math,
+│   │                       #   time converters (formerly :core:core → renamed)
+│   ├── analytics/
+│   │   ├── api/            #   AnalyticsService interface (pure Kotlin)
+│   │   └── impl/           #   Analytics implementation
+│   ├── connectivity/       # ConnectivityRepository (network state, modern observer-based)
+│   ├── content/api/        # Shared content value objects used across features
+│   ├── core-database/      # RoomDatabase orchestrator, cross-feature schema migrations
+│   ├── core-networks/      # Retrofit/Ktor config, prod & dev network data sources
+│   ├── core-paging/        # PagingData infrastructure — isolates AndroidX Paging from domain
+│   ├── coroutines/         # Coroutine Dispatchers DI module
+│   ├── image/api/          # Pure Kotlin ImageLoader contract (KMP-portable)
+│   ├── image-glide/        # Glide implementation of ImageLoader
+│   └── lifecycle/          # AppLifecycleObserver
+├── docs/
+│   ├── adr/                # Architectural Decision Records
+│   └── plans/              # Implementation and refactoring plans
+└── feature/
+    ├── feed/               # Article feed — full vertical slice
+    │   ├── api/            #   Component contracts, ContentItem domain model, repository API
+    │   ├── local/          #   ContentEntity, ContentDao (feed-owned Room storage)
+    │   └── impl/           #   UI views, XML layouts, Hilt modules, repository impls, Paging
+    ├── recommendation/     # Recommendation engine — full vertical slice
+    │   ├── api/            #   Recommendation model, RecommendationRepository contract
+    │   ├── local/          #   Recommendation Room entities and DAOs
+    │   └── impl/           #   Recommender, EmbeddingIndex (cosine similarity), Hilt modules
+    └── userprofile/        # User identity — vertical slice
+        ├── api/            #   UserProfile model, UserProfileRepository contract
+        ├── impl/           #   Repository impl, Hilt module
+        └── local/          #   User profile Room storage
 ```
 
 ---
 
 ## 📅 Modernization Roadmap
 
-The project is undergoing a staged modernization to demonstrate migration of legacy codebases:
-
-* **Phase 0: Project Cleanup**
-  * [x] Stash experimental changes (`create-post-wip`) to isolate polish steps.
-* **Phase 1: Showcase Polish & Docs**
-  * [x] Add system architecture diagram and module layouts.
-  * [x] Write ADRs detailing Decompose choice and incremental Compose adoption.
-* **Phase 2: Build Logic & Static Analysis**
-  * [x] Consolidate `buildSrc` into `build-logic`.
-  * [x] Upgrade to Android Gradle Plugin (AGP) **9.2.1**, Kotlin **2.1.10**, Java Toolchain **17**.
-  * [x] Integrate Spotless, Ktlint formatting, and Detekt config rule sets.
-* **Phase 3: MainActivity Refactoring**
-  * [ ] Decouple app startup bootstrap from `MainActivity` lifecycle.
-  * [ ] Clean up Hilt dependency injection to target interface `FeedRootComponent.Factory`.
-* **Phase 4: Feature Module Separation**
-  * [ ] Extract component interfaces from `:feature:feed` into `:feature:feed:api`.
-  * [ ] Place UI Views and implementation classes in `:feature:feed:impl`.
-* **Phase 5: Incremental MVI Slice Migration**
-  * [ ] Migrate Feed list to MVI contract (`FeedState`, `FeedIntent`, `FeedEffect`).
-  * [ ] Cover MVI Reducer transitions with pure JVM Unit Tests.
-* **Phase 6: Jetpack Compose Card Island**
-  * [ ] Build Compose-based `ArticleCard` and bind it inside XML RecyclerView list.
+| Phase | Description | Status |
+|-------|-------------|--------|
+| **0** | Stash WIP (`create-post-wip`), isolate polish steps | ✅ Done |
+| **1** | Architecture docs, ADRs, diagrams | ✅ Done |
+| **2** | Build logic consolidation (`buildSrc` → `build-logic`), AGP 9.2.1, Kotlin 2.3.21, KSP 2.3.9, Detekt 2 | ✅ Done |
+| **3** | Konsist architecture enforcement module (`:architecture-tests`) | ✅ Done |
+| **4** | `MainActivity` decoupling — `AppStartupCoordinator`, `SystemBarsController`, `FeedRootViewHost` | ✅ Done |
+| **5** | AndroidX Paging dependency inversion — `:core:core-paging` | ✅ Done |
+| **6** | Feature API/Impl split — `:feature:feed:api` and `:feature:feed:impl` | ✅ Done |
+| **7** | **Core Layer Modularization** — 3-module feature slices (`api/local/impl`), `:core:core` → `:core:common`, eliminated `core-domain` / `core-data` monoliths, build noise cleanup | ✅ **Done** |
+| **8** | MVI slice — `FeedState`, `FeedIntent`, `FeedEffect`, pure JVM Reducer tests | 🔜 Next |
+| **9** | Jetpack Compose Card Island — `ArticleCard` in XML RecyclerView ViewHolder | 🔜 Planned |
 
 ---
 
@@ -96,14 +117,22 @@ The project is undergoing a staged modernization to demonstrate migration of leg
    git clone https://github.com/nikkiw/smart-feed.git
    cd smart-feed
    ```
-2. Build the app and run checks:
+2. Run the full quality gate locally:
    ```bash
-   # Run detekt checks
-   ./gradlew detekt
-   # Run spotless checks and auto-format
+   # Auto-format code
    ./gradlew spotlessApply
+   # Static analysis (layered Detekt profiles)
+   ./gradlew detekt
+   # Architecture consistency tests (Konsist)
+   ./gradlew :architecture-tests:test
+   # All unit tests
+   ./gradlew test
    # Assemble developer debug build
    ./gradlew assembleDevDebug
+   ```
+3. Full CI verification matrix in one command:
+   ```bash
+   ./gradlew spotlessCheck detekt :architecture-tests:test test
    ```
 
 ---

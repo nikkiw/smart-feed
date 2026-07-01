@@ -8,11 +8,11 @@ import androidx.cardview.widget.CardView
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.extensions.android.layoutInflater
-import com.core.domain.model.ContentItemPreview
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
 import com.core.image.ImageSource
 import com.feature.feed.R
+import com.feature.feed.domain.model.ContentItemPreview
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Suppress("FunctionName")

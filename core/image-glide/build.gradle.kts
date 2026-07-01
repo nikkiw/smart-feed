@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.core)
+    implementation(projects.core.image.api)
     implementation(libs.bundles.glide)
     ksp(libs.glide.ksp)
 }

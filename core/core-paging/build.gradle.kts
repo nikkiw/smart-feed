@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.coreDomain)
+    api(projects.feature.feed.api)
 
     implementation(libs.androidx.pagging.ktx)
 }

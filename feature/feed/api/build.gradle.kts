@@ -9,8 +9,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.coreDomain)
-    implementation(projects.core.corePaging)
+    api(projects.core.content.api)
 
     implementation(libs.decompose)
     implementation(libs.androidx.pagging.ktx)

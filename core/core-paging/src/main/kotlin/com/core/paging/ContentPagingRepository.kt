@@ -1,8 +1,8 @@
 package com.core.paging
 
 import androidx.paging.PagingData
-import com.core.domain.model.ContentItemPreview
-import com.core.domain.repository.Query
+import com.feature.feed.domain.model.ContentItemPreview
+import com.feature.feed.domain.repository.Query
 import kotlinx.coroutines.flow.Flow
 
 interface ContentPagingRepository {

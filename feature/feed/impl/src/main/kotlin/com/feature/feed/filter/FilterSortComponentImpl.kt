@@ -4,9 +4,9 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
-import com.core.domain.model.Tags
-import com.core.domain.repository.ContentItemRepository
-import com.core.domain.repository.ContentItemsSortedType
+import com.core.content.model.Tags
+import com.feature.feed.domain.repository.ContentItemRepository
+import com.feature.feed.domain.repository.ContentItemsSortedType
 import kotlinx.coroutines.launch
 
 /**

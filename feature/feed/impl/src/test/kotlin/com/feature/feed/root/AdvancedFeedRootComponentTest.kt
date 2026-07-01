@@ -1,16 +1,13 @@
 package com.feature.feed.root
 
 import com.arkivanov.decompose.ComponentContext
-import com.core.domain.model.Content
-import com.core.domain.model.ContentId
-import com.core.domain.model.ContentItem.Article
-import com.core.domain.model.ContentItemPreview
-import com.core.domain.model.ContentItemPreview.ArticlePreview
-import com.core.domain.model.ImageUrl
-import com.core.domain.model.ShortDescription
-import com.core.domain.model.Tags
-import com.core.domain.model.Title
-import com.core.domain.model.UpdatedAt
+import com.core.content.model.Content
+import com.core.content.model.ContentId
+import com.core.content.model.ImageUrl
+import com.core.content.model.ShortDescription
+import com.core.content.model.Tags
+import com.core.content.model.Title
+import com.core.content.model.UpdatedAt
 import com.feature.feed.DecomposeTestUtils
 import com.feature.feed.FeedComponentSubjects
 import com.feature.feed.FeedTestDataBuilder
@@ -19,6 +16,9 @@ import com.feature.feed.article.ArticleItemComponent
 import com.feature.feed.bottombar.BottomBarComponent
 import com.feature.feed.bottombar.BottomBarComponentImpl
 import com.feature.feed.bottombar.model.BottomBarState
+import com.feature.feed.domain.model.ContentItem.Article
+import com.feature.feed.domain.model.ContentItemPreview
+import com.feature.feed.domain.model.ContentItemPreview.ArticlePreview
 import com.feature.feed.getBackStackSize
 import com.feature.feed.getCurrentConfig
 import com.feature.feed.recommendation.RecommendationListComponent

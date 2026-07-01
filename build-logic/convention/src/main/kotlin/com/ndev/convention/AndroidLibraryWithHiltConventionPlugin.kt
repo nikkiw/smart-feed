@@ -1,6 +1,6 @@
 package com.ndev.convention
 
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.ndev.convention.common.Config
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -11,7 +11,6 @@ class AndroidLibraryWithHiltConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("com.android.library")
-            pluginManager.apply("org.jetbrains.kotlin.android")
             pluginManager.apply("com.google.devtools.ksp")
             pluginManager.apply("com.google.dagger.hilt.android")
             pluginManager.apply("smart.feed.detekt")

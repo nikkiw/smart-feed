@@ -3,10 +3,10 @@ package com.core.database
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.core.database.event.ContentInteractionStatsDao
-import com.core.database.event.EventLogDao
-import com.core.database.event.entity.EventLog
-import com.core.database.event.entity.EventType
+import com.core.analytics.local.EventLogDao
+import com.core.analytics.local.entity.EventLog
+import com.core.analytics.local.entity.EventType
+import com.feature.recommendation.local.event.ContentInteractionStatsDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
