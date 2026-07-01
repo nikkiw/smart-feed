@@ -44,6 +44,7 @@ graph TD
     end
 
     subgraph core ["Core Infrastructure"]
+        CoreCommon[":core:common (pure Kotlin utils)"]
         CoreDB[":core:core-database"]
         CoreNet[":core:core-networks"]
         CorePaging[":core:core-paging"]
@@ -106,15 +107,15 @@ Every feature follows a strict 3-module pattern:
 
 | Module | Responsibility |
 |--------|----------------|
-| `:core:common` | Pure Kotlin shared utilities: coroutine helpers, time parsing, embedding math |
-| `:core:core-database` | `RoomDatabase` orchestrator, schema migrations |
-| `:core:core-networks` | Retrofit/Ktor client configuration, dev mock data source |
+| `:core:common` | Pure Kotlin shared utilities: coroutine extensions, embedding math, time converters. _(Renamed from `:core:core` — Android manifest removed, pure JVM module)_ |
+| `:core:core-database` | `RoomDatabase` orchestrator, cross-feature schema migrations |
+| `:core:core-networks` | Retrofit/Ktor client configuration, dev/prod network data sources |
 | `:core:core-paging` | `PagingData` infrastructure abstractions, isolating AndroidX Paging from domain |
-| `:core:image:api` | Pure Kotlin `ImageLoader` interface (KMP-ready) |
+| `:core:image:api` | Pure Kotlin `ImageLoader` interface (KMP-portable, no Glide dependency) |
 | `:core:image-glide` | Glide implementation of `ImageLoader` |
 | `:core:analytics:api` | `AnalyticsService` interface |
 | `:core:analytics:impl` | Analytics implementation |
-| `:core:connectivity` | `ConnectivityRepository` — Android network state monitoring |
+| `:core:connectivity` | `ConnectivityRepository` — network state monitoring (modern observer-based implementation) |
 | `:core:lifecycle` | `AppLifecycleObserver` |
 | `:core:coroutines` | Coroutine `Dispatchers` DI module, Flow extension utilities |
 
@@ -175,7 +176,7 @@ Every commit is validated through a tiered gate:
 # 1. Code formatting (Spotless + Ktlint)
 ./gradlew spotlessCheck
 
-# 2. Static analysis (Detekt — layered profiles per module type)
+# 2. Static analysis (Detekt 2 — layered profiles per module type)
 ./gradlew detekt
 
 # 3. Architecture consistency tests (Konsist)
@@ -185,8 +186,23 @@ Every commit is validated through a tiered gate:
 ./gradlew test
 ```
 
-Detekt profiles are layered per module type:
+Detekt **2.0** profiles are layered per module type:
+- `detekt-common.yml` — base rules shared across all modules.
 - `detekt-domain.yml` — strictest. No complexity violations in business rules.
 - `detekt-data.yml` — moderate. Allows slightly larger classes for repository implementations.
 - `detekt-ui.yml` — relaxed on complexity (UI state machines are inherently complex).
 - `detekt-test.yml` — permissive. Readability over brevity in tests.
+- `detekt-android-test.yml` — rules for instrumented Android tests.
+
+---
+
+## 9. Build Noise Reduction
+
+The following recurring Gradle/toolchain warnings were resolved as part of Phase 7:
+
+- **Dokka Gradle plugin V2** migration helpers — disabled via `gradle.properties`.
+- **AGP deprecated APIs** (`applicationVariants`, `libraryVariants`) — migrated to `AndroidComponentsExtension`.
+- **Detekt migration to 2.x** — updated plugin coordinates (`io.gitlab.arturbosch.detekt` → `dev.detekt`), removed deprecated rule keys, updated config files.
+- **KSP / Kotlin version alignment** — upgraded to Kotlin **2.3.21** and KSP **2.3.9** to eliminate version mismatch warnings.
+- **ConnectivityRepository** — replaced legacy `NetworkCallback` approach with modern `NetworkObserver`-based implementation.
+- **`gradle.properties` cleanup** — removed obsolete feature flags that triggered deprecation warnings.
