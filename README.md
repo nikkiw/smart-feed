@@ -1,4 +1,4 @@
-# Smart Feed (Senior Android Architecture Showcase)
+# Smart Feed (Android Architecture Showcase)
 
 [![Android CI](https://github.com/nikkiw/smart-feed/actions/workflows/android_ci.yml/badge.svg)](https://github.com/nikkiw/smart-feed/actions)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
