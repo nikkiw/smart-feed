@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.hilt.work)
 
     testImplementation(libs.junit4)
+    testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.kotlin.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.robolectric)
