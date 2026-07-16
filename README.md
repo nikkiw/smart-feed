@@ -7,7 +7,7 @@
 
 **Smart Feed** is a showcase Android application demonstrating modern, production-grade architectural patterns. It features a modular, offline-first article feed, dynamic filtering/sorting, and an on-device recommendation engine powered by text embeddings.
 
-A reference project demonstrating scalable Android architecture. The core focus is on building predictable systems using **Feature-Driven Vertical Slices** with strict modular boundaries (API / Local / Impl). It utilizes **Decompose** for lifecycle-aware navigation, while architectural constraints and code quality are automatically enforced via **Konsist**, **Detekt 2**, and **Spotless**."
+A reference project demonstrating scalable Android architecture. The core focus is on building predictable systems using **Feature-Driven Vertical Slices** with strict modular boundaries (API / Local / Impl). It utilizes **Decompose** for lifecycle-aware navigation, while architectural constraints and code quality are automatically enforced via **Konsist**, **Detekt 2**, and **Spotless**.
 
 
 ## 🎥 Demo
@@ -31,7 +31,7 @@ The project is structured under **Clean Architecture** guidelines with **Feature
    ```
    `api` is the stable feature contract. `local` owns the Room schema without circular dependencies. `impl` contains UI, Store, repositories, and Android-specific integrations.
 2. **3-Module Feature Structure**: The `:local` module is a deliberate architectural solution to prevent circular Gradle dependencies caused by Room's `@Database` entity registration requirement. See [Architecture Documentation](docs/architecture.md).
-3. **Decompose Navigation**: Pure Kotlin component tree controlling lifecycle, state preservation, and back-stack handling — completely decoupled from the Android framework. See [ADR 0001](docs/adr/0001-why-decompose.md).
+3. **Decompose Navigation**: Pure Kotlin component tree controlling lifecycle, state preservation, and back-stack handling — navigation and state ownership are decoupled from Android UI implementations. See [ADR 0001](docs/adr/0001-why-decompose.md).
 4. **Executable Architecture Guards (Konsist)**: A dedicated `:architecture-tests` JVM module enforces module boundary rules on every CI build — preventing domain leakage, platform imports in API modules, and naming violations.
 5. **Consolidated Gradle Build-Logic**: Modern composite `build-logic` eliminating old `buildSrc`. Convention plugins handle per-module Detekt profiles, Spotless formatting, and toolchain configuration.
 6. **Incremental UI Modernization**: the current Feed UI is XML/ViewBinding hosted by RecyclerView. The next UI track adds a Compose card beside the XML implementation so rendering and scrolling performance can be compared before selecting a migration path. See [ADR 0002](docs/adr/0002-xml-to-compose-migration.md).
