@@ -2,57 +2,28 @@ package com.feature.feed.data.work
 
 import android.content.Context
 import android.widget.ImageView
-import com.core.content.model.ContentId
-import com.core.content.model.Tags
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
 import com.core.image.ImageSource
-import com.feature.feed.domain.model.ContentItem
-import com.feature.feed.domain.repository.ContentItemRepository
-import com.feature.recommendation.domain.service.Recommender
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FakeContentRepo
+class FakeSyncContentUseCase
     @Inject
-    constructor() : ContentItemRepository {
+    constructor() : SyncContentUseCase {
         var shouldFail = false
+        val invoked = AtomicBoolean(false)
 
-        override suspend fun getContentById(itemId: ContentId): Result<ContentItem> {
-            error("Not used by ContentFetchWorker tests")
-        }
-
-        override suspend fun isEmpty(): Boolean = true
-
-        override fun observeHasContent(): Flow<Boolean> = flowOf(false)
-
-        override fun flowAllTags(): Flow<Tags> = flowOf(Tags(emptyList()))
-
-        override suspend fun syncContent(): Result<Unit> =
-            if (shouldFail) {
+        override suspend fun invoke(): Result<Unit> {
+            invoked.set(true)
+            return if (shouldFail) {
                 Result.failure(Exception("Test failure"))
             } else {
                 Result.success(Unit)
             }
-    }
-
-@Singleton
-class FakeRecommender
-    @Inject
-    constructor() : Recommender {
-        val updatedUser = AtomicBoolean(false)
-        val updatedArticles = AtomicBoolean(false)
-
-        override suspend fun updateRecommendationsForUser() {
-            updatedUser.set(true)
-        }
-
-        override suspend fun updateRecommendationsForArticles() {
-            updatedArticles.set(true)
         }
     }
 

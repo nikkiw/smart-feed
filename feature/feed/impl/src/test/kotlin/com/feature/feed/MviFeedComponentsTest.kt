@@ -8,6 +8,7 @@ import com.feature.feed.articlerecommendation.ArticleRecommendationsComponent
 import com.feature.feed.component.article.ArticleItemComponentImpl
 import com.feature.feed.component.articlerecommendation.ArticleRecommendationsComponentImpl
 import com.feature.feed.component.recommendation.RecommendationListComponentImpl
+import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.usecase.GetContentItemUseCase
 import com.feature.feed.domain.usecase.sync.SyncContentUseCase
@@ -48,7 +49,7 @@ class MviFeedComponentsTest {
             val getArticle = mockk<GetContentItemUseCase>()
             coEvery { getArticle(ContentId("missing")) } returns Result.failure(IllegalStateException("missing"))
             val related = mockk<RecommendForArticleUseCase>()
-            coEvery { related(any()) } returns emptyList()
+            every { related(any()) } returns flowOf(emptyList())
             val component =
                 ArticleItemComponentImpl(
                     componentContext = context.componentContext,
@@ -74,7 +75,7 @@ class MviFeedComponentsTest {
         runTest(dispatcher) {
             val context = DecomposeTestUtils.createTestComponentContext()
             val useCase = mockk<RecommendForArticleUseCase>()
-            coEvery { useCase(any()) } returns emptyList()
+            every { useCase(any()) } returns flowOf(emptyList())
             val component =
                 ArticleRecommendationsComponentImpl(
                     componentContext = context.componentContext,
@@ -88,6 +89,35 @@ class MviFeedComponentsTest {
             advanceUntilIdle()
 
             assertThat(component.model.value.state).isEqualTo(ArticleRecommendationsComponent.State.Empty)
+            context.destroyLifecycle()
+        }
+
+    @Test
+    fun `article recommendations update when room emits after initial empty state`() =
+        runTest(dispatcher) {
+            val context = DecomposeTestUtils.createTestComponentContext()
+            val recommendations = MutableStateFlow(emptyList<ContentItemPreview>())
+            val useCase = mockk<RecommendForArticleUseCase>()
+            every { useCase(ContentId("article")) } returns recommendations
+            val component =
+                ArticleRecommendationsComponentImpl(
+                    componentContext = context.componentContext,
+                    storeFactory = DefaultStoreFactory(),
+                    articleId = ContentId("article"),
+                    recommendForArticleUseCase = useCase,
+                    onItemClick = {},
+                )
+
+            context.startLifecycle()
+            advanceUntilIdle()
+            assertThat(component.model.value.state).isEqualTo(ArticleRecommendationsComponent.State.Empty)
+
+            val preview = mockk<ContentItemPreview>()
+            recommendations.value = listOf(preview)
+            advanceUntilIdle()
+
+            assertThat(component.model.value.state)
+                .isEqualTo(ArticleRecommendationsComponent.State.Content(listOf(preview)))
             context.destroyLifecycle()
         }
 

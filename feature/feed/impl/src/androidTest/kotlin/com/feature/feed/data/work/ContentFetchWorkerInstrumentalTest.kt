@@ -6,8 +6,7 @@ import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.core.image.ImageLoader
 import com.feature.feed.data.di.FeedDataModule
-import com.feature.feed.domain.repository.ContentItemRepository
-import com.feature.recommendation.domain.service.Recommender
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import com.google.common.truth.Truth.assertThat
 import dagger.Binds
 import dagger.Module
@@ -31,11 +30,7 @@ class ContentFetchWorkerInstrumentalTest {
     abstract class WorkerTestModule {
         @Binds
         @Singleton
-        abstract fun bindContentRepo(repo: FakeContentRepo): ContentItemRepository
-
-        @Binds
-        @Singleton
-        abstract fun bindRecommender(rec: FakeRecommender): Recommender
+        abstract fun bindSyncContentUseCase(useCase: FakeSyncContentUseCase): SyncContentUseCase
 
         @Binds
         @Singleton
@@ -46,10 +41,7 @@ class ContentFetchWorkerInstrumentalTest {
     var hiltRule = HiltAndroidRule(this)
 
     @Inject
-    lateinit var fakeRepo: FakeContentRepo
-
-    @Inject
-    lateinit var fakeRec: FakeRecommender
+    lateinit var fakeSyncContentUseCase: FakeSyncContentUseCase
 
     private lateinit var context: Context
 
@@ -66,10 +58,10 @@ class ContentFetchWorkerInstrumentalTest {
     }
 
     @Test
-    fun doWork_successful_invokes_sync_and_recommender_and_returns_success() =
+    fun doWork_successful_invokes_orchestrated_sync_and_returns_success() =
         runTest {
             // arrange
-            fakeRepo.shouldFail = false
+            fakeSyncContentUseCase.shouldFail = false
 
             // act
             val worker = buildWorker()
@@ -77,15 +69,14 @@ class ContentFetchWorkerInstrumentalTest {
 
             // assert
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
-            assertThat(fakeRec.updatedUser.get()).isTrue()
-            assertThat(fakeRec.updatedArticles.get()).isTrue()
+            assertThat(fakeSyncContentUseCase.invoked.get()).isTrue()
         }
 
     @Test
     fun doWork_failure_returns_failure_with_error_message() =
         runTest {
             // arrange
-            fakeRepo.shouldFail = true
+            fakeSyncContentUseCase.shouldFail = true
 
             // act
             val worker = buildWorker()

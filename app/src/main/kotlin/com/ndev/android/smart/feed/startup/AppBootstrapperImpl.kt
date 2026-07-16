@@ -2,6 +2,7 @@ package com.ndev.android.smart.feed.startup
 
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.usecase.sync.ContentFetchScheduleUseCase
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import com.feature.recommendation.domain.service.Recommender
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -20,15 +21,17 @@ class AppBootstrapperImpl
     constructor(
         private val contentItemRepository: ContentItemRepository,
         private val contentFetchScheduleUseCase: ContentFetchScheduleUseCase,
+        private val syncContentUseCase: SyncContentUseCase,
         private val recommender: Recommender,
     ) : AppBootstrapper {
         override suspend fun bootstrap() {
             supervisorScope {
                 launch {
                     if (contentItemRepository.isEmpty()) {
-                        contentItemRepository.syncContent()
+                        syncContentUseCase().getOrThrow()
+                    } else {
+                        recommender.updateRecommendationsForUser()
                     }
-                    recommender.updateRecommendationsForUser()
                 }
                 launch {
                     contentFetchScheduleUseCase.schedule()

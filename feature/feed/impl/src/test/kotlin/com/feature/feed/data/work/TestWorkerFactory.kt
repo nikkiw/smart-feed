@@ -4,12 +4,10 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.feature.feed.domain.repository.ContentItemRepository
-import com.feature.recommendation.domain.service.Recommender
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 
 class TestWorkerFactory(
-    private val repository: ContentItemRepository,
-    private val recommender: Recommender,
+    private val syncContentUseCase: SyncContentUseCase,
 ) : WorkerFactory() {
     override fun createWorker(
         appContext: Context,
@@ -18,7 +16,7 @@ class TestWorkerFactory(
     ): ListenableWorker? {
         return when (workerClassName) {
             ContentFetchWorker::class.java.name ->
-                ContentFetchWorker(appContext, workerParameters, repository, recommender)
+                ContentFetchWorker(appContext, workerParameters, syncContentUseCase)
 
             else -> null
         }

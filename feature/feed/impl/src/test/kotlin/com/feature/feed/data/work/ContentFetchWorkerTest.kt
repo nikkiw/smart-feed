@@ -4,12 +4,9 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.feature.feed.data.CoroutineTestRule
-import com.feature.feed.domain.repository.ContentItemRepository
-import com.feature.recommendation.domain.service.Recommender
-import io.mockk.Runs
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
@@ -24,45 +21,39 @@ class ContentFetchWorkerTest {
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var context: Context
-    private lateinit var repository: ContentItemRepository
-    private lateinit var recommender: Recommender
+    private lateinit var syncContentUseCase: SyncContentUseCase
 
     @Before
     fun setUp() {
         context = mockk(relaxed = true)
-        repository = mockk()
-        recommender = mockk()
+        syncContentUseCase = mockk()
     }
 
     @Test
-    fun `doWork returns Success when syncContent and recommender succeed`() =
+    fun `doWork returns Success when orchestrated sync succeeds`() =
         coroutineRule.runBlockingTest {
-            coEvery { repository.syncContent() } returns Result.success(Unit)
-            coEvery { recommender.updateRecommendationsForUser() } just Runs
-            coEvery { recommender.updateRecommendationsForArticles() } just Runs
+            coEvery { syncContentUseCase() } returns Result.success(Unit)
 
             val worker =
                 TestListenableWorkerBuilder<ContentFetchWorker>(context)
-                    .setWorkerFactory(TestWorkerFactory(repository, recommender))
+                    .setWorkerFactory(TestWorkerFactory(syncContentUseCase))
                     .build()
 
             val result = worker.startWork().get()
             assertTrue(result is ListenableWorker.Result.Success)
 
-            coVerify { repository.syncContent() }
-            coVerify { recommender.updateRecommendationsForUser() }
-            coVerify { recommender.updateRecommendationsForArticles() }
+            coVerify(exactly = 1) { syncContentUseCase() }
         }
 
     @Test
     fun `doWork returns Failure and includes error message when syncContent fails`() =
         coroutineRule.runBlockingTest {
             val error = RuntimeException("Sync failed")
-            coEvery { repository.syncContent() } returns Result.failure(error)
+            coEvery { syncContentUseCase() } returns Result.failure(error)
 
             val worker =
                 TestListenableWorkerBuilder<ContentFetchWorker>(context)
-                    .setWorkerFactory(TestWorkerFactory(repository, recommender))
+                    .setWorkerFactory(TestWorkerFactory(syncContentUseCase))
                     .build()
 
             val result = worker.startWork().get()
@@ -72,7 +63,6 @@ class ContentFetchWorkerTest {
             val errorMsg = failure.outputData.getString(ContentFetchWorker.KEY_ERROR_MESSAGE)
             assertEquals("Sync failed", errorMsg)
 
-            coVerify(exactly = 0) { recommender.updateRecommendationsForUser() }
-            coVerify(exactly = 0) { recommender.updateRecommendationsForArticles() }
+            coVerify(exactly = 1) { syncContentUseCase() }
         }
 }

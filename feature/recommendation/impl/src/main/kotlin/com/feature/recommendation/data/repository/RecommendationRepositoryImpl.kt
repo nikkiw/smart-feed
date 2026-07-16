@@ -8,7 +8,6 @@ import com.feature.recommendation.domain.repository.RecommendationRepository
 import com.feature.recommendation.local.recommendation.RecommendationDao
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -28,10 +27,8 @@ class RecommendationRepositoryImpl
                 }
                 .flowOn(ioDispatcher)
 
-        override suspend fun recommendForArticle(contentId: ContentId): List<Recommendation> {
-            return recommendationDao.getContentRecommendations(contentId.value)
+        override fun recommendForArticle(contentId: ContentId): Flow<List<Recommendation>> =
+            recommendationDao.getContentRecommendations(contentId.value)
+                .map { entities -> entities.map { it.toRecommendation() } }
                 .flowOn(ioDispatcher)
-                .first()
-                .map { it.toRecommendation() }
-        }
     }

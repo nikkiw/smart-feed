@@ -5,11 +5,12 @@ import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
-import com.core.common.coroutines.runSuspendCatching
 import com.core.content.model.ContentId
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.recommendation.domain.usecase.RecommendForArticleUseCase
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 internal class ArticleRecommendationsStoreFactory(
@@ -70,13 +71,12 @@ internal class ArticleRecommendationsStoreFactory(
             dispatch(Msg.Loading)
             job =
                 scope.launch {
-                    runSuspendCatching { recommendForArticleUseCase(articleId) }
-                        .fold(
-                            onSuccess = { dispatch(Msg.Loaded(it)) },
-                            onFailure = {
-                                dispatch(Msg.Failed(it.message ?: "Failed to load related articles"))
-                            },
-                        )
+                    recommendForArticleUseCase(articleId)
+                        .catch { error ->
+                            if (error is CancellationException) throw error
+                            dispatch(Msg.Failed(error.message ?: "Failed to load related articles"))
+                        }
+                        .collect { dispatch(Msg.Loaded(it)) }
                 }
         }
     }
