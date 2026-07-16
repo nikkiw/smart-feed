@@ -6,6 +6,7 @@ import com.arkivanov.decompose.value.Value
 import com.core.content.model.ContentId
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.Query
+import kotlinx.coroutines.flow.Flow
 
 /**
  *A component for displaying a feed of articles with support for Paging and Pull-to-Refresh.
@@ -15,17 +16,26 @@ interface FeedListComponent {
      * Feed status: PagingData stream.
      * Updated when filtering/sorting is changed.
      */
-    val pagingItems: Value<PagingData<ContentItemPreview>>
+    val pagingItems: Flow<PagingData<ContentItemPreview>>
 
     /**
      * Download status (for Pull-to-Refresh).
      */
-    val isRefreshing: Value<State>
+    val model: Value<Model>
+
+    /**
+     * One-shot user-facing effects from the feed slice.
+     */
+    val effects: Flow<Effect>
 
     /**
      * Request data again (Pull-to-Refresh).
      */
     fun onRefresh()
+
+    fun onRetry()
+
+    fun onEnableInternetClicked()
 
     /**
      *The event when the user clicked on an item in the list
@@ -33,8 +43,6 @@ interface FeedListComponent {
     fun onListItemClick(itemId: ContentId)
 
     fun updateQuery(query: Query)
-
-    val isOnline: Boolean
 
     fun interface Factory {
         operator fun invoke(
@@ -44,11 +52,21 @@ interface FeedListComponent {
         ): FeedListComponent
     }
 
-    sealed class State {
-        data object IsRefreshing : State()
+    data class Model(
+        val isOnline: Boolean,
+        val hasLocalContent: Boolean,
+        val refreshState: RefreshState = RefreshState.Idle,
+    )
 
-        data object RefreshSuccess : State()
+    sealed interface RefreshState {
+        data object Idle : RefreshState
 
-        data class ErrorRefresh(val errorMessage: String) : State()
+        data object Refreshing : RefreshState
+
+        data class Failed(val message: String) : RefreshState
+    }
+
+    sealed interface Effect {
+        data object OpenInternetSettings : Effect
     }
 }

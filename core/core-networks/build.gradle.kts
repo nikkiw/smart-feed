@@ -10,10 +10,13 @@ android {
 dependencies {
     implementation(projects.core.common)
     implementation(projects.core.coroutines)
+    devImplementation(projects.core.connectivity)
     // Network - Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.gson)
+
+    testImplementation(libs.google.truth)
 }

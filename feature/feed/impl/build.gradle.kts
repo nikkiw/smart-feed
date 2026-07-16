@@ -6,6 +6,10 @@ plugins {
 android {
     namespace = "com.feature.feed"
 
+    defaultConfig {
+        testInstrumentationRunner = "com.feature.feed.HiltCustomTestRunner"
+    }
+
 //    packaging {
 //        resources {
 //            excludes += setOf("DebugProbesKt.bin", "META-INF/LICENSE", "META-INF/NOTICE")
@@ -27,6 +31,10 @@ dependencies {
     implementation(projects.core.image.api)
     implementation(projects.feature.feed.local)
     implementation(projects.feature.recommendation.api)
+
+    implementation(libs.mvikotlin.core)
+    implementation(libs.mvikotlin.main)
+    implementation(libs.mvikotlin.extensions.coroutines)
 
     // Pagging
     implementation(libs.room.paging)

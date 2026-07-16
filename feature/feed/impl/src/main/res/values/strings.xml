@@ -13,5 +13,13 @@
     <string name="error_loading_data">"Internet access is required to retrieve data. Please check your connection and try again."</string>
 
     <string name="recommended_reading">"Recommended reading"</string>
+    <string name="enable_internet">Enable internet</string>
+    <string name="retry">Retry</string>
+    <string name="feed_empty">No articles match the selected filters.</string>
+    <string name="feed_initial_loading_title">Preparing your feed</string>
+    <string name="feed_initial_loading_message">Loading saved articles and checking for updates</string>
+    <string name="recommendations_empty">No recommendations yet.</string>
+    <string name="related_articles_empty">No related articles.</string>
+    <string name="error_loading_unknown">Unable to load data.</string>
     <string name="sorted_by">"Sorted by:"</string>
 </resources>

@@ -96,6 +96,14 @@
                         android:textAppearance="?attr/textAppearanceBody2"
                         android:textIsSelectable="true" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/articleRetry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="@string/retry"
+                        android:visibility="gone" />
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

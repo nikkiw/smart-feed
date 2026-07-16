@@ -21,14 +21,14 @@ import java.util.concurrent.atomic.AtomicReference
  *
  * @constructor Creates an instance of [DevStaticJsonTestNetworkDataSource].
  * @param context The [Context] used to access the assets directory.
+ * @param isInternetAvailable Reports whether the mock network boundary is currently reachable.
  */
 class DevStaticJsonTestNetworkDataSource(
     private val context: Context,
+    private val isInternetAvailable: () -> Boolean = { true },
 ) : NetworkDataSource {
     private val accessTokenRef = AtomicReference<String?>(null)
     private val lastSyncAtRef = AtomicReference<String>("1970-01-01T00:00:00Z")
-
-    private var counterGetUpdates = 0
 
     private val gson by lazy {
         GsonBuilder()
@@ -40,10 +40,9 @@ class DevStaticJsonTestNetworkDataSource(
         since: String,
         limit: Int,
     ): Result<UpdatesResponse> {
+        if (!isInternetAvailable()) return offlineFailure()
+
         return runCatching {
-            if (++counterGetUpdates % 3 == 0) {
-                throw IOException("Test exception counterGetUpdates=$counterGetUpdates")
-            }
             val jsonString = readJsonFromAssets("articles.json")
             val response = gson.fromJson(jsonString, UpdatesResponse::class.java)
 
@@ -87,6 +86,8 @@ class DevStaticJsonTestNetworkDataSource(
         type: String,
         id: String,
     ): Result<ContentUpdate> {
+        if (!isInternetAvailable()) return offlineFailure()
+
         return runCatching {
             val jsonString = readJsonFromAssets("articles.json")
             val response = gson.fromJson(jsonString, UpdatesResponse::class.java)
@@ -113,6 +114,8 @@ class DevStaticJsonTestNetworkDataSource(
         return lastSyncAtRef.get()
     }
 
+    private fun <T> offlineFailure(): Result<T> = Result.failure(IOException(NO_INTERNET_MESSAGE))
+
     private fun readJsonFromAssets(fileName: String): String {
         return try {
             context.assets.open(fileName).bufferedReader().use { it.readText() }
@@ -136,5 +139,9 @@ class DevStaticJsonTestNetworkDataSource(
                 true // В случае ошибки парсинга возвращаем true
             }
         }
+    }
+
+    private companion object {
+        const val NO_INTERNET_MESSAGE = "No internet connection"
     }
 }

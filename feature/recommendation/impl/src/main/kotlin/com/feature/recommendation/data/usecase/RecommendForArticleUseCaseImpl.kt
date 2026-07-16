@@ -6,7 +6,8 @@ import com.feature.feed.domain.model.toContentItemPreview
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.recommendation.domain.repository.RecommendationRepository
 import com.feature.recommendation.domain.usecase.RecommendForArticleUseCase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
@@ -18,8 +19,7 @@ import javax.inject.Inject
  *
  * ### Example usage:
  * ```kotlin
- * val relatedArticles = recommendForArticleUseCase(contentId)
- * if (relatedArticles.isNotEmpty()) {
+ * recommendForArticleUseCase(contentId).collect { relatedArticles ->
  *     adapter.submitList(relatedArticles)
  * }
  * ```
@@ -42,17 +42,16 @@ class RecommendForArticleUseCaseImpl
          * 3. Converts each content item into a preview using [toContentItemPreview].
          *
          * @param articleId The ID of the article for which to get recommendations.
-         * @return A list of [ContentItemPreview] objects representing recommended content.
-         *         Returns an empty list if no recommendations can be retrieved or mapped.
+         * @return A [Flow] emitting recommended content items whenever local data changes.
          */
-        @OptIn(ExperimentalCoroutinesApi::class)
-        override suspend fun invoke(articleId: ContentId): List<ContentItemPreview> {
-            return recommendationRepository.recommendForArticle(articleId)
-                .mapNotNull { recommendation ->
-                    contentItemRepository
-                        .getContentById(recommendation.articleId)
-                        .getOrNull()
-                        ?.toContentItemPreview()
+        override fun invoke(articleId: ContentId): Flow<List<ContentItemPreview>> =
+            recommendationRepository.recommendForArticle(articleId)
+                .map { recommendations ->
+                    recommendations.mapNotNull { recommendation ->
+                        contentItemRepository
+                            .getContentById(recommendation.articleId)
+                            .getOrNull()
+                            ?.toContentItemPreview()
+                    }
                 }
-        }
     }

@@ -57,7 +57,7 @@ class RecommenderImplTest {
         applicationScope = CoroutineScope(SupervisorJob() + testDispatcher)
 
         networkDataSource = DevStaticJsonTestNetworkDataSource(context)
-        db = AppDatabase.Companion.getTestDatabase(context)
+        db = AppDatabase.getTestDatabase(context)
 
         userProfileRepository = FakeUserProfileRepository(db)
         recommender =
@@ -93,7 +93,7 @@ class RecommenderImplTest {
             // когда нет никакого профиля, возвращается 5 последний загруженных статей
             seedContent()
 
-            var expectedRecommendations =
+            val expectedRecommendations =
                 db.contentDao().getRecentContent(mmrK).map { it.contentUpdate.id }
 
             recommender.updateRecommendationsForUser()
@@ -110,7 +110,7 @@ class RecommenderImplTest {
             // когда нет никакого профиля, возвращается 5 последний загруженных статей
             seedContent()
 
-            var articleRead =
+            val articleRead =
                 db.contentDao().getRecentContent(1).first()
 
             db.eventLogDao().insertEvent(
@@ -124,7 +124,7 @@ class RecommenderImplTest {
 
             userProfileRepository.onArticleVisited(ContentId(articleRead.contentUpdate.id))
 
-            var expectedRecommendations =
+            val expectedRecommendations =
                 db.contentDao().getRecentContent(mmrK).map { it.contentUpdate.id }
 
             recommender.updateRecommendationsForUser()
@@ -172,10 +172,10 @@ class RecommenderImplTest {
     ) : UserProfileRepository {
         private val profile = MutableStateFlow<Embeddings?>(null)
 
-        override suspend fun onArticleVisited(artileId: ContentId): Embeddings? {
+        override suspend fun onArticleVisited(articleId: ContentId): Embeddings? {
             val embeddings =
                 db.articleEmbeddingDao()
-                    .getEmbeddings(artileId.value)
+                    .getEmbeddings(articleId.value)
                     ?.unitEmbedding
                     ?.let(::Embeddings)
             profile.value = embeddings

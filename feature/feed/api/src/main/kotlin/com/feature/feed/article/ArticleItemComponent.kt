@@ -12,23 +12,27 @@ interface ArticleItemComponent {
     /**
      * UI state for the element.
      */
-    val model: Value<State>
+    val model: Value<Model>
 
     val itemId: ContentId
 
     val articleRecommendationsComponent: ArticleRecommendationsComponent
 
-    sealed class State {
-        data object Init : State()
+    data class Model(
+        val contentState: ContentState = ContentState.Loading,
+    )
 
-        data class Loaded(val contentItem: ContentItem) : State()
+    sealed interface ContentState {
+        data object Loading : ContentState
 
-        data class Error(val errorMessage: String) : State()
+        data class Content(val contentItem: ContentItem) : ContentState
+
+        data class Failed(val message: String) : ContentState
     }
 
     fun onClose()
 
-    fun registerOnCloseListener(listener: () -> Unit)
+    fun onRetry()
 
-    fun logPercentRead(percentRead: Float)
+    fun onReadProgressChanged(percentRead: Float)
 }

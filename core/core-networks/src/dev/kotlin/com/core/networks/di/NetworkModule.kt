@@ -3,6 +3,7 @@ package com.core.networks.di
 import android.content.Context
 import com.core.networks.datasource.NetworkDataSource
 import com.core.networks.datasource.dev.DevStaticJsonTestNetworkDataSource
+import com.core.observers.ConnectivityRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +18,11 @@ object NetworkModule {
     @Singleton
     fun provideNetworkDataSource(
         @ApplicationContext context: Context,
+        connectivityRepository: ConnectivityRepository,
     ): NetworkDataSource {
-        return DevStaticJsonTestNetworkDataSource(context)
+        return DevStaticJsonTestNetworkDataSource(
+            context = context,
+            isInternetAvailable = connectivityRepository::isInternetAvailable,
+        )
     }
 }

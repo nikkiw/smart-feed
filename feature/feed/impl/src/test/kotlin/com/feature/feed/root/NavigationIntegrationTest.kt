@@ -15,10 +15,10 @@ import com.feature.feed.FeedComponentSubjects
 import com.feature.feed.FeedTestDataBuilder
 import com.feature.feed.NavigationTestScenarios
 import com.feature.feed.article.ArticleItemComponent
-import com.feature.feed.bottombar.BottomBarComponentImpl
 import com.feature.feed.bottombar.model.BottomBarState
+import com.feature.feed.component.bottombar.BottomBarComponentImpl
+import com.feature.feed.component.root.FeedRootComponentImpl
 import com.feature.feed.domain.model.ContentItem.Article
-import com.feature.feed.domain.model.ContentItemPreview
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -70,7 +70,7 @@ class NavigationIntegrationTest {
                 fakeArticle,
             )
 
-        every { mockDependencies.recommendForUserUseCase.invoke() } returns flowOf(emptyList<ContentItemPreview>())
+        every { mockDependencies.recommendForUserUseCase.invoke() } returns flowOf(emptyList())
 
         feedRootComponent =
             FeedTestDataBuilder.createFeedRootComponent(
@@ -112,7 +112,7 @@ class NavigationIntegrationTest {
 
             // When - Navigate to recommendations via bottom bar
             val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
-            bottomBar.onTabBarChanged(BottomBarState.Recommendation)
+            bottomBar.onClickTabBar(BottomBarState.Recommendation)
 
             // Then
             NavigationTestScenarios.verifyNavigationToRecommendations(feedRootComponent)
@@ -130,13 +130,13 @@ class NavigationIntegrationTest {
             val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
 
             // Navigate to recommendations
-            bottomBar.onTabBarChanged(BottomBarState.Recommendation)
+            bottomBar.onClickTabBar(BottomBarState.Recommendation)
             FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
                 .hasActiveConfiguration(FeedRootComponent.Config.RecommendationScreenConfig)
                 .hasEmptyBackStack() // replaceAll clears the stack
 
             // Navigate back to feed
-            bottomBar.onTabBarChanged(BottomBarState.List)
+            bottomBar.onClickTabBar(BottomBarState.List)
             FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
                 .hasActiveConfiguration(FeedRootComponent.Config.FeedScreenConfig)
                 .hasEmptyBackStack()
@@ -147,7 +147,7 @@ class NavigationIntegrationTest {
         runTest {
             // Given - Start at recommendations screen
             val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
-            bottomBar.onTabBarChanged(BottomBarState.Recommendation)
+            bottomBar.onClickTabBar(BottomBarState.Recommendation)
 
             // When - Navigate to article from recommendations
             val articleId = "recommendation-article-123"
@@ -224,7 +224,7 @@ class NavigationIntegrationTest {
 
             navigationSequence.forEach { (barState, expectedConfig) ->
                 // When
-                bottomBar.onTabBarChanged(barState)
+                bottomBar.onClickTabBar(barState)
 
                 // Then
                 FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)

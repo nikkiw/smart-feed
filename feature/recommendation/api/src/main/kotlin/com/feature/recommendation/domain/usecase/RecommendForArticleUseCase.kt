@@ -2,6 +2,7 @@ package com.feature.recommendation.domain.usecase
 
 import com.core.content.model.ContentId
 import com.feature.feed.domain.model.ContentItemPreview
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Use case interface for retrieving content recommendations based on a specific article.
@@ -11,9 +12,8 @@ import com.feature.feed.domain.model.ContentItemPreview
  *
  * ### Example usage:
  * ```kotlin
- * val result = recommendForArticleUseCase(articleId)
- * if (result.isNotEmpty()) {
- *     showRelatedArticles(result)
+ * recommendForArticleUseCase(articleId).collect { recommendations ->
+ *     showRelatedArticles(recommendations)
  * }
  * ```
  */
@@ -22,7 +22,7 @@ interface RecommendForArticleUseCase {
      * Retrieves a list of recommended content items related to the specified article.
      *
      * @param articleId The ID of the article for which to get recommendations.
-     * @return A list of [ContentItemPreview] objects representing recommended content.
+     * @return A [Flow] emitting recommended content items whenever local data changes.
      */
-    suspend operator fun invoke(articleId: ContentId): List<ContentItemPreview>
+    operator fun invoke(articleId: ContentId): Flow<List<ContentItemPreview>>
 }

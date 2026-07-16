@@ -2,82 +2,28 @@ package com.feature.feed.data.work
 
 import android.content.Context
 import android.widget.ImageView
-import com.core.content.model.ContentId
-import com.core.content.model.Tags
 import com.core.image.ImageLoader
 import com.core.image.ImageOptions
 import com.core.image.ImageSource
-import com.feature.feed.domain.model.ContentItem
-import com.feature.feed.domain.repository.ContentItemRepository
-import com.feature.recommendation.domain.service.Recommender
-import kotlinx.coroutines.flow.Flow
+import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// @Module
-// @TestInstallIn(
-//    components = [SingletonComponent::class],
-//    replaces = [
-//        DataModule::class
-//    ]
-// )
-// abstract class WorkerTestModule {
-//    @Binds
-//    @Singleton
-//    abstract fun bindContentRepo(repo: FakeContentRepo): ContentItemRepository
-//
-//    @Binds
-//    @Singleton
-//    abstract fun bindRecommender(rec: FakeRecommender): Recommender
-//
-//
-//    @Binds
-//    @Singleton
-//    abstract fun bindImageLoader(rec: FakeImageLoader): ImageLoader
-// }
-
 @Singleton
-class FakeContentRepo
+class FakeSyncContentUseCase
     @Inject
-    constructor() : ContentItemRepository {
-        // переключаемое поведение
+    constructor() : SyncContentUseCase {
         var shouldFail = false
+        val invoked = AtomicBoolean(false)
 
-        override suspend fun getContentById(itemId: ContentId): Result<ContentItem> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun isEmpty(): Boolean {
-            TODO("Not yet implemented")
-        }
-
-        override fun flowAllTags(): Flow<Tags> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun syncContent(): Result<Unit> {
+        override suspend fun invoke(): Result<Unit> {
+            invoked.set(true)
             return if (shouldFail) {
                 Result.failure(Exception("Test failure"))
             } else {
                 Result.success(Unit)
             }
-        }
-    }
-
-@Singleton
-class FakeRecommender
-    @Inject
-    constructor() : Recommender {
-        val updatedUser = AtomicBoolean(false)
-        val updatedArticles = AtomicBoolean(false)
-
-        override suspend fun updateRecommendationsForUser() {
-            updatedUser.set(true)
-        }
-
-        override suspend fun updateRecommendationsForArticles() {
-            updatedArticles.set(true)
         }
     }
 
@@ -90,15 +36,11 @@ class FakeImageLoader
             imageSource: ImageSource,
             imageView: ImageView,
             options: ImageOptions,
-        ) {
-            TODO("Not yet implemented")
-        }
+        ) = Unit
 
         override fun preload(
             context: Context,
             imageSource: ImageSource,
             options: ImageOptions,
-        ) {
-            TODO("Not yet implemented")
-        }
+        ) = Unit
     }

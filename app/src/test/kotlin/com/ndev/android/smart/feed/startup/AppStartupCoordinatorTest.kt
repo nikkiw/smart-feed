@@ -10,24 +10,24 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class AppStartupCoordinatorTest {
     private val dispatcher = StandardTestDispatcher()
 
-    @BeforeTest
+    @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
     }
 
-    @AfterTest
+    @After
     fun tearDown() {
         Dispatchers.resetMain()
     }

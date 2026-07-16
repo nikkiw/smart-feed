@@ -7,6 +7,7 @@ import com.core.content.model.ContentId
 import com.core.content.model.ContentType
 import com.core.content.model.Tags
 import com.feature.feed.DecomposeTestUtils
+import com.feature.feed.component.master.FeedMasterComponentImpl
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.repository.ContentItemsSortedType
@@ -16,6 +17,9 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -91,17 +95,64 @@ class FeedMasterComponentImplTest {
                 )
         }
 
+    @Test
+    fun `simple filter state survives component recreation with the same instance keeper`() =
+        runTest(dispatcher) {
+            val firstFeedList = RecordingFeedListComponent()
+            val first = createComponent(firstFeedList, testContext)
+            first.onSortTypeSelected(ContentItemsSortedType.ByNameDesc)
+            first.onTagsSelected(Tags(listOf("kotlin", "android")))
+
+            val recreatedContext = testContext.recreate()
+            val recreatedFeedList = RecordingFeedListComponent()
+            val recreated = createComponent(recreatedFeedList, recreatedContext)
+
+            assertThat(recreated.state.value)
+                .isEqualTo(
+                    FeedMasterComponent.State(
+                        selectedTags = Tags(listOf("kotlin", "android")),
+                        selectedSortType = ContentItemsSortedType.ByNameDesc,
+                    ),
+                )
+            assertThat(recreatedFeedList.initialQuery)
+                .isEqualTo(
+                    Query(
+                        types = listOf(ContentType.ARTICLE),
+                        tags = Tags(listOf("kotlin", "android")),
+                        sortedBy = ContentItemsSortedType.ByNameDesc,
+                    ),
+                )
+        }
+
+    private fun createComponent(
+        feedList: RecordingFeedListComponent,
+        context: DecomposeTestUtils.TestComponentContext,
+    ): FeedMasterComponentImpl =
+        FeedMasterComponentImpl(
+            componentContext = context.componentContext,
+            contentItemRepository = mockk<ContentItemRepository>(relaxed = true),
+            feedListComponentFactory = { _, initialQuery, _ ->
+                feedList.initialQuery = initialQuery
+                feedList
+            },
+            onListItemClick = {},
+        )
+
     private class RecordingFeedListComponent : FeedListComponent {
         var initialQuery: Query? = null
         val queryUpdates = mutableListOf<Query>()
 
-        override val pagingItems: Value<PagingData<ContentItemPreview>> =
-            MutableValue(PagingData.empty())
-        override val isRefreshing: Value<FeedListComponent.State> =
-            MutableValue(FeedListComponent.State.RefreshSuccess)
-        override val isOnline: Boolean = true
+        override val pagingItems: Flow<PagingData<ContentItemPreview>> =
+            flowOf(PagingData.empty())
+        override val model: Value<FeedListComponent.Model> =
+            MutableValue(FeedListComponent.Model(isOnline = true, hasLocalContent = true))
+        override val effects: Flow<FeedListComponent.Effect> = emptyFlow()
 
         override fun onRefresh() = Unit
+
+        override fun onRetry() = Unit
+
+        override fun onEnableInternetClicked() = Unit
 
         override fun onListItemClick(itemId: ContentId) = Unit
 

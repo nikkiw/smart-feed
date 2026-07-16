@@ -37,7 +37,7 @@ class ContentItemRepositoryImplTest {
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         networkDataSource = DevNetworkDataSource()
-        db = AppDatabase.Companion.getTestDatabase(context)
+        db = AppDatabase.getTestDatabase(context)
         contentDao = db.contentDao()
         repo =
             ContentItemRepositoryImpl(

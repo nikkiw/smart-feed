@@ -22,13 +22,13 @@ interface RecommendationRepository {
     fun recommendForUser(): Flow<List<Recommendation>>
 
     /**
-     * Returns a list of recommended content items related to a specific article.
+     * Observes recommended content items related to a specific article.
      *
      * These recommendations are often based on similarity (e.g., embeddings, tags, etc.)
      * and can be used to show "You might also like" suggestions in the UI.
      *
      * @param contentId The ID of the article for which to get related recommendations.
-     * @return A list of [Recommendation] objects.
+     * @return A [Flow] emitting lists of [Recommendation] objects.
      */
-    suspend fun recommendForArticle(contentId: ContentId): List<Recommendation>
+    fun recommendForArticle(contentId: ContentId): Flow<List<Recommendation>>
 }
