@@ -21,6 +21,15 @@ A reference project demonstrating scalable Android architecture. The core focus 
 The project is structured under **Clean Architecture** guidelines with **Feature-Driven Vertical Slice** decomposition and **Component-Driven UI** navigation:
 
 1. **Vertical Feature Slices**: Each feature owns its full stack — domain contracts (`:api`), Room entities and DAOs (`:local`), and all UI and infrastructure implementations (`:impl`). This eliminates the "horizontal monolith" anti-pattern.
+   ```text
+   app
+    └─ feed:impl
+        ├─ feed:api
+        ├─ feed:local
+        ├─ recommendation:api
+        └─ core contracts
+   ```
+   `api` is the stable feature contract. `local` owns the Room schema without circular dependencies. `impl` contains UI, Store, repositories, and Android-specific integrations.
 2. **3-Module Feature Structure**: The `:local` module is a deliberate architectural solution to prevent circular Gradle dependencies caused by Room's `@Database` entity registration requirement. See [Architecture Documentation](docs/architecture.md).
 3. **Decompose Navigation**: Pure Kotlin component tree controlling lifecycle, state preservation, and back-stack handling — completely decoupled from the Android framework. See [ADR 0001](docs/adr/0001-why-decompose.md).
 4. **Executable Architecture Guards (Konsist)**: A dedicated `:architecture-tests` JVM module enforces module boundary rules on every CI build — preventing domain leakage, platform imports in API modules, and naming violations.
