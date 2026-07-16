@@ -14,8 +14,9 @@ import com.feature.feed.FeedTestDataBuilder
 import com.feature.feed.NavigationTestScenarios
 import com.feature.feed.article.ArticleItemComponent
 import com.feature.feed.bottombar.BottomBarComponent
-import com.feature.feed.bottombar.BottomBarComponentImpl
 import com.feature.feed.bottombar.model.BottomBarState
+import com.feature.feed.component.bottombar.BottomBarComponentImpl
+import com.feature.feed.component.root.FeedRootComponentImpl
 import com.feature.feed.domain.model.ContentItem.Article
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.model.ContentItemPreview.ArticlePreview
@@ -239,8 +240,8 @@ class AdvancedFeedRootComponentTest {
         assertThat(recommendationChild.component).isInstanceOf(RecommendationListComponent::class.java)
         verify { mockDependencies.recommendForUserUseCase() }
 
-        // Then: ensure unrelated repository was not accessed
-        verify { mockDependencies.connectivityRepository wasNot called }
+        // Connectivity participates only in the top-level empty-Room recovery state.
+        verify(atLeast = 1) { mockDependencies.connectivityRepository.isConnected }
     }
 
     @Test
@@ -284,9 +285,7 @@ class AdvancedFeedRootComponentTest {
         assertThat(bottomBar).isInstanceOf(BottomBarComponent::class.java)
 
         // Then: inspect implementation-specific properties
-        if (bottomBar is BottomBarComponentImpl) {
-            assertThat(bottomBar.onTabBarChanged).isNotNull()
-        }
+        assertThat(bottomBar.state.value).isEqualTo(BottomBarState.List)
     }
 
     @Test

@@ -80,7 +80,7 @@ class UserProfileRepositoryImpl
          * 3. For new users: Create initial profile with weighted embeddings
          * 4. For existing users: Update profile using weighted moving average
          *
-         * @param artileId The unique identifier of the visited article
+         * @param articleId The unique identifier of the visited article
          * @return Updated user embeddings after processing the visit, or null if article has no embeddings
          *
          * @sample
@@ -93,17 +93,17 @@ class UserProfileRepositoryImpl
          * }
          * ```
          */
-        override suspend fun onArticleVisited(artileId: ContentId): Embeddings? =
+        override suspend fun onArticleVisited(articleId: ContentId): Embeddings? =
             withContext(ioDispatcher) {
                 mutex.withLock {
                     // Retrieve article embeddings - return null if article has no embeddings
-                    embeddingDao.getEmbeddings(artileId.value)?.unitEmbedding?.let { articleEmbeddings ->
+                    embeddingDao.getEmbeddings(articleId.value)?.unitEmbedding?.let { articleEmbeddings ->
                         if (articleEmbeddings.isEmpty()) {
                             return@let null
                         }
 
                         // Get interaction statistics for engagement calculation
-                        val stats = contentInteractionStatsDao.getStatsForContent(artileId.value)
+                        val stats = contentInteractionStatsDao.getStatsForContent(articleId.value)
 
                         // Calculate engagement percentage (minimum 0.1% to avoid zero weights)
                         val engPercent = (stats?.avgReadPercentage ?: 0.001).coerceAtLeast(0.001)

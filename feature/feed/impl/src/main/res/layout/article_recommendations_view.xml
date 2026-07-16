@@ -21,4 +21,20 @@
         android:orientation="vertical"
         android:showDividers="middle" />
 
+    <TextView
+        android:id="@+id/recommendationsStateMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/recommendationsRetry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/retry"
+        android:visibility="gone" />
+
 </LinearLayout>

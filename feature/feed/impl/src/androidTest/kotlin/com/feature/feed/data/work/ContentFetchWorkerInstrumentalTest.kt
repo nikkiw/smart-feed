@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
+import com.core.image.ImageLoader
 import com.feature.feed.data.di.FeedDataModule
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.recommendation.domain.service.Recommender
@@ -35,6 +36,10 @@ class ContentFetchWorkerInstrumentalTest {
         @Binds
         @Singleton
         abstract fun bindRecommender(rec: FakeRecommender): Recommender
+
+        @Binds
+        @Singleton
+        abstract fun bindImageLoader(loader: FakeImageLoader): ImageLoader
     }
 
     @get:Rule

@@ -13,6 +13,7 @@ import com.feature.feed.local.content.entity.ArticleAttributesEntity
 import com.feature.feed.local.content.entity.ContentEntity
 import com.feature.feed.local.content.entity.ContentPreviewWithDetails
 import com.feature.feed.local.content.entity.ContentWithDetails
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Data Access Object (DAO) for accessing and manipulating content data,
@@ -60,6 +61,9 @@ interface ContentDao {
      */
     @Query("SELECT COUNT(*) > 0 FROM content")
     suspend fun isNotEmpty(): Boolean
+
+    @Query("SELECT COUNT(*) > 0 FROM content")
+    fun observeIsNotEmpty(): Flow<Boolean>
 
     /**
      * Retrieves a single content entry along with its associated article details

@@ -4,8 +4,8 @@ import android.widget.FrameLayout
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.android.DefaultViewContext
 import com.arkivanov.essenty.lifecycle.Lifecycle
+import com.feature.feed.component.root.FeedRootComponentView
 import com.feature.feed.root.FeedRootComponent
-import com.feature.feed.root.FeedRootComponentView
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 

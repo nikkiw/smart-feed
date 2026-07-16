@@ -11,58 +11,33 @@ import com.feature.feed.domain.model.ContentItem
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.recommendation.domain.service.Recommender
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
-
-// @Module
-// @TestInstallIn(
-//    components = [SingletonComponent::class],
-//    replaces = [
-//        DataModule::class
-//    ]
-// )
-// abstract class WorkerTestModule {
-//    @Binds
-//    @Singleton
-//    abstract fun bindContentRepo(repo: FakeContentRepo): ContentItemRepository
-//
-//    @Binds
-//    @Singleton
-//    abstract fun bindRecommender(rec: FakeRecommender): Recommender
-//
-//
-//    @Binds
-//    @Singleton
-//    abstract fun bindImageLoader(rec: FakeImageLoader): ImageLoader
-// }
 
 @Singleton
 class FakeContentRepo
     @Inject
     constructor() : ContentItemRepository {
-        // переключаемое поведение
         var shouldFail = false
 
         override suspend fun getContentById(itemId: ContentId): Result<ContentItem> {
-            TODO("Not yet implemented")
+            error("Not used by ContentFetchWorker tests")
         }
 
-        override suspend fun isEmpty(): Boolean {
-            TODO("Not yet implemented")
-        }
+        override suspend fun isEmpty(): Boolean = true
 
-        override fun flowAllTags(): Flow<Tags> {
-            TODO("Not yet implemented")
-        }
+        override fun observeHasContent(): Flow<Boolean> = flowOf(false)
 
-        override suspend fun syncContent(): Result<Unit> {
-            return if (shouldFail) {
+        override fun flowAllTags(): Flow<Tags> = flowOf(Tags(emptyList()))
+
+        override suspend fun syncContent(): Result<Unit> =
+            if (shouldFail) {
                 Result.failure(Exception("Test failure"))
             } else {
                 Result.success(Unit)
             }
-        }
     }
 
 @Singleton
@@ -90,15 +65,11 @@ class FakeImageLoader
             imageSource: ImageSource,
             imageView: ImageView,
             options: ImageOptions,
-        ) {
-            TODO("Not yet implemented")
-        }
+        ) = Unit
 
         override fun preload(
             context: Context,
             imageSource: ImageSource,
             options: ImageOptions,
-        ) {
-            TODO("Not yet implemented")
-        }
+        ) = Unit
     }

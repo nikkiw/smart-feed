@@ -27,6 +27,7 @@ desugarJdkLibs = "2.1.5"
 gson = "2.11.0"
 kotlinxSerializationJson = "1.8.1"
 decompose = "3.3.0"
+mvikotlin = "4.2.0"
 essentyLifecycleCoroutines = "2.5.0"
 
 # Database
@@ -110,6 +111,9 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 # Decompose
 decompose = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decompose" }
+mvikotlin-main = { group = "com.arkivanov.mvikotlin", name = "mvikotlin-main", version.ref = "mvikotlin" }
+mvikotlin-core = { group = "com.arkivanov.mvikotlin", name = "mvikotlin", version.ref = "mvikotlin" }
+mvikotlin-extensions-coroutines = { group = "com.arkivanov.mvikotlin", name = "mvikotlin-extensions-coroutines", version.ref = "mvikotlin" }
 essenty-lifecycle-coroutines = { group = "com.arkivanov.essenty", name = "lifecycle-coroutines", version.ref = "essentyLifecycleCoroutines" }
 decompose-extensions-android = { group = "com.arkivanov.decompose", name = "extensions-android", version.ref = "decompose" }
 

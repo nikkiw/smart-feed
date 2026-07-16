@@ -15,10 +15,10 @@ interface UserProfileRepository {
      * This method is typically used to personalize recommendations by updating the user's
      * embedding vector using the content of the visited article.
      *
-     * @param artileId The ID of the article that the user has visited.
+     * @param articleId The ID of the article that the user has visited.
      * @return The updated user profile embeddings, or `null` if the update could not be performed.
      */
-    suspend fun onArticleVisited(artileId: ContentId): Embeddings?
+    suspend fun onArticleVisited(articleId: ContentId): Embeddings?
 
     /**
      * Returns a Flow of the current user profile embeddings, if available.

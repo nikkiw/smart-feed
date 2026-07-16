@@ -29,7 +29,6 @@ class ContentFetchWorkerTest {
 
     @Before
     fun setUp() {
-        // Просто мокируем Context, он не используется внутри doWork()
         context = mockk(relaxed = true)
         repository = mockk()
         recommender = mockk()

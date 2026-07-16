@@ -35,6 +35,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+private const val DEFAULT_SYNC_START_DATE = "1970-01-01T00:00:00Z"
+
 class ContentItemRepositoryImpl
     @Inject
     constructor(
@@ -66,7 +68,7 @@ class ContentItemRepositoryImpl
 
         override suspend fun getContentById(itemId: ContentId): Result<ContentItem> =
             withContext(ioDispatcher) {
-                runCatching {
+                runSuspendCatching {
                     contentDao.getContentById(itemId.value).toContentItem()
                 }
             }
@@ -75,6 +77,8 @@ class ContentItemRepositoryImpl
             withContext(ioDispatcher) {
                 !contentDao.isNotEmpty()
             }
+
+        override fun observeHasContent(): Flow<Boolean> = contentDao.observeIsNotEmpty().flowOn(ioDispatcher)
 
         override fun flowAllTags(): Flow<Tags> {
             return contentTagsDao.allTags()
@@ -87,9 +91,8 @@ class ContentItemRepositoryImpl
             return runSuspendCatching {
                 withContext(ioDispatcher) {
                     mutex.withLock {
-                        var since = updatesMetaDao.getMeta()?.lastSyncAt ?: "1970-01-01T00:00:00Z"
+                        var since = updatesMetaDao.getMeta()?.lastSyncAt ?: DEFAULT_SYNC_START_DATE
                         do {
-                            // Запрос очередной страницы
                             val networkResult = networkDataSource.getUpdates(since = since)
                             if (networkResult.isFailure) {
                                 val error =

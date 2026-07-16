@@ -10,22 +10,23 @@ import com.arkivanov.essenty.lifecycle.create
 import com.arkivanov.essenty.lifecycle.destroy
 import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
+import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.core.analytics.api.AnalyticsService
 import com.core.content.model.ContentId
 import com.core.content.model.ShortDescription
 import com.core.content.model.Title
 import com.core.observers.ConnectivityRepository
 import com.feature.feed.bottombar.BottomBarComponent
-import com.feature.feed.bottombar.BottomBarComponentImpl
 import com.feature.feed.bottombar.model.BottomBarState
+import com.feature.feed.component.bottombar.BottomBarComponentImpl
+import com.feature.feed.component.list.DefaultFeedListComponentFactory
+import com.feature.feed.component.root.FeedRootComponentImpl
 import com.feature.feed.data.usecase.content.GetPagedContentUseCase
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.usecase.GetContentItemUseCase
 import com.feature.feed.domain.usecase.sync.SyncContentUseCase
-import com.feature.feed.list.DefaultFeedListComponentFactory
 import com.feature.feed.root.FeedRootComponent
-import com.feature.feed.root.FeedRootComponentImpl
 import com.feature.recommendation.domain.usecase.RecommendForArticleUseCase
 import com.feature.recommendation.domain.usecase.RecommendForUserUseCase
 import com.google.common.truth.FailureMetadata
@@ -34,6 +35,8 @@ import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 
 /**
  * Test utilities for Decompose components testing
@@ -55,12 +58,14 @@ object DecomposeTestUtils {
                     instanceKeeper = instanceKeeper,
                 ),
             lifecycle = lifecycle,
+            instanceKeeper = instanceKeeper,
         )
     }
 
     class TestComponentContext(
         val componentContext: ComponentContext,
         val lifecycle: LifecycleRegistry,
+        private val instanceKeeper: InstanceKeeperDispatcher,
     ) {
         fun startLifecycle() {
             lifecycle.create()
@@ -69,6 +74,20 @@ object DecomposeTestUtils {
 
         fun destroyLifecycle() {
             lifecycle.destroy()
+        }
+
+        fun recreate(): TestComponentContext {
+            val recreatedLifecycle = LifecycleRegistry()
+            return TestComponentContext(
+                componentContext =
+                    DefaultComponentContext(
+                        lifecycle = recreatedLifecycle,
+                        stateKeeper = StateKeeperDispatcher(),
+                        instanceKeeper = instanceKeeper,
+                    ),
+                lifecycle = recreatedLifecycle,
+                instanceKeeper = instanceKeeper,
+            )
         }
     }
 }
@@ -88,13 +107,11 @@ object FeedComponentSubjects {
         companion object {
             /** Truth factory for ChildStackSubject */
             private val FACTORY =
-                object : Factory<ChildStackSubject, ChildStack<*, FeedRootComponent.Child>> {
-                    override fun createSubject(
-                        metadata: FailureMetadata,
-                        actual: ChildStack<*, FeedRootComponent.Child>?,
-                    ): ChildStackSubject {
-                        return ChildStackSubject(metadata, actual!!)
-                    }
+                Factory<ChildStackSubject, ChildStack<*, FeedRootComponent.Child>> { metadata, actual ->
+                    ChildStackSubject(
+                        metadata,
+                        actual!!,
+                    )
                 }
 
             /** Entry point to use in tests: */
@@ -142,15 +159,21 @@ object FeedComponentSubjects {
  */
 object FeedTestDataBuilder {
     fun createMockDependencies(): MockDependencies {
+        val contentItemRepository = mockk<ContentItemRepository>(relaxed = true)
+        every { contentItemRepository.observeHasContent() } returns emptyFlow()
+        val connectivityRepository = mockk<ConnectivityRepository>(relaxed = true)
+        every { connectivityRepository.isConnected } returns MutableStateFlow(true)
+        val recommendForUserUseCase = mockk<RecommendForUserUseCase>(relaxed = true)
+        every { recommendForUserUseCase.invoke() } returns emptyFlow()
         return MockDependencies(
-            contentItemRepository = mockk(relaxed = true),
+            contentItemRepository = contentItemRepository,
             getPagedContentUseCase = mockk(relaxed = true),
             syncContentUseCase = mockk(relaxed = true),
             getContentItemUseCase = mockk(relaxed = true),
             analyticsService = mockk(relaxed = true),
-            recommendForUserUseCase = mockk(relaxed = true),
+            recommendForUserUseCase = recommendForUserUseCase,
             recommendForArticleUseCase = mockk(relaxed = true),
-            connectivityRepository = mockk(relaxed = true),
+            connectivityRepository = connectivityRepository,
         )
     }
 
@@ -174,15 +197,19 @@ object FeedTestDataBuilder {
             contentItemRepository = dependencies.contentItemRepository,
             feedListComponentFactory =
                 DefaultFeedListComponentFactory(
+                    storeFactory = DefaultStoreFactory(),
                     getPagedContentUseCase = dependencies.getPagedContentUseCase,
                     syncContentUseCase = dependencies.syncContentUseCase,
                     connectivityRepository = dependencies.connectivityRepository,
+                    contentItemRepository = dependencies.contentItemRepository,
                 ),
             getContentItemUseCase = dependencies.getContentItemUseCase,
             analyticsService = dependencies.analyticsService,
             recommendForUserUseCase = dependencies.recommendForUserUseCase,
             recommendForArticleUseCase = dependencies.recommendForArticleUseCase,
             connectivityRepository = dependencies.connectivityRepository,
+            syncContentUseCase = dependencies.syncContentUseCase,
+            storeFactory = DefaultStoreFactory(),
         )
     }
 }

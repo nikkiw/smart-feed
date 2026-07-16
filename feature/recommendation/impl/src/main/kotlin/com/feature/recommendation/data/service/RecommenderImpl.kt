@@ -144,7 +144,7 @@ class RecommenderImpl
                         // Find "cold" items: embeddings farthest (opposite) from profile
                         val cold =
                             embeddingIndex.search(
-                                EmbeddingIndex.Companion.opposite(userProfile.value),
+                                EmbeddingIndex.opposite(userProfile.value),
                                 k = coldK,
                             ).sortedByDescending { it.second }
 
@@ -216,7 +216,7 @@ class RecommenderImpl
                     // Cold items for diversity
                     val cold =
                         embeddingIndex.search(
-                            EmbeddingIndex.Companion.opposite(articleUnitEmbeddings),
+                            EmbeddingIndex.opposite(articleUnitEmbeddings),
                             k = coldK,
                         ).filter { it.first != currentContent.articleId }
                             .sortedByDescending { it.second }
@@ -281,11 +281,11 @@ class RecommenderImpl
                 // Score each candidate by combining relevance and diversity
                 val scored =
                     remaining.map { candidate ->
-                        val simToQuery = EmbeddingIndex.Companion.dot(candidate.second, profile)
+                        val simToQuery = EmbeddingIndex.dot(candidate.second, profile)
                         // similarity to already selected set (max)
                         val simToSelected =
                             selected.maxOfOrNull {
-                                EmbeddingIndex.Companion.dot(candidate.second, it.second)
+                                EmbeddingIndex.dot(candidate.second, it.second)
                             } ?: 0f
                         val score = lambda * simToQuery - (1 - lambda) * simToSelected
                         candidate to score

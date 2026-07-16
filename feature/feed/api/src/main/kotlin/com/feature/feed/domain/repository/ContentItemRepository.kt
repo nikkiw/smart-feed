@@ -63,6 +63,9 @@ interface ContentItemRepository {
      */
     suspend fun isEmpty(): Boolean
 
+    /** Observes whether Room contains any content, independently of the active feed filter. */
+    fun observeHasContent(): Flow<Boolean>
+
     /**
      * Returns a Flow of all available tags from the repository.
      *
