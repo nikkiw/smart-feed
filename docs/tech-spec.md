@@ -4,7 +4,7 @@
 
 **Project Name:** smart-feed
 **Description:** A demo Android application featuring an article feed with an on-device recommendation system.
-**Technology Stack:** Kotlin, Android MVVM, Coroutines, Room, WorkManager, Hilt, Retrofit, Decompose (for BLoC-style screen composition and navigation), GitHub Actions CI.
+**Technology Stack:** Kotlin, Coroutines, Room, WorkManager, Hilt, Retrofit, Decompose for lifecycle-aware component navigation, and MVIKotlin 4.2.0 for stateful Feed components. The current UI uses XML/ViewBinding and RecyclerView; Compose is planned as a parallel rendering path for measured comparison.
 
 ## 2. Objectives
 
@@ -36,11 +36,13 @@
    * Bottom navigation: Feed | Recommendations.
    * Pull-to-refresh and infinite scroll.
    * Periodic content updates.
+   * Current rendering is XML/ViewBinding with RecyclerView. A Compose `ArticleCard` is planned
+     as a parallel implementation for performance comparison before broader migration.
 
 5. **Testing and CI**
 
    * Android instrumented tests for SQLite and other platform-specific logic.
-   * Unit tests for ViewModels, UseCases, and DAOs.
+   * Unit tests for reducers, Decompose components, use cases, and DAOs.
    * GitHub Actions for linting, building, and test execution.
 
 ## 4. Non-Functional Requirements
@@ -53,23 +55,23 @@
 
 ```plaintext
 smart-feed/
-├── app/             # App module: UI, navigation, ViewModels, DI (via Decompose)
-├── build-logic/     # Custom Gradle conventions and plugins
-├── buildSrc/        # App configuration and global constants
-├── core/            # Shared models and utilities used across the project
-├── docs/            # Documentation in Markdown
-├── feature/         # Decompose components and UI features
+├── app/             # Composition root, startup, navigation host, DI
+├── architecture-tests/ # Konsist architecture tests
+├── build-logic/     # Convention plugins, Detekt, Spotless, toolchain
+├── core/            # Cross-cutting infrastructure and pure Kotlin contracts
+├── docs/            # Documentation and ADRs
+├── feature/         # api/local/impl vertical feature slices
 ├── mock-server/     # Mock server for local development and testing
-└── scripts/         # Python scripts for test data generation
+└── scripts/         # Scripts for test data generation
 ```
 
-* **Navigation & State Management:** Decompose replaces Android Navigation Component for lifecycle management, state handling, and multiplatform support.
+* **Navigation & State Management:** Decompose owns the component tree and lifecycle. MVIKotlin stores are used only where Feed state and side effects are complex; simple coordinators stay plain Decompose components.
 * **Modularity:** Each module exposes its components via Decompose.
-* **Dependency Injection:** Hilt provides components to ViewModels and UseCases.
+* **Dependency Injection:** Hilt provides component factories, stores, repositories, and use cases.
 
 ## 6. API Specification
 
-The full API description is available in the file [content\_delta\_sync\_spec.md](/docs/content_delta_sync_spec.md).
+The full API description is available in [content_delta_sync_spec.md](content_delta_sync_spec.md).
 
 ## 7. Screens & User Flow
 
@@ -104,9 +106,9 @@ The full API description is available in the file [content\_delta\_sync\_spec.md
 
 ## 11. Testing Strategy
 
-* **Unit Tests:** JUnit + MockK for ViewModels and UseCases.
+* **Unit Tests:** JUnit + MockK for reducers, components, and UseCases.
 * **Instrumented Tests:** Room, SQLite behavior, and Worker testing.
-* **CI:** GitHub Actions (`.github/workflows/android-ci.yml`) triggered on push and pull requests.
+* **CI:** GitHub Actions (`.github/workflows/android_ci.yml`) triggered on push and pull requests.
 
 ## 12. Roadmap & Future Enhancements
 

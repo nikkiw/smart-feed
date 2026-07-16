@@ -95,7 +95,7 @@ Every feature follows a strict 3-module pattern:
 |--------|----------|--------------|
 | `:feature:<name>:api` | Domain models, repository interfaces, component contracts (Decompose), state objects | Pure Kotlin only — no Android, no Hilt |
 | `:feature:<name>:local` | Room `@Entity` classes, `@Dao` interfaces, TypeConverters for this feature | `:feature:<name>:api` only |
-| `:feature:<name>:impl` | UI layouts (XML/Compose), component implementations, repository implementations, Hilt modules | `:api`, `:local`, `:core:core-database`, `:core:image:api`, etc. |
+| `:feature:<name>:impl` | Component implementations, current XML/ViewBinding UI, repository implementations, Hilt modules | `:api`, `:local`, `:core:core-database`, `:core:image:api`, etc. |
 
 ---
 
@@ -180,6 +180,17 @@ graph TD
 * **`FeedListComponent`**: Encapsulates Paging 3 data loading, loading/error/empty state tracking, and swipe-to-refresh.
 * **`ArticleItemComponent`**: Renders Markdown content (Markwon), tracks read-percentage analytics, and loads contextual article recommendations.
 * **`RecommendationListComponent`**: Displays locally ranked recommendations based on article embeddings, user interaction stats (`ContentInteractionStats`), cosine similarity scoring, cold-pick diversity, and MMR diversification. All computation runs on-device in `:feature:recommendation:impl`.
+
+Complex Feed components (`FeedListComponent`, `RecommendationListComponent`, `ArticleItemComponent`,
+and `ArticleRecommendationsComponent`) retain MVIKotlin stores and expose only component models
+and effects to the UI layer. `FeedRootComponent`, `FeedMasterComponent`, `FilterSortComponent`,
+and `BottomBarComponent` remain lightweight Decompose coordinators. The current rendering layer is
+XML/ViewBinding with RecyclerView; Compose is intentionally not part of the production path yet.
+
+The planned migration starts with a parallel Compose `ArticleCard` implementation using the same
+component contract and data model. XML remains available as a control path while startup time,
+scrolling smoothness, frame timing, memory, and recomposition behavior are measured on the same
+dataset. A broader XML-to-Compose migration is considered only after that comparison.
 
 ---
 

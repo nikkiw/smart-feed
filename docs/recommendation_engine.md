@@ -91,10 +91,16 @@ Ranked recommendation list
 | Mode | Trigger | Algorithm |
 |------|---------|-----------|
 | **User recommendations** | Profile vector updated (article visit) | top-K + cold-K → MMR over user profile vector |
-| **Content-to-content** | Batch update (WorkManager) | For each article, top-K + cold-K relative to its own embedding → MMR |
+| **Content-to-content** | Successful `SyncContentUseCase` run (startup empty-db sync, manual refresh, or `ContentFetchWorker`) | For each article, top-K + cold-K relative to its own embedding → MMR |
 
 Content-to-content recommendations power the "You might also like" section inside the article
 detail screen (`ArticleItemComponent`).
+
+The foreground and background paths share the same synchronization use case. This is important
+for offline-first behavior: when the app starts without connectivity, the article screen may show
+an empty local recommendation state; after connectivity returns and content sync succeeds, the
+same sync also rebuilds article recommendations without requiring a separate recommendation API
+call from the UI.
 
 ---
 

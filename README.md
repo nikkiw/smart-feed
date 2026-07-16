@@ -21,11 +21,20 @@ A reference project demonstrating scalable Android architecture. The core focus 
 The project is structured under **Clean Architecture** guidelines with **Feature-Driven Vertical Slice** decomposition and **Component-Driven UI** navigation:
 
 1. **Vertical Feature Slices**: Each feature owns its full stack — domain contracts (`:api`), Room entities and DAOs (`:local`), and all UI and infrastructure implementations (`:impl`). This eliminates the "horizontal monolith" anti-pattern.
+   ```text
+   app
+    └─ feed:impl
+        ├─ feed:api
+        ├─ feed:local
+        ├─ recommendation:api
+        └─ core contracts
+   ```
+   `api` is the stable feature contract. `local` owns the Room schema without circular dependencies. `impl` contains UI, Store, repositories, and Android-specific integrations.
 2. **3-Module Feature Structure**: The `:local` module is a deliberate architectural solution to prevent circular Gradle dependencies caused by Room's `@Database` entity registration requirement. See [Architecture Documentation](docs/architecture.md).
 3. **Decompose Navigation**: Pure Kotlin component tree controlling lifecycle, state preservation, and back-stack handling — completely decoupled from the Android framework. See [ADR 0001](docs/adr/0001-why-decompose.md).
 4. **Executable Architecture Guards (Konsist)**: A dedicated `:architecture-tests` JVM module enforces module boundary rules on every CI build — preventing domain leakage, platform imports in API modules, and naming violations.
 5. **Consolidated Gradle Build-Logic**: Modern composite `build-logic` eliminating old `buildSrc`. Convention plugins handle per-module Detekt profiles, Spotless formatting, and toolchain configuration.
-6. **Incremental Compose Migration**: Compose is introduced via "Compose Islands" inside existing XML RecyclerView ViewHolders — no big-bang rewrite. See [ADR 0002](docs/adr/0002-xml-to-compose-migration.md).
+6. **Incremental UI Modernization**: the current Feed UI is XML/ViewBinding hosted by RecyclerView. The next UI track adds a Compose card beside the XML implementation so rendering and scrolling performance can be compared before selecting a migration path. See [ADR 0002](docs/adr/0002-xml-to-compose-migration.md).
 
 For a complete breakdown, see the [Architecture Documentation](docs/architecture.md).
 
@@ -38,7 +47,7 @@ For a complete breakdown, see the [Architecture Documentation](docs/architecture
 | **Language**     | Kotlin **2.3.21**, JVM 17 target                                                                  |
 | **Build**        | Android Gradle Plugin **9.2.1**, Gradle **9.4.1**, KSP **2.3.9**, composite `build-logic`        |
 | **Navigation**   | [Decompose](https://github.com/arkivanov/Decompose) **3.3.0** with Android ViewContext extensions |
-| **State**        | MVIKotlin **4.2.0** (next milestone: MVI feed slice)                                              |
+| **State**        | MVIKotlin **4.2.0** for complex Feed components; simple coordinators remain Decompose components |
 | **Database**     | Room **2.7.1** with float-array embedding converters, per-feature entity/DAO modules (`:local`), Paging 3 (`PagingData`, `GetPagedContentUseCase`) owned by `:feature:feed:impl` |
 | **Background**   | WorkManager with Hilt worker scheduling                                                           |
 | **DI**           | Dagger Hilt **2.60** (assisted factories, interface binds, per-feature Hilt modules)              |
@@ -110,7 +119,7 @@ smart-feed/
     ├── feed/               # Article feed — full vertical slice
     │   ├── api/            #   Component contracts, ContentItem domain model, repository API
     │   ├── local/          #   ContentEntity, ContentDao (feed-owned Room storage)
-    │   └── impl/           #   UI views, XML layouts, Hilt modules, repository impls,
+    │   └── impl/           #   XML/ViewBinding UI, Hilt modules, repository impls,
     │                       #   Paging 3 (ContentPagingRepository, GetPagedContentUseCase)
     ├── recommendation/     # Recommendation engine — full vertical slice
     │   ├── api/            #   Recommendation contracts, models (Recommendation, Recommender,
@@ -140,8 +149,8 @@ smart-feed/
 | **5** | AndroidX Paging dependency inversion — extracted to `:core:core-paging`, then **co-located into `:feature:feed:impl`** (sole consumer) | ✅ Done |
 | **6** | Feature API/Impl split — `:feature:feed:api` and `:feature:feed:impl` | ✅ Done |
 | **7** | **Core Layer Modularization** — 3-module feature slices (`api/local/impl`), `:core:core` → `:core:common`, eliminated `core-domain` / `core-data` / `core-paging` monoliths, build noise cleanup | ✅ **Done** |
-| **8** | MVI slice — `FeedState`, `FeedIntent`, `FeedEffect`, pure JVM Reducer tests | 🔜 Next |
-| **9** | Jetpack Compose Card Island — `ArticleCard` in XML RecyclerView ViewHolder | 🔜 Planned |
+| **8** | MVIKotlin stores for Feed List, Recommendations, Article, and Article Recommendations with reducer/component tests | ✅ Done |
+| **9** | Parallel Compose `ArticleCard` track with XML parity and performance comparison | 🔜 Next |
 
 ---
 

@@ -9,7 +9,9 @@ Traditionally, Android applications rely on Jetpack Navigation (Fragments, Activ
 
 ## Decision
 
-We have decided to adopt **Decompose** by Arkadii Ivanov as the primary navigation and state management framework. 
+We have decided to adopt **Decompose** by Arkadii Ivanov as the primary navigation and component
+lifecycle framework. Complex Feed state is handled by retained MVIKotlin stores inside the owning
+components; simple coordinators keep their state directly in Decompose components.
 
 Decompose breaks the application into a tree of component nodes. Each component is a pure Kotlin class that:
 - Inherits `ComponentContext` which provides an independent, platform-agnostic `Lifecycle`.
@@ -19,7 +21,7 @@ Decompose breaks the application into a tree of component nodes. Each component 
 ## Consequences
 
 ### Positive
-- **100% Platform Independent**: Navigation and component state can be unit-tested using JVM tests without robolectric or Android emulator.
+- **Navigation and state ownership are decoupled from the Android UI framework**: the component tree can be unit-tested using JVM tests without robolectric or an Android emulator.
 - **Granular Scoping**: Instead of sharing singletons or large-scoped ViewModels, dependencies and parameters can be passed directly to sub-components via constructors, ensuring clean memory management.
 - **Modular Compile Times**: Because components are declared in lightweight API modules, compilation of presentation contracts is extremely fast.
 - **UI Framework Agnostic**: The same Decompose component tree can be bound to XML/ViewBinding layouts (using extensions-android) or Jetpack Compose UI (using standard Compose state observe bindings).
