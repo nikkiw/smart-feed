@@ -9,14 +9,24 @@ However, a full rewrite ("Big Bang") introduces significant risks:
 2. **Feature Freeze**: Migrating all layouts at once halts product feature delivery.
 3. **Architecture Instability**: Navigation and side-effects handling must be fully refactored simultaneously.
 
+**Current status (2026-07-16):** the production Feed UI is still XML/ViewBinding hosted by
+RecyclerView. Compose dependencies and a Compose card are not part of the current implementation.
+
 ## Decision
 
-We have decided to adopt an **incremental migration strategy** using **"Compose Islands"** inside existing XML and RecyclerView structures.
+We have decided to adopt an **incremental migration strategy** using a parallel **"Compose Island"**
+inside the existing XML and RecyclerView structures. The first implementation must keep the XML
+card available as a control path instead of replacing it immediately.
 
 Instead of replacing entire screens, we will migrate individual UI components step-by-step:
-1. **RecyclerView ViewHolder Compose Wrapper**: Integrate a `ComposeView` inside standard XML-based ViewHolders (e.g. `ArticleViewHolder`) to render lists where individual cards are written in Compose, but the list scrolling and caching remains managed by RecyclerView.
+1. **RecyclerView ViewHolder Compose Wrapper**: Integrate a `ComposeView` inside the current
+   `ArticleViewHolder` to render a Compose `ArticleCard`, while RecyclerView scrolling and caching
+   remain unchanged. Keep the XML card selectable for A/B comparison during the migration.
 2. **State Sharing**: Decompose components will expose state using Decompose `Value<T>`, which can be easily adapted to Compose `State<T>` via the `subscribeAsState()` extension, or consumed as standard Kotlin `StateFlow`.
 3. **Shared Element Transitions**: Retain XML shared element transitions for screen navigation until all target screens are fully migrated to Compose.
+4. **Performance comparison**: compare the XML and Compose variants on the same device, dataset,
+   and interaction script. Record cold/warm startup, frame timing/jank while scrolling, memory,
+   and (for Compose) recomposition counts before deciding whether to continue the migration.
 
 ## Consequences
 
@@ -24,6 +34,8 @@ Instead of replacing entire screens, we will migrate individual UI components st
 - **Low Risk**: Legacy XML code remains stable, and migrations can be tested component-by-component.
 - **Immediate Value**: High-frequency components (like article cards) can be modernized with Compose UI gradients and animations immediately.
 - **Coexistence**: XML Views and Jetpack Compose Composable layouts will coexist gracefully under the same Decompose lifecycle management.
+- **Evidence-based migration**: the XML path provides a baseline, so a broader migration is based
+  on measured behavior rather than assumptions about performance.
 
 ### Negative / Trade-offs
 - **Bridge Overhead**: Creating `ComposeView` inside RecyclerView lists introduces small memory and layout overhead, which must be mitigated by properly disposing of Composition lifecycles on ViewHolder recycle.

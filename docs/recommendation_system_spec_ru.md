@@ -27,7 +27,7 @@
 | Производительность | Генерация рекомендаций < 500 мс                                                  |
 | Расширяемость      | Добавление новых сигналов без правок в ядре                                      |
 | Тестируемость      | Unit- и integration-tests для каждого модуля                                     |
-| Надёжность         | Рекомендации генерируются регулярно (каждые 6ч) и при старте приложения          |
+| Надёжность         | Рекомендации восстанавливаются при синхронизации, обновляются при изменении профиля и запускаются по расписанию WorkManager |
 | Приватность        | Все данные хранятся локально, никакие поведенческие данные не покидают устройство |
 
 ---
@@ -178,11 +178,13 @@ MMR_score = λ × sim(candidate, profile) − (1 − λ) × max_{s ∈ selected}
    `userProfileRepository.getUserProfileEmbeddings()` → при изменении профиля
    автоматически запускает `updateRecommendationsForUser()`.
 
-3. **WorkManager** → `RecommendationWorker` по расписанию вызывает
-   `updateRecommendationsForArticles()` — генерирует content-to-content рекомендации для
-   всех статей батчем.
+3. **Синхронизация контента** → `SyncContentUseCase` после успешной загрузки вызывает
+   `updateRecommendationsForUser()` и `updateRecommendationsForArticles()`. Поэтому
+   content-to-content рекомендации для статей восстанавливаются и после offline → online.
+4. **WorkManager** → `ContentFetchWorker` запускает тот же `SyncContentUseCase` по расписанию,
+   заданному `ContentFetchScheduler`.
 
-4. **Отображение** → `RecommendationRepositoryImpl` читает
+5. **Отображение** → `RecommendationRepositoryImpl` читает
    `UserRecommendationEntity` / `ContentRecommendationEntity` из Room →
    `RecommendationListComponent` и `ArticleItemComponent` отображают результаты.
 
@@ -208,7 +210,8 @@ Recommendation boundary rule:
 
 - **Separation of Concerns**: api / local / impl — каждый слой имеет одну ответственность.
 - **Dependency Injection** через Hilt: все зависимости проброшены через DI, нет прямых instantiation.
-- **WorkManager** для фоновых задач (`RecommendationWorker`).
+- **WorkManager** для фоновых задач (`ContentFetchWorker`), который переиспользует общий
+  `SyncContentUseCase`.
 - **Room + TypeConverters** для хранения `FloatArray`-эмбеддингов в бинарном формате.
 - **Реактивность**: `Flow<Embeddings?>` из `UserProfileRepository` связывает
   обновление профиля с немедленной регенерацией рекомендаций.

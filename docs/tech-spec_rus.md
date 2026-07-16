@@ -4,7 +4,7 @@
 
 **Название проекта:** smart-feed
 **Описание:** Demo-приложение на Android с лентой статей и встроенной системой рекомендаций на устройстве.
-**Стек технологий:** Kotlin, Android MVVM, Coroutines, Room, WorkManager, Hilt, Retrofit, Decompose (для навигации разбиения сложных экранов на BloC), GitHub Actions CI.
+**Стек технологий:** Kotlin, Coroutines, Room, WorkManager, Hilt, Retrofit, Decompose для навигации и жизненного цикла компонентов, MVIKotlin 4.2.0 для сложного состояния Feed. Текущий UI использует XML/ViewBinding и RecyclerView; Compose планируется как параллельный путь рендеринга для сравнения по измеряемым метрикам.
 
 ## 2. Цели
 
@@ -36,11 +36,13 @@
     * Bottom: Feed | Recommendations.
     * Pull-to-refresh и бесконечная прокрутка.
     * Периодическое обновление контента
+    * Текущий рендеринг выполнен через XML/ViewBinding и RecyclerView. Compose-карточка статьи
+      планируется как параллельная реализация для сравнения производительности перед дальнейшей миграцией.
 
 5. **Тестирование и CI**
     
     * Android test для тестирования SQLite и других специфических вещей
-    * Юнит-тесты для ViewModel, UseCase и DAO.
+    * Юнит-тесты для редьюсеров, Decompose-компонентов, UseCase и DAO.
     * GitHub Actions для запуска lint, сборки и тестов.
 
 ## 4. Нефункциональные требования
@@ -53,23 +55,23 @@
 
 ```plaintext
 smart-feed/
-├── app/             # Модуль приложения:  UI, навигация, ViewModel, DI (на основе Decompose)
-├── build-logic/     # Собственные Gradle-конвенции и плагины:
-├── buildSrc/        # Конфигурация приложения и глобальные константы:
-├── core/            # Общие модели и утилиты, используемые по всему проекту:
-├── docs/            # Документация в Markdown
-├── feature/         # Компоненты decompose и ui отображения
+├── app/             # Composition root, startup, хост навигации и DI
+├── architecture-tests/ # Архитектурные тесты Konsist
+├── build-logic/     # Gradle-конвенции, Detekt, Spotless и toolchain
+├── core/            # Общая инфраструктура и чистые Kotlin-контракты
+├── docs/            # Документация и ADR
+├── feature/         # Вертикальные срезы api/local/impl
 ├── mock-server/     # Мок-сервер для локальной разработки и тестирования
-└── scripts/         # Phython срипты для генерации данных (тестовых)
+└── scripts/         # Скрипты генерации тестовых данных
 ```
 
-* **Навигация и управление состоянием:** Используется Decompose вместо Android Navigation Component — управление жизненным циклом, состоянием, поддержка мультиплатформы.
+* **Навигация и управление состоянием:** Decompose управляет деревом компонентов и их жизненным циклом. MVIKotlin используется только в сложных Feed-компонентах, простые координаторы остаются обычными Decompose-компонентами.
 * **Модульность:** Каждый модуль предоставляет свои компоненты через Decompose.
-* **Внедрение зависимостей:** Передача компонентов из Hilt в ViewModel и UseCase.
+* **Внедрение зависимостей:** Hilt предоставляет фабрики компонентов, Store, репозитории и UseCase.
 
 ## 6. API спецификация
 
-Полное описание API представлено в файле [content_delta_sync_spec_rus.md](/docs/content_delta_sync_spec_rus.md).
+Полное описание API представлено в файле [content_delta_sync_spec_rus.md](content_delta_sync_spec_rus.md).
 
 ## 7. Экраны и пользовательский поток
 
@@ -104,9 +106,9 @@ smart-feed/
 
 ## 11. Стратегия тестирования
 
-* **Юнит-тесты:** JUnit + или MockK для ViewModel и UseCase
+* **Юнит-тесты:** JUnit/MockK для редьюсеров, компонентов и UseCase
 * **Инструментальные тесты:** поведение Room, Sqlite, Worker
-* **CI:** GitHub Actions `.github/workflows/android-ci.yml`, запуск на push и PR
+* **CI:** GitHub Actions `.github/workflows/android_ci.yml`, запуск на push и PR
 
 ## 12. Дорожная карта и улучшения
 
