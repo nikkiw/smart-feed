@@ -52,3 +52,4 @@ google-services.json
 changes_for_llm.txt
 /scripts/.venv/**
 docs/plans/
+.artifacts/
