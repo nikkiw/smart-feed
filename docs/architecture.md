@@ -12,7 +12,7 @@ This transition was driven by:
 - **Build performance**: Smaller, focused modules maximize Gradle's build cache and parallel compilation.
 - **Team scalability**: Feature boundaries prevent cross-team accidental coupling.
 - **Testability**: Isolated domain modules require no Android framework — pure JVM unit tests.
-- **KMP readiness**: Pure Kotlin `:api` modules are portable to Kotlin Multiplatform without modification.
+- **Contract boundaries**: Stable feature contracts stay isolated from UI implementations, repositories, Room schemas, and DI. Some Android features intentionally expose AndroidX or Decompose abstractions in their public API.
 
 ---
 
@@ -93,7 +93,7 @@ Every feature follows a strict 3-module pattern:
 
 | Module | Contents | Dependencies |
 |--------|----------|--------------|
-| `:feature:<name>:api` | Domain models, repository interfaces, component contracts (Decompose), state objects | Pure Kotlin only — no Android, no Hilt |
+| `:feature:<name>:api` | Domain models, repository interfaces, component contracts, state objects | Stable contract surface; independent from UI implementations, repositories, Room schemas, and DI. AndroidX or Decompose abstractions may appear when they are part of the contract. |
 | `:feature:<name>:local` | Room `@Entity` classes, `@Dao` interfaces, TypeConverters for this feature | `:feature:<name>:api` only |
 | `:feature:<name>:impl` | Component implementations, current XML/ViewBinding UI, repository implementations, Hilt modules | `:api`, `:local`, `:core:core-database`, `:core:image:api`, etc. |
 
@@ -209,7 +209,7 @@ We use **Dagger Hilt** throughout.
 A dedicated JVM module `:architecture-tests` runs on every CI build via `./gradlew :architecture-tests:test`.
 
 Enforced rules:
-- `:feature:<name>:api` modules must not import Android platform APIs, Room, Retrofit, Hilt, or Decompose.
+- `:feature:<name>:api` modules must not import implementation-only Android platform APIs, Room, Retrofit, or Hilt. AndroidX or Decompose abstractions are allowed when they are part of the public contract surface.
 - `:feature:<name>:impl` must not expose its implementation factories via the API contract.
 - Decompose component implementations must follow the naming suffix convention (`ComponentImpl`).
 - MVI Reducers must be pure functions — no side effects.
