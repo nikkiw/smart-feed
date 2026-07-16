@@ -1,4 +1,4 @@
-package com.feature.feed.component.root
+package com.feature.feed.component.root.ui
 
 import android.view.View
 import com.arkivanov.decompose.ExperimentalDecomposeApi

@@ -1,4 +1,4 @@
-package com.feature.feed.component.root
+package com.feature.feed.component.root.ui
 
 import android.graphics.Color
 import android.view.Gravity
@@ -12,6 +12,7 @@ import androidx.transition.TransitionSet
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.router.stack.ChildStack
+import com.feature.feed.R
 import com.feature.feed.root.FeedRootComponent
 import com.google.android.material.transition.MaterialContainerTransform
 
@@ -159,8 +160,8 @@ internal object ComplexBoundsTransformTransition : DelayedTransition {
 //                )
 //
 //            )
-                excludeTarget(com.feature.feed.R.id.appBarLayout, true)
-                excludeTarget(com.feature.feed.R.id.shimmerView, true)
+                excludeTarget(R.id.appBarLayout, true)
+                excludeTarget(R.id.shimmerView, true)
             }
 
         TransitionManager.beginDelayedTransition(parent, transform)

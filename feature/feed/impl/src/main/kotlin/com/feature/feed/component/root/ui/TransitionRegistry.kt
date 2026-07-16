@@ -1,4 +1,4 @@
-package com.feature.feed.component.root
+package com.feature.feed.component.root.ui
 
 import com.feature.feed.root.FeedRootComponent
 import kotlin.reflect.KClass
@@ -17,10 +17,8 @@ data class TransitionKey(
  * Можно пополнять новыми записями в одном месте.
  */
 object TransitionRegistry {
-    // Явные маппинги
     private val map = mutableMapOf<TransitionKey, DelayedTransition>()
 
-    // Дефолтный переход, можно менять при инициализации
     var defaultTransition: DelayedTransition = SlideFadeDelayedTransition
 
     fun register(

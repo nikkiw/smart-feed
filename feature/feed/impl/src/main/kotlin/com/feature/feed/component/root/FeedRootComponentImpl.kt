@@ -21,6 +21,10 @@ import com.feature.feed.component.article.ArticleItemComponentImpl
 import com.feature.feed.component.bottombar.BottomBarComponentImpl
 import com.feature.feed.component.master.FeedMasterComponentImpl
 import com.feature.feed.component.recommendation.RecommendationListComponentImpl
+import com.feature.feed.component.root.ui.ComplexBoundsTransformTransition
+import com.feature.feed.component.root.ui.SlideFadeDelayedTransitionBack
+import com.feature.feed.component.root.ui.SlideFadeDelayedTransitionTo
+import com.feature.feed.component.root.ui.TransitionRegistry
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.usecase.GetContentItemUseCase
 import com.feature.feed.domain.usecase.sync.SyncContentUseCase
