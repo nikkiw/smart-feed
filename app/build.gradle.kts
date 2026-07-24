@@ -15,11 +15,21 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+        }
+
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+            enableAndroidTestCoverage = false
+            enableUnitTestCoverage = false
         }
     }
 
@@ -53,6 +63,10 @@ dependencies {
     // Worker
     implementation(libs.work.runtime.ktx)
     implementation(libs.hilt.work)
+
+    // Needed for macrobenchmark on non-rooted devices: registers ProfileInstallReceiver
+    // to handle the DROP_SHADER_CACHE broadcast sent before each benchmark iteration.
+    implementation(libs.androidx.profileinstaller)
 
     testImplementation(libs.junit4)
     testImplementation(libs.kotlin.test.junit)

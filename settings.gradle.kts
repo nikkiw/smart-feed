@@ -28,6 +28,7 @@ rootProject.name = "SmartFeedMVP"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
+include(":benchmark")
 include(":mock-server")
 include(":core:common")
 include(":core:core-database")
