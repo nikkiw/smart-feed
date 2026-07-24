@@ -8,6 +8,8 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.getByType
 
+private const val COVERAGE_BUILD_TYPE = "debug"
+
 class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
@@ -16,8 +18,9 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
             val androidExtension = extensions.getByType<ApplicationExtension>()
 
             androidExtension.buildTypes.configureEach {
-                enableAndroidTestCoverage = true
-                enableUnitTestCoverage = true
+                val coverageEnabled = name == COVERAGE_BUILD_TYPE
+                enableAndroidTestCoverage = coverageEnabled
+                enableUnitTestCoverage = coverageEnabled
             }
 
             configureJacoco(extensions.getByType<ApplicationAndroidComponentsExtension>())
