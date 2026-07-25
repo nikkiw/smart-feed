@@ -4,6 +4,7 @@ import android.widget.FrameLayout
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.android.DefaultViewContext
 import com.arkivanov.essenty.lifecycle.Lifecycle
+import com.feature.feed.component.list.ui.ArticleCardRenderMode
 import com.feature.feed.component.root.ui.FeedRootComponentView
 import com.feature.feed.root.FeedRootComponent
 import dagger.hilt.android.scopes.ActivityScoped
@@ -18,13 +19,14 @@ class FeedRootViewHost
             container: FrameLayout,
             component: FeedRootComponent,
             lifecycle: Lifecycle,
+            articleCardRenderMode: ArticleCardRenderMode,
         ) {
             val viewContext =
                 DefaultViewContext(
                     parent = container,
                     lifecycle = lifecycle,
                 )
-            val rootView = viewContext.FeedRootComponentView(component)
+            val rootView = viewContext.FeedRootComponentView(component, articleCardRenderMode)
             container.removeAllViews()
             container.addView(rootView)
         }

@@ -9,7 +9,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +17,9 @@ import com.arkivanov.decompose.extensions.android.ViewContext
 import com.arkivanov.decompose.extensions.android.layoutInflater
 import com.arkivanov.decompose.value.subscribe
 import com.feature.feed.R
-import com.feature.feed.component.list.ui.ArticleViewHolder
+import com.feature.feed.component.list.ui.ArticleCardRenderMode
+import com.feature.feed.component.list.ui.ArticleCardViewHolder
+import com.feature.feed.component.list.ui.ContentItemPreviewDiffCallback
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.recommendation.RecommendationListComponent
 import com.feature.feed.ui.openInternetSettings
@@ -28,7 +29,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Suppress("FunctionName")
-fun ViewContext.RecommendationListView(component: RecommendationListComponent): View {
+fun ViewContext.RecommendationListView(
+    component: RecommendationListComponent,
+    articleCardRenderMode: ArticleCardRenderMode,
+): View {
     val view = layoutInflater.inflate(R.layout.recommendation_list, parent, false)
     val recycler = view.findViewById<RecyclerView>(R.id.recyclerFeed)
     val shimmer = view.findViewById<ShimmerView>(R.id.shimmerView)
@@ -37,7 +41,7 @@ fun ViewContext.RecommendationListView(component: RecommendationListComponent): 
     val action = view.findViewById<MaterialButton>(R.id.errorAction)
     recycler.layoutManager = LinearLayoutManager(view.context)
 
-    val adapter = recommendationAdapter(component)
+    val adapter = recommendationAdapter(component, articleCardRenderMode)
     recycler.adapter = adapter
 
     component.model.subscribe(lifecycle) { model ->
@@ -86,30 +90,27 @@ fun ViewContext.RecommendationListView(component: RecommendationListComponent): 
     return view
 }
 
-private fun recommendationAdapter(component: RecommendationListComponent) =
-    object : ListAdapter<ContentItemPreview, ArticleViewHolder>(DIFF_CALLBACK) {
-        override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int,
-        ): ArticleViewHolder = ArticleViewHolder.create(parent) { component.onListItemClick(it.id) }
-
-        override fun onBindViewHolder(
-            holder: ArticleViewHolder,
-            position: Int,
-        ) {
-            (getItem(position) as? ContentItemPreview.ArticlePreview)?.let(holder::bind)
+private fun recommendationAdapter(
+    component: RecommendationListComponent,
+    articleCardRenderMode: ArticleCardRenderMode,
+) = object : ListAdapter<ContentItemPreview, ArticleCardViewHolder>(ContentItemPreviewDiffCallback) {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ArticleCardViewHolder =
+        ArticleCardViewHolder.create(parent, articleCardRenderMode) {
+            component.onListItemClick(it.id)
         }
+
+    override fun onBindViewHolder(
+        holder: ArticleCardViewHolder,
+        position: Int,
+    ) {
+        (getItem(position) as? ContentItemPreview.ArticlePreview)?.let(holder::bind) ?: holder.recycle()
     }
 
-private val DIFF_CALLBACK =
-    object : DiffUtil.ItemCallback<ContentItemPreview>() {
-        override fun areItemsTheSame(
-            oldItem: ContentItemPreview,
-            newItem: ContentItemPreview,
-        ) = oldItem.id == newItem.id
-
-        override fun areContentsTheSame(
-            oldItem: ContentItemPreview,
-            newItem: ContentItemPreview,
-        ) = oldItem == newItem
+    override fun onViewRecycled(holder: ArticleCardViewHolder) {
+        holder.recycle()
+        super.onViewRecycled(holder)
     }
+}
