@@ -12,7 +12,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -31,7 +30,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Suppress("FunctionName")
-fun ViewContext.FeedListView(component: FeedListComponent): View {
+fun ViewContext.FeedListView(
+    component: FeedListComponent,
+    articleCardRenderMode: ArticleCardRenderMode,
+): View {
     val view = layoutInflater.inflate(R.layout.feed_list, parent, false)
     val initialLoadingContainer = view.findViewById<View>(R.id.initialLoadingContainer)
     val shimmer = view.findViewById<ShimmerView>(R.id.shimmerView)
@@ -43,7 +45,7 @@ fun ViewContext.FeedListView(component: FeedListComponent): View {
     val action = view.findViewById<MaterialButton>(R.id.errorAction)
 
     recycler.layoutManager = LinearLayoutManager(view.context)
-    val adapter = feedAdapter(component)
+    val adapter = feedAdapter(component, articleCardRenderMode)
     recycler.adapter = adapter
 
     val renderer =
@@ -220,20 +222,30 @@ internal fun resolveFeedPresentation(
     }
 }
 
-private fun feedAdapter(component: FeedListComponent) =
-    object : PagingDataAdapter<ContentItemPreview, ArticleViewHolder>(DIFF_CALLBACK) {
-        override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int,
-        ): ArticleViewHolder = ArticleViewHolder.create(parent) { component.onListItemClick(it.id) }
-
-        override fun onBindViewHolder(
-            holder: ArticleViewHolder,
-            position: Int,
-        ) {
-            (getItem(position) as? ContentItemPreview.ArticlePreview)?.let(holder::bind)
+private fun feedAdapter(
+    component: FeedListComponent,
+    articleCardRenderMode: ArticleCardRenderMode,
+) = object : PagingDataAdapter<ContentItemPreview, ArticleCardViewHolder>(ContentItemPreviewDiffCallback) {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ArticleCardViewHolder =
+        ArticleCardViewHolder.create(parent, articleCardRenderMode) {
+            component.onListItemClick(it.id)
         }
+
+    override fun onBindViewHolder(
+        holder: ArticleCardViewHolder,
+        position: Int,
+    ) {
+        (getItem(position) as? ContentItemPreview.ArticlePreview)?.let(holder::bind) ?: holder.recycle()
     }
+
+    override fun onViewRecycled(holder: ArticleCardViewHolder) {
+        holder.recycle()
+        super.onViewRecycled(holder)
+    }
+}
 
 private fun installBottomBarScrollBehavior(recycler: RecyclerView) {
     recycler.addOnScrollListener(
@@ -253,16 +265,3 @@ private fun installBottomBarScrollBehavior(recycler: RecyclerView) {
         },
     )
 }
-
-private val DIFF_CALLBACK =
-    object : DiffUtil.ItemCallback<ContentItemPreview>() {
-        override fun areItemsTheSame(
-            oldItem: ContentItemPreview,
-            newItem: ContentItemPreview,
-        ) = oldItem.id == newItem.id
-
-        override fun areContentsTheSame(
-            oldItem: ContentItemPreview,
-            newItem: ContentItemPreview,
-        ) = oldItem == newItem
-    }

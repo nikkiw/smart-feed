@@ -34,7 +34,7 @@ The project is structured under **Clean Architecture** guidelines with **Feature
 3. **Decompose Navigation**: Pure Kotlin component tree controlling lifecycle, state preservation, and back-stack handling — navigation and state ownership are decoupled from Android UI implementations. See [ADR 0001](docs/adr/0001-why-decompose.md).
 4. **Executable Architecture Guards (Konsist)**: A dedicated `:architecture-tests` JVM module enforces module boundary rules on every CI build — preventing domain leakage, platform imports in API modules, and naming violations.
 5. **Consolidated Gradle Build-Logic**: Modern composite `build-logic` eliminating old `buildSrc`. Convention plugins handle per-module Detekt profiles, Spotless formatting, and toolchain configuration.
-6. **Incremental UI Modernization**: the current Feed UI is XML/ViewBinding hosted by RecyclerView. The next UI track adds a Compose card beside the XML implementation so rendering and scrolling performance can be compared before selecting a migration path. See [ADR 0002](docs/adr/0002-xml-to-compose-migration.md).
+6. **Incremental UI Modernization**: The Feed UI integrates a Compose card ("Island") beside the XML implementation. Rendering and scrolling performance have been evaluated and optimized using **Baseline Profiles** (Macrobenchmark) to ensure smooth 60fps scrolling before a full Compose migration. See [ADR 0002](docs/adr/0002-xml-to-compose-migration.md) and [Performance Results](docs/performance/xml-vs-compose-results.md).
 
 For a complete breakdown, see the [Architecture Documentation](docs/architecture.md).
 
@@ -150,7 +150,9 @@ smart-feed/
 | **6** | Feature API/Impl split — `:feature:feed:api` and `:feature:feed:impl` | ✅ Done |
 | **7** | **Core Layer Modularization** — 3-module feature slices (`api/local/impl`), `:core:core` → `:core:common`, eliminated `core-domain` / `core-data` / `core-paging` monoliths, build noise cleanup | ✅ **Done** |
 | **8** | MVIKotlin stores for Feed List, Recommendations, Article, and Article Recommendations with reducer/component tests | ✅ Done |
-| **9** | Parallel Compose `ArticleCard` track with XML parity and performance comparison | 🔜 Next |
+| **9** | Parallel Compose `ArticleCard` track with XML parity, performance comparison, and Baseline Profiles | ✅ Done |
+| **10** | Full Jetpack Compose migration of remaining screens and navigation | 🔜 Next |
+| **11** | Image Prefetching and migration to Coil for Compose | 📝 Planned |
 
 ---
 

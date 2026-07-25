@@ -1,7 +1,10 @@
 package com.ndev.android.smart.feed.benchmark
 
 import androidx.benchmark.macro.CompilationMode
+import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.FrameTimingMetric
+import androidx.benchmark.macro.MacrobenchmarkScope
+import androidx.benchmark.macro.MemoryUsageMetric
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -22,17 +25,19 @@ class FeedScrollBenchmark {
     val benchmarkRule = MacrobenchmarkRule()
 
     private val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    private val renderer = ArticleCardRenderer.fromInstrumentationArguments()
 
     @Before
     fun prepareDataAndCaches() {
         prepareFeed(
             device = device,
             warmScrollCache = true,
+            renderer = renderer,
         )
     }
 
     @Test
-    fun xmlRecyclerViewScrollNoCompilation() {
+    fun recyclerViewScrollNoCompilation() {
         benchmarkRule.measureRepeated(
             packageName = TARGET_PACKAGE,
             metrics = listOf(FrameTimingMetric()),
@@ -47,22 +52,75 @@ class FeedScrollBenchmark {
             },
         ) {
             // With COLD startup the framework kills the process after setupBlock and
-            // cold-relaunches it before this block. We must launch the activity and
             // wait for the feed to be ready on every iteration.
-            startActivityAndWait()
-            val feed = device.waitForFeed().apply {
-                setGestureMargin(device.displayWidth / 5)
-            }
-            device.waitForIdle()
+            scrollFeed()
+        }
+    }
 
-            repeat(5) {
-                feed.fling(Direction.DOWN)
-                device.waitForIdle()
-            }
-            repeat(5) {
-                feed.fling(Direction.UP)
-                device.waitForIdle()
-            }
+    @OptIn(androidx.benchmark.macro.ExperimentalMacrobenchmarkApi::class)
+    @Test
+    fun recyclerViewScrollWithProfile() {
+        benchmarkRule.measureRepeated(
+            packageName = TARGET_PACKAGE,
+            metrics = listOf(FrameTimingMetric()),
+            compilationMode = CompilationMode.Ignore(),
+            startupMode = StartupMode.COLD,
+            iterations = 10,
+            setupBlock = {
+                pressHome()
+            },
+        ) {
+            scrollFeed()
+        }
+    }
+
+
+    @OptIn(ExperimentalMetricApi::class)
+    @Test
+    fun recyclerViewMemoryNoCompilation() {
+        benchmarkRule.measureRepeated(
+            packageName = TARGET_PACKAGE,
+            metrics = listOf(MemoryUsageMetric(MemoryUsageMetric.Mode.Max)),
+            compilationMode = CompilationMode.None(),
+            startupMode = StartupMode.COLD,
+            iterations = 10,
+            setupBlock = { pressHome() },
+        ) {
+            scrollFeed()
+        }
+    }
+
+    @OptIn(ExperimentalMetricApi::class, androidx.benchmark.macro.ExperimentalMacrobenchmarkApi::class)
+    @Test
+    fun recyclerViewMemoryWithProfile() {
+        benchmarkRule.measureRepeated(
+            packageName = TARGET_PACKAGE,
+            metrics = listOf(MemoryUsageMetric(MemoryUsageMetric.Mode.Max)),
+            compilationMode = CompilationMode.Ignore(),
+            startupMode = StartupMode.COLD,
+            iterations = 10,
+            setupBlock = { pressHome() },
+        ) {
+            scrollFeed()
+        }
+    }
+
+    private fun MacrobenchmarkScope.scrollFeed() {
+        startActivityAndWait { launchIntent ->
+            launchIntent.putExtra(ARTICLE_CARD_RENDERER_EXTRA, renderer.wireValue)
+        }
+        val feed = device.waitForFeed().apply {
+            setGestureMargin(device.displayWidth / 5)
+        }
+        device.waitForIdle()
+
+        repeat(5) {
+            feed.fling(Direction.DOWN)
+            device.waitForIdle()
+        }
+        repeat(5) {
+            feed.fling(Direction.UP)
+            device.waitForIdle()
         }
     }
 }

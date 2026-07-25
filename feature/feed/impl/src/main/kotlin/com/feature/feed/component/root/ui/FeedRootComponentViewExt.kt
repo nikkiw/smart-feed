@@ -10,6 +10,7 @@ import com.core.di.ImageLoaderEntryPoint
 import com.feature.feed.R
 import com.feature.feed.component.article.ArticleItemView
 import com.feature.feed.component.bottombar.BottomBarView
+import com.feature.feed.component.list.ui.ArticleCardRenderMode
 import com.feature.feed.component.master.FeedMasterView
 import com.feature.feed.component.recommendation.RecommendationListView
 import com.feature.feed.root.FeedRootComponent
@@ -18,7 +19,10 @@ import io.noties.markwon.Markwon
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Suppress("FunctionName")
-fun ViewContext.FeedRootComponentView(component: FeedRootComponent): View {
+fun ViewContext.FeedRootComponentView(
+    component: FeedRootComponent,
+    articleCardRenderMode: ArticleCardRenderMode,
+): View {
     val layout = layoutInflater.inflate(R.layout.feed_root, parent, false)
     val routerView: StackRouterView = layout.findViewById(R.id.router)
 
@@ -49,10 +53,12 @@ fun ViewContext.FeedRootComponentView(component: FeedRootComponent): View {
                             markwon,
                         )
 
-                    is FeedRootComponent.Child.FeedScreen -> FeedMasterView(child.component)
+                    is FeedRootComponent.Child.FeedScreen ->
+                        FeedMasterView(child.component, articleCardRenderMode)
                     is FeedRootComponent.Child.RecommendationScreen ->
                         RecommendationListView(
                             child.component,
+                            articleCardRenderMode,
                         )
                 }
             },

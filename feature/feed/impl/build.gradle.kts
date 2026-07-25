@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.smart.feed.android.feature)
     alias(libs.plugins.smart.feed.android.library.jacoco)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -8,6 +9,10 @@ android {
 
     defaultConfig {
         testInstrumentationRunner = "com.feature.feed.HiltCustomTestRunner"
+    }
+
+    buildFeatures {
+        compose = true
     }
 
 //    packaging {
@@ -49,6 +54,13 @@ dependencies {
     implementation(libs.markwon.core)
     implementation(libs.nikkiw.android.ui.components)
 
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+
     // Unit test
     testImplementation(libs.google.truth)
     testImplementation(libs.androidx.work.testing)
@@ -61,4 +73,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.core.ktx)
     androidTestImplementation(libs.google.truth)
     androidTestImplementation(projects.core.image.api)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

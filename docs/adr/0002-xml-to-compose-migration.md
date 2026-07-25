@@ -9,8 +9,7 @@ However, a full rewrite ("Big Bang") introduces significant risks:
 2. **Feature Freeze**: Migrating all layouts at once halts product feature delivery.
 3. **Architecture Instability**: Navigation and side-effects handling must be fully refactored simultaneously.
 
-**Current status (2026-07-16):** the production Feed UI is still XML/ViewBinding hosted by
-RecyclerView. Compose dependencies and a Compose card are not part of the current implementation.
+**Current status (2026-07-25):** The "Compose Island" approach has been implemented (`ComposeArticleCard` inside a RecyclerView). Performance parity has been achieved and verified via Android Macrobenchmark using **Baseline Profiles**. The XML and Compose paths coexist and can be swapped dynamically.
 
 ## Decision
 

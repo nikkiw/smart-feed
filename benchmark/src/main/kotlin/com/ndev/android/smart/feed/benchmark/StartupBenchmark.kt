@@ -21,12 +21,14 @@ class StartupBenchmark {
     val benchmarkRule = MacrobenchmarkRule()
 
     private val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    private val renderer = ArticleCardRenderer.fromInstrumentationArguments()
 
     @Before
     fun prepareData() {
         prepareFeed(
             device = device,
             warmScrollCache = false,
+            renderer = renderer,
         )
     }
 
@@ -41,6 +43,25 @@ class StartupBenchmark {
             pressHome()
         },
     ) {
-        startActivityAndWait()
+        startActivityAndWait { launchIntent ->
+            launchIntent.putExtra(ARTICLE_CARD_RENDERER_EXTRA, renderer.wireValue)
+        }
+    }
+
+    @OptIn(androidx.benchmark.macro.ExperimentalMacrobenchmarkApi::class)
+    @Test
+    fun coldStartupWithProfile() = benchmarkRule.measureRepeated(
+        packageName = TARGET_PACKAGE,
+        metrics = listOf(StartupTimingMetric()),
+        compilationMode = CompilationMode.Ignore(),
+        startupMode = StartupMode.COLD,
+        iterations = 10,
+        setupBlock = {
+            pressHome()
+        },
+    ) {
+        startActivityAndWait { launchIntent ->
+            launchIntent.putExtra(ARTICLE_CARD_RENDERER_EXTRA, renderer.wireValue)
+        }
     }
 }

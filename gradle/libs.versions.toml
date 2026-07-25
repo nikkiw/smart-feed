@@ -15,6 +15,7 @@ concurrentFutures = "1.2.0"
 androidxLifecycle = "2.9.1"
 
 # UI
+androidxComposeBom = "2025.08.00"
 material = "1.12.0"
 swiperefreshlayout = "1.1.0"
 markwon = "4.6.2"
@@ -99,6 +100,14 @@ androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-p
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
 
 # UI
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+androidx-compose-material = { group = "androidx.compose.material", name = "material" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 markwon-core = { group = "io.noties.markwon", name = "core", version.ref = "markwon" }
@@ -218,6 +227,7 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
