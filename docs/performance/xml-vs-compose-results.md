@@ -14,7 +14,7 @@ The baseline values were captured using the instructions in [xml-baseline.md](xm
 
 ## Metrics Comparison
 
-| Metric | XML (Baseline) | Compose Islands (Без профиля) | Compose Islands (С профилем) |
+| Metric | XML (Baseline) | Compose Islands (Without Profile) | Compose Islands (With Profile) |
 |---|---|---|---|
 | **Startup** | | | |
 | timeToInitialDisplayMs (Median) | 661.7 ms | 672.3 ms | 669.8 ms |
@@ -31,9 +31,9 @@ The baseline values were captured using the instructions in [xml-baseline.md](xm
 | Build Time (Clean assemble) | 296 sec | 326 sec | 244 sec |
 
 ## Analysis (XML vs Compose Islands)
-- **Startup Time**: При внедрении Compose без профиля медиана TTID выросла на 10.6 ms (с 661.7 до 672.3 ms). Добавление Baseline Profile (CompilationMode.Ignore) немного улучшило результат до 669.8 ms, сократив деградацию до 8.1 ms.
-- **Feed Scroll Performance**: Скролл без профиля показал рост времени кадра (P50: 6.7 -> 8.1 ms, P90: 9.5 -> 10.5 ms, P99: 23.8 -> 26.5 ms). Измерения с профилем дали практически идентичные результаты (P50: 8.1 ms, P90: 10.9 ms, P99: 26.3 ms). Обе реализации Compose (с профилем и без) работают в пределах бюджета в 16 мс на кадр (60 FPS), поэтому скролл ощущается плавным.
-- **APK Size**: Размер релиза увеличился с 9.38 MB до 9.91 MB из-за библиотек Compose и вшитого файла профиля.
-- **Build Time**: Время чистой сборки с Compose выросло на ~30 сек по сравнению с XML. Время сборки (244 сек с профилем) может колебаться в зависимости от загрузки машины.
+- **Startup Time**: Introducing Compose without a profile increased the median TTID by 10.6 ms (from 661.7 ms to 672.3 ms). Adding the Baseline Profile (`CompilationMode.Ignore`) slightly improved the result to 669.8 ms, reducing the degradation to 8.1 ms.
+- **Feed Scroll Performance**: Scrolling without a profile showed an increase in frame duration (P50: 6.7 -> 8.1 ms, P90: 9.5 -> 10.5 ms, P99: 23.8 -> 26.5 ms). Measurements with the profile yielded practically identical results (P50: 8.1 ms, P90: 10.9 ms, P99: 26.3 ms). Both Compose implementations (with and without a profile) operate well within the 16 ms per frame budget (60 FPS), ensuring the scroll feels smooth.
+- **APK Size**: The release build size increased from 9.38 MB to 9.91 MB due to the inclusion of Compose libraries and the bundled profile file.
+- **Build Time**: Clean build time with Compose increased by ~30 seconds compared to XML. Build times (244 seconds with profile) may fluctuate depending on machine load.
 
-> **Примечание о Baseline Profiles:** Профиль был успешно сгенерирован на эмуляторе с API 31 с помощью `Gradle Managed Devices` и добавлен в исходный код (`app/src/main/baseline-prof.txt`). Так как на физическом устройстве HUAWEI (API 29) Android Macrobenchmark не может динамически послать broadcast для установки профиля через `CompilationMode.Partial()` (из-за ограничений оболочки), профиль замерялся в режиме `CompilationMode.Ignore()`, который тестирует состояние приложения после обычной установки пакета (где профиль вшит в APK и применяется системой естественно). Влияние Baseline Profile в данном этапе "Островов" (Islands) оказалось минимальным, так как Compose инициализируется только внутри отдельных карточек при скролле. Ожидается, что польза от профиля будет гораздо заметнее при полном переходе на Compose (Full Compose) навигации и экранов.
+> **Note on Baseline Profiles:** The profile was successfully generated on an API 31 emulator using `Gradle Managed Devices` and embedded into the source code (`app/src/main/baseline-prof.txt`). Because Android Macrobenchmark cannot dynamically send a broadcast to install the profile via `CompilationMode.Partial()` on the physical HUAWEI device (API 29) due to OEM shell restrictions, the profile was measured in `CompilationMode.Ignore()` mode. This mode tests the app state after a standard package installation (where the profile is bundled in the APK and applied naturally by the system). The impact of the Baseline Profile during this "Islands" phase proved minimal, as Compose is only initialized inside individual cards during scrolling. We expect the profile's benefits to be far more pronounced when fully migrating to Compose (Full Compose) for navigation and entire screens.
