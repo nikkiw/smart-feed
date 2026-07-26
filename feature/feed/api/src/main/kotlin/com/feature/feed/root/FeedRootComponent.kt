@@ -26,7 +26,10 @@ interface FeedRootComponent {
         data object FeedScreenConfig : Config()
 
         @Serializable
-        data class ArticleScreenConfig(val itemId: String) : Config()
+        data class ArticleScreenConfig(
+            val itemId: String,
+            val preview: ArticleRoutePreview? = null,
+        ) : Config()
 
         @Serializable
         data object RecommendationScreenConfig : Config()
@@ -35,7 +38,10 @@ interface FeedRootComponent {
     sealed class Child {
         data class FeedScreen(val component: FeedMasterComponent) : Child()
 
-        data class ArticleScreen(val component: ArticleItemComponent) : Child()
+        data class ArticleScreen(
+            val component: ArticleItemComponent,
+            val preview: ArticleRoutePreview?,
+        ) : Child()
 
         data class RecommendationScreen(val component: RecommendationListComponent) : Child()
     }

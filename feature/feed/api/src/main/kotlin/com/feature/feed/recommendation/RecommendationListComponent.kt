@@ -1,7 +1,6 @@
 package com.feature.feed.recommendation
 
 import com.arkivanov.decompose.value.Value
-import com.core.content.model.ContentId
 import com.feature.feed.domain.model.ContentItemPreview
 import kotlinx.coroutines.flow.Flow
 
@@ -10,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface RecommendationListComponent {
     val model: Value<Model>
+    val initialScrollPosition: ScrollPosition
     val effects: Flow<Effect>
 
     fun onRetry()
@@ -19,13 +19,20 @@ interface RecommendationListComponent {
     /**
      *The event when the user clicked on an item in the list
      */
-    fun onListItemClick(itemId: ContentId)
+    fun onListItemClick(item: ContentItemPreview)
+
+    fun onScrollPositionChanged(itemIndex: Int, itemOffsetPx: Int)
 
     data class Model(
         val items: List<ContentItemPreview> = emptyList(),
         val isOnline: Boolean,
         val hasLocalContent: Boolean = false,
         val loadState: LoadState = LoadState.Loading,
+    )
+
+    data class ScrollPosition(
+        val itemIndex: Int = 0,
+        val itemOffsetPx: Int = 0,
     )
 
     sealed interface LoadState {

@@ -4,6 +4,8 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
@@ -30,8 +32,13 @@ class ArticleItemComponentImpl(
     private val analyticsService: AnalyticsService,
     override val itemId: ContentId,
     private val onFinished: () -> Unit,
-    onClickItem: (ContentId) -> Unit,
+    onClickItem: (com.feature.feed.domain.model.ContentItemPreview) -> Unit,
 ) : ArticleItemComponent, ComponentContext by componentContext {
+    private val stateHolder =
+        instanceKeeper.getOrCreate(STATE_HOLDER_KEY) {
+            StateHolder()
+        }
+
     private val store =
         instanceKeeper.getStore {
             ArticleStoreFactory(storeFactory, itemId, getContentItemUseCase).create()
@@ -39,6 +46,12 @@ class ArticleItemComponentImpl(
 
     private val _model = MutableValue(ArticleItemComponent.Model())
     override val model: Value<ArticleItemComponent.Model> = _model
+    override val initialScrollPosition: ArticleItemComponent.ScrollPosition
+        get() =
+            ArticleItemComponent.ScrollPosition(
+                itemIndex = stateHolder.scrollItemIndex,
+                itemOffsetPx = stateHolder.scrollItemOffsetPx,
+            )
 
     override val articleRecommendationsComponent: ArticleRecommendationsComponent =
         ArticleRecommendationsComponentImpl(
@@ -84,6 +97,18 @@ class ArticleItemComponentImpl(
         maxPercentRead = maxOf(maxPercentRead, percentRead.coerceIn(0f, 1f))
     }
 
+    override fun onScrollPositionChanged(itemIndex: Int, itemOffsetPx: Int) {
+        if (
+            stateHolder.scrollItemIndex == itemIndex &&
+            stateHolder.scrollItemOffsetPx == itemOffsetPx
+        ) {
+            return
+        }
+
+        stateHolder.scrollItemIndex = itemIndex
+        stateHolder.scrollItemOffsetPx = itemOffsetPx
+    }
+
     private fun stopReadingTimer() {
         visibleStartTimestamp?.let { accumulatedVisibleMillis += System.currentTimeMillis() - it }
         visibleStartTimestamp = null
@@ -93,11 +118,20 @@ class ArticleItemComponentImpl(
         _model.value =
             ArticleItemComponent.Model(
                 contentState =
-                    when (state) {
-                        ArticleStore.State.Loading -> ArticleItemComponent.ContentState.Loading
-                        is ArticleStore.State.Content -> ArticleItemComponent.ContentState.Content(state.item)
-                        is ArticleStore.State.Failed -> ArticleItemComponent.ContentState.Failed(state.message)
-                    },
+                when (state) {
+                    ArticleStore.State.Loading -> ArticleItemComponent.ContentState.Loading
+                    is ArticleStore.State.Content -> ArticleItemComponent.ContentState.Content(state.item)
+                    is ArticleStore.State.Failed -> ArticleItemComponent.ContentState.Failed(state.message)
+                },
             )
+    }
+
+    private class StateHolder(
+        var scrollItemIndex: Int = 0,
+        var scrollItemOffsetPx: Int = 0,
+    ) : InstanceKeeper.Instance
+
+    private companion object {
+        const val STATE_HOLDER_KEY = "ArticleItemUiStateHolder"
     }
 }

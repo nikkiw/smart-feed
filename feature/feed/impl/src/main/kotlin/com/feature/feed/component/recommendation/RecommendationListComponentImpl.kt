@@ -3,16 +3,18 @@ package com.feature.feed.component.recommendation
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.bind
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.states
-import com.core.content.model.ContentId
 import com.core.observers.ConnectivityRepository
 import com.feature.feed.component.recommendation.store.RecommendationStore
 import com.feature.feed.component.recommendation.store.RecommendationStoreFactory
+import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import com.feature.feed.recommendation.RecommendationListComponent
@@ -28,8 +30,13 @@ class RecommendationListComponentImpl(
     connectivityRepository: ConnectivityRepository,
     contentItemRepository: ContentItemRepository,
     syncContentUseCase: SyncContentUseCase,
-    private val onItemClick: (ContentId) -> Unit,
+    private val onItemClick: (ContentItemPreview) -> Unit,
 ) : RecommendationListComponent, ComponentContext by componentContext {
+    private val stateHolder =
+        instanceKeeper.getOrCreate(STATE_HOLDER_KEY) {
+            StateHolder()
+        }
+
     private val store =
         instanceKeeper.getStore {
             RecommendationStoreFactory(
@@ -48,6 +55,12 @@ class RecommendationListComponentImpl(
             ),
         )
     override val model: Value<RecommendationListComponent.Model> = _model
+    override val initialScrollPosition: RecommendationListComponent.ScrollPosition
+        get() =
+            RecommendationListComponent.ScrollPosition(
+                itemIndex = stateHolder.scrollItemIndex,
+                itemOffsetPx = stateHolder.scrollItemOffsetPx,
+            )
 
     private val effectChannel = Channel<RecommendationListComponent.Effect>(Channel.BUFFERED)
     override val effects: Flow<RecommendationListComponent.Effect> = effectChannel.receiveAsFlow()
@@ -63,7 +76,16 @@ class RecommendationListComponentImpl(
 
     override fun onEnableInternetClicked() = store.accept(RecommendationStore.Intent.EnableInternetClicked)
 
-    override fun onListItemClick(itemId: ContentId) = store.accept(RecommendationStore.Intent.ArticleClicked(itemId))
+    override fun onListItemClick(item: ContentItemPreview) {
+        store.accept(RecommendationStore.Intent.ArticleClicked(item))
+    }
+
+    override fun onScrollPositionChanged(itemIndex: Int, itemOffsetPx: Int) {
+        if (stateHolder.scrollItemIndex == itemIndex && stateHolder.scrollItemOffsetPx == itemOffsetPx) return
+
+        stateHolder.scrollItemIndex = itemIndex
+        stateHolder.scrollItemOffsetPx = itemOffsetPx
+    }
 
     private fun render(state: RecommendationStore.State) {
         _model.value =
@@ -72,20 +94,29 @@ class RecommendationListComponentImpl(
                 isOnline = state.isOnline,
                 hasLocalContent = state.hasLocalContent,
                 loadState =
-                    when (val loadState = state.loadState) {
-                        RecommendationStore.LoadState.Loading -> RecommendationListComponent.LoadState.Loading
-                        RecommendationStore.LoadState.Idle -> RecommendationListComponent.LoadState.Idle
-                        is RecommendationStore.LoadState.Failed ->
-                            RecommendationListComponent.LoadState.Failed(loadState.message)
-                    },
+                when (val loadState = state.loadState) {
+                    RecommendationStore.LoadState.Loading -> RecommendationListComponent.LoadState.Loading
+                    RecommendationStore.LoadState.Idle -> RecommendationListComponent.LoadState.Idle
+                    is RecommendationStore.LoadState.Failed ->
+                        RecommendationListComponent.LoadState.Failed(loadState.message)
+                },
             )
     }
 
     private fun handleLabel(label: RecommendationStore.Label) {
         when (label) {
-            is RecommendationStore.Label.OpenArticle -> onItemClick(label.id)
+            is RecommendationStore.Label.OpenArticle -> onItemClick(label.preview)
             RecommendationStore.Label.OpenInternetSettings ->
                 effectChannel.trySend(RecommendationListComponent.Effect.OpenInternetSettings)
         }
+    }
+
+    private class StateHolder(
+        var scrollItemIndex: Int = 0,
+        var scrollItemOffsetPx: Int = 0,
+    ) : InstanceKeeper.Instance
+
+    private companion object {
+        const val STATE_HOLDER_KEY = "RecommendationListUiStateHolder"
     }
 }

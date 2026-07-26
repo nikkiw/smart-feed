@@ -13,6 +13,7 @@ import com.core.content.model.ContentId
 import com.feature.feed.articlerecommendation.ArticleRecommendationsComponent
 import com.feature.feed.component.articlerecommendation.store.ArticleRecommendationsStore
 import com.feature.feed.component.articlerecommendation.store.ArticleRecommendationsStoreFactory
+import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.recommendation.domain.usecase.RecommendForArticleUseCase
 
 class ArticleRecommendationsComponentImpl(
@@ -20,7 +21,7 @@ class ArticleRecommendationsComponentImpl(
     storeFactory: StoreFactory,
     articleId: ContentId,
     recommendForArticleUseCase: RecommendForArticleUseCase,
-    private val onItemClick: (ContentId) -> Unit,
+    private val onItemClick: (ContentItemPreview) -> Unit,
 ) : ArticleRecommendationsComponent, ComponentContext by componentContext {
     private val store =
         instanceKeeper.getStore {
@@ -39,7 +40,7 @@ class ArticleRecommendationsComponentImpl(
             store.states bindTo ::render
             store.labels bindTo { label ->
                 when (label) {
-                    is ArticleRecommendationsStore.Label.OpenArticle -> onItemClick(label.id)
+                    is ArticleRecommendationsStore.Label.OpenArticle -> onItemClick(label.preview)
                 }
             }
         }
@@ -47,21 +48,22 @@ class ArticleRecommendationsComponentImpl(
 
     override fun onRetry() = store.accept(ArticleRecommendationsStore.Intent.Retry)
 
-    override fun onListItemClick(itemId: ContentId) =
-        store.accept(ArticleRecommendationsStore.Intent.ArticleClicked(itemId))
+    override fun onListItemClick(item: ContentItemPreview) {
+        store.accept(ArticleRecommendationsStore.Intent.ArticleClicked(item))
+    }
 
     private fun render(state: ArticleRecommendationsStore.State) {
         _model.value =
             ArticleRecommendationsComponent.Model(
                 state =
-                    when (state) {
-                        ArticleRecommendationsStore.State.Loading -> ArticleRecommendationsComponent.State.Loading
-                        is ArticleRecommendationsStore.State.Content ->
-                            ArticleRecommendationsComponent.State.Content(state.items)
-                        ArticleRecommendationsStore.State.Empty -> ArticleRecommendationsComponent.State.Empty
-                        is ArticleRecommendationsStore.State.Failed ->
-                            ArticleRecommendationsComponent.State.Failed(state.message)
-                    },
+                when (state) {
+                    ArticleRecommendationsStore.State.Loading -> ArticleRecommendationsComponent.State.Loading
+                    is ArticleRecommendationsStore.State.Content ->
+                        ArticleRecommendationsComponent.State.Content(state.items)
+                    ArticleRecommendationsStore.State.Empty -> ArticleRecommendationsComponent.State.Empty
+                    is ArticleRecommendationsStore.State.Failed ->
+                        ArticleRecommendationsComponent.State.Failed(state.message)
+                },
             )
     }
 }

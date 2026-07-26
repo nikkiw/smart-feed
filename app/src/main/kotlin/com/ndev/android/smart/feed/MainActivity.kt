@@ -1,20 +1,18 @@
 package com.ndev.android.smart.feed
 
 import android.os.Bundle
-import android.widget.FrameLayout
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import com.arkivanov.decompose.defaultComponentContext
-import com.arkivanov.essenty.lifecycle.essentyLifecycle
-import com.feature.feed.component.list.ui.ArticleCardRenderMode
+import com.feature.feed.compose.FeedRootContent
 import com.feature.feed.root.FeedRootComponent
 import com.ndev.android.smart.feed.startup.AppStartupCoordinator
-import com.ndev.android.smart.feed.ui.FeedRootViewHost
 import com.ndev.android.smart.feed.ui.SystemBarsController
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     @Inject
     lateinit var rootFactory: FeedRootComponent.Factory
 
@@ -23,9 +21,6 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var systemBarsController: SystemBarsController
-
-    @Inject
-    lateinit var rootViewHost: FeedRootViewHost
 
     private lateinit var feedRootComponent: FeedRootComponent
 
@@ -36,19 +31,10 @@ class MainActivity : AppCompatActivity() {
             restoreAfterProcessDeath = savedInstanceState != null,
         )
 
-        setContentView(R.layout.main_activity)
-
-        val container: FrameLayout = findViewById(R.id.content)
         feedRootComponent = rootFactory(defaultComponentContext())
-        rootViewHost.attach(
-            container = container,
-            component = feedRootComponent,
-            lifecycle = essentyLifecycle(),
-            articleCardRenderMode =
-                ArticleCardRenderMode.fromWireValue(
-                    intent.getStringExtra(ArticleCardRenderMode.EXTRA_ARTICLE_CARD_RENDERER),
-                ),
-        )
+        setContent {
+            FeedRootContent(component = feedRootComponent)
+        }
         startupCoordinator.attach(this)
     }
 }

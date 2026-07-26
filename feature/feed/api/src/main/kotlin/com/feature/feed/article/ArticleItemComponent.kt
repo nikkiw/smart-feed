@@ -16,10 +16,17 @@ interface ArticleItemComponent {
 
     val itemId: ContentId
 
+    val initialScrollPosition: ScrollPosition
+
     val articleRecommendationsComponent: ArticleRecommendationsComponent
 
     data class Model(
         val contentState: ContentState = ContentState.Loading,
+    )
+
+    data class ScrollPosition(
+        val itemIndex: Int = 0,
+        val itemOffsetPx: Int = 0,
     )
 
     sealed interface ContentState {
@@ -35,4 +42,6 @@ interface ArticleItemComponent {
     fun onRetry()
 
     fun onReadProgressChanged(percentRead: Float)
+
+    fun onScrollPositionChanged(itemIndex: Int, itemOffsetPx: Int)
 }

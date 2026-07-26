@@ -6,10 +6,10 @@ import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
-import com.core.content.model.ContentId
 import com.core.content.model.ContentType
 import com.core.content.model.Tags
 import com.feature.feed.component.filter.FilterSortComponentImpl
+import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.repository.ContentItemsSortedType
 import com.feature.feed.domain.repository.Query
@@ -26,7 +26,7 @@ class FeedMasterComponentImpl(
     componentContext: ComponentContext,
     private val contentItemRepository: ContentItemRepository,
     private val feedListComponentFactory: FeedListComponent.Factory,
-    onListItemClick: (ContentId) -> Unit,
+    onListItemClick: (ContentItemPreview) -> Unit,
     initialSortType: ContentItemsSortedType = ContentItemsSortedType.ByDateNewestFirst,
     initialTags: Tags = Tags(),
 ) : FeedMasterComponent, ComponentContext by componentContext {
@@ -74,8 +74,8 @@ class FeedMasterComponentImpl(
             feedListComponentFactory(
                 componentContext = childContext(key = "feedList"),
                 initialQuery = initialQuery,
-                onItemClick = { itemId ->
-                    onListItemClick(itemId)
+                onItemClick = { preview ->
+                    onListItemClick(preview)
                 },
             )
     }

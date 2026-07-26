@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="article_main_image_content_description">Главное изображение для «%1$s»</string>
+    <string name="article_state_is_loaded">Загружено…</string>
+
+    <string name="bottom_list">Лента</string>
+    <string name="bottom_recommendation">Рекомендации</string>
+    <string name="feed_filters_title">Фильтры</string>
+
+    <string name="error_icon">Иконка ошибки</string>
+    <string name="error_loading_data">Для загрузки данных нужен интернет. Проверьте подключение и попробуйте снова.</string>
+
+    <string name="recommended_reading">Рекомендуем почитать</string>
+    <string name="enable_internet">Включить интернет</string>
+    <string name="retry">Повторить</string>
+    <string name="feed_empty">Нет статей, подходящих под выбранные фильтры.</string>
+    <string name="feed_initial_loading_title">Подготавливаем ленту</string>
+    <string name="feed_initial_loading_message">Загружаем сохранённые статьи и проверяем обновления</string>
+    <string name="article_loading_title">Подготавливаем статью</string>
+    <string name="article_back">Назад</string>
+    <string name="recommendations_empty">Пока нет рекомендаций.</string>
+    <string name="related_articles_empty">Похожих статей нет.</string>
+    <string name="error_loading_unknown">Не удалось загрузить данные.</string>
+    <string name="sorted_by">Сортировка:</string>
+    <string name="sort_name_asc">Название А–Я</string>
+    <string name="sort_name_desc">Название Я–А</string>
+    <string name="sort_date_newest">Сначала новые</string>
+    <string name="sort_date_oldest">Сначала старые</string>
+    <string name="article_tags">Теги статьи</string>
+</resources>

@@ -17,25 +17,25 @@ import javax.inject.Singleton
  */
 @Singleton
 class AppBootstrapperImpl
-    @Inject
-    constructor(
-        private val contentItemRepository: ContentItemRepository,
-        private val contentFetchScheduleUseCase: ContentFetchScheduleUseCase,
-        private val syncContentUseCase: SyncContentUseCase,
-        private val recommender: Recommender,
-    ) : AppBootstrapper {
-        override suspend fun bootstrap() {
-            supervisorScope {
-                launch {
-                    if (contentItemRepository.isEmpty()) {
-                        syncContentUseCase().getOrThrow()
-                    } else {
-                        recommender.updateRecommendationsForUser()
-                    }
+@Inject
+constructor(
+    private val contentItemRepository: ContentItemRepository,
+    private val contentFetchScheduleUseCase: ContentFetchScheduleUseCase,
+    private val syncContentUseCase: SyncContentUseCase,
+    private val recommender: Recommender,
+) : AppBootstrapper {
+    override suspend fun bootstrap() {
+        supervisorScope {
+            launch {
+                if (contentItemRepository.isEmpty()) {
+                    syncContentUseCase().getOrThrow()
+                } else {
+                    recommender.updateRecommendationsForUser()
                 }
-                launch {
-                    contentFetchScheduleUseCase.schedule()
-                }
+            }
+            launch {
+                contentFetchScheduleUseCase.schedule()
             }
         }
     }
+}

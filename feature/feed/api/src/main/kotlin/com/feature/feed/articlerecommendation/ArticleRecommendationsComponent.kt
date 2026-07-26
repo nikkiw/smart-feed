@@ -1,7 +1,6 @@
 package com.feature.feed.articlerecommendation
 
 import com.arkivanov.decompose.value.Value
-import com.core.content.model.ContentId
 import com.feature.feed.domain.model.ContentItemPreview
 
 interface ArticleRecommendationsComponent {
@@ -12,7 +11,7 @@ interface ArticleRecommendationsComponent {
     /**
      *The event when the user clicked on an item in the list
      */
-    fun onListItemClick(itemId: ContentId)
+    fun onListItemClick(item: ContentItemPreview)
 
     data class Model(
         val state: State = State.Loading,
