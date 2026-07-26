@@ -54,6 +54,10 @@ interface ContentDao {
     @Query("SELECT * FROM content ORDER BY updatedAt DESC LIMIT :limit")
     suspend fun getRecentContent(limit: Int): List<ContentPreviewWithDetails>
 
+    @Transaction
+    @Query("SELECT * FROM content WHERE languageCode = :languageCode ORDER BY updatedAt DESC LIMIT :limit")
+    suspend fun getRecentContentByLanguage(limit: Int, languageCode: String): List<ContentPreviewWithDetails>
+
     /**
      * Checks whether the `content` table contains any entries.
      *

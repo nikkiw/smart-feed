@@ -38,6 +38,7 @@ sealed class ContentAttributes {
         @SerializedName("title") val title: String,
         @SerializedName("shortDescription") val shortDescription: String,
         @SerializedName("content") val content: String,
+        @SerializedName("languageCode") val languageCode: String?,
         @SerializedName("embeddings") val embeddings: Embeddings,
     ) : ContentAttributes()
 

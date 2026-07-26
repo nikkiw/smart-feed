@@ -272,6 +272,24 @@ class FeatureBoundaryKonsistTest {
             )
     }
 
+    @Test
+    fun `compose screens stay on contracts and ui helpers only`() {
+        sourceFilesUnder("feature/feed/impl/src/main/kotlin/com/feature/feed/compose")
+            .assertNoImports(
+                forbiddenPrefixes =
+                listOf(
+                    "com.feature.feed.component.",
+                    "com.feature.feed.data.",
+                    "com.feature.feed.local.",
+                    "com.feature.recommendation.data.",
+                    "com.arkivanov.mvikotlin.",
+                ),
+                reason =
+                "Compose renderers must bind feature contracts and UI helpers only; " +
+                    "component/data/store details must stay outside composables.",
+            )
+    }
+
     private fun String.hasImplementationType(): Boolean = substringAfterLast('.').endsWith("Impl") || contains(".impl.")
 
     private fun String.isInfrastructureImport(): Boolean = startsWith("androidx.work.") ||

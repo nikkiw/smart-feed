@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.core.content.model.ContentLanguage
 
 /**
  * Entity representing a general piece of content (e.g., article, etc.).
@@ -30,6 +31,7 @@ data class ContentEntity(
     val action: String,
     val updatedAt: Long,
     val mainImageUrl: String,
+    val languageCode: String = ContentLanguage.UNDETERMINED.code,
     @TypeConverters(Converter::class)
     val tags: List<String>,
 )

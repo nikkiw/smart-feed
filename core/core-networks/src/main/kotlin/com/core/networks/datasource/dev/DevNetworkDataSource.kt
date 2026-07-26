@@ -111,6 +111,7 @@ class DevNetworkDataSource : NetworkDataSource {
                         title = "Article title №$i",
                         shortDescription = "Article Summary №$i",
                         content = "Content of article №$i. This can be any text.Short content of the article.",
+                        languageCode = "en",
                         embeddings =
                         Embeddings(
                             typeName = "test",

@@ -1,4 +1,4 @@
-package com.feature.feed.component.root
+package com.feature.feed.mapper
 
 import com.feature.feed.domain.model.ContentItem
 import com.feature.feed.domain.model.ContentItemPreview

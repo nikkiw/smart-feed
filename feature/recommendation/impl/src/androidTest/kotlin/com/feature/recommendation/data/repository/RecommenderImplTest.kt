@@ -7,6 +7,7 @@ import com.core.analytics.local.entity.EventLog
 import com.core.analytics.local.entity.EventType
 import com.core.content.embedding.EmbeddingIndex
 import com.core.content.model.ContentId
+import com.core.content.model.ContentLanguage
 import com.core.content.model.Embeddings
 import com.core.database.AppDatabase
 import com.core.networks.datasource.dev.DevStaticJsonTestNetworkDataSource
@@ -32,6 +33,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Instant
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.test.assertNotEquals
 
 @RunWith(AndroidJUnit4::class)
@@ -133,6 +135,95 @@ class RecommenderImplTest {
         assertNotEquals(expectedRecommendations, actualRecommendations)
     }
 
+    @Test
+    fun testRecommendForUser_prefers_dominant_read_language() = runTest {
+        seedArticle(
+            id = "en-old",
+            title = "English article one",
+            shortDescription = "English short",
+            content = "English body one",
+            updatedAt = "2025-01-01T10:00:00Z",
+            languageCode = ContentLanguage.ENGLISH.code,
+            embedding = floatArrayOf(1f, 0f, 0f),
+        )
+        seedArticle(
+            id = "en-new",
+            title = "English article two",
+            shortDescription = "English short",
+            content = "English body two",
+            updatedAt = "2025-01-03T10:00:00Z",
+            languageCode = ContentLanguage.ENGLISH.code,
+            embedding = floatArrayOf(0.9f, 0.1f, 0f),
+        )
+        seedArticle(
+            id = "ru-newest",
+            title = "Русская статья",
+            shortDescription = "Короткое описание",
+            content = "Русский текст статьи",
+            updatedAt = "2025-01-04T10:00:00Z",
+            languageCode = ContentLanguage.RUSSIAN.code,
+            embedding = floatArrayOf(0f, 1f, 0f),
+        )
+
+        db.eventLogDao().insertEvent(
+            EventLog(
+                contentId = "en-new",
+                eventType = EventType.READ,
+                readPercentage = 1f,
+                readingTimeMillis = 12_000,
+            ),
+        )
+
+        recommender.updateRecommendationsForUser()
+
+        val actualRecommendations =
+            recommendationRepository.recommendForUser().first().map { it.articleId.value }
+
+        assertEquals(listOf("en-new", "en-old"), actualRecommendations)
+    }
+
+    @Test
+    fun testRecommendForArticle_stays_within_article_language_when_possible() = runTest {
+        seedArticle(
+            id = "en-source",
+            title = "English source article",
+            shortDescription = "English short",
+            content = "English body source",
+            updatedAt = "2025-02-01T10:00:00Z",
+            languageCode = ContentLanguage.ENGLISH.code,
+            embedding = floatArrayOf(1f, 0f, 0f),
+        )
+        seedArticle(
+            id = "en-related",
+            title = "English related article",
+            shortDescription = "English short",
+            content = "English body related",
+            updatedAt = "2025-02-02T10:00:00Z",
+            languageCode = ContentLanguage.ENGLISH.code,
+            embedding = floatArrayOf(0.95f, 0.05f, 0f),
+        )
+        seedArticle(
+            id = "ru-related",
+            title = "Русская похожая статья",
+            shortDescription = "Короткое описание",
+            content = "Русский текст похожей статьи",
+            updatedAt = "2025-02-03T10:00:00Z",
+            languageCode = ContentLanguage.RUSSIAN.code,
+            embedding = floatArrayOf(0.96f, 0.04f, 0f),
+        )
+
+        recommender.updateRecommendationsForArticles()
+
+        val recommendations =
+            recommendationRepository.recommendForArticle(ContentId("en-source"))
+                .first()
+                .map { it.articleId.value }
+
+        assertTrue(recommendations.isNotEmpty())
+        assertTrue("en-related" in recommendations)
+        assertTrue("ru-related" !in recommendations)
+    }
+
     private suspend fun seedContent() {
         val updates = networkDataSource.getUpdates(since = "1970-01-01T00:00:00Z").getOrThrow().data
         Assert.assertTrue(updates.isNotEmpty())
@@ -145,6 +236,15 @@ class RecommenderImplTest {
                     action = update.action,
                     updatedAt = Instant.parse(update.updatedAt).toEpochMilli(),
                     mainImageUrl = update.mainImageUrl,
+                    languageCode =
+                    (update.attributes as? ContentAttributes.Article)?.let {
+                        ContentLanguage.resolve(
+                            explicitCode = it.languageCode,
+                            title = it.title,
+                            shortDescription = it.shortDescription,
+                            content = it.content,
+                        ).code
+                    } ?: ContentLanguage.UNDETERMINED.code,
                     tags = update.tags,
                 )
             val articleEntity =
@@ -163,6 +263,35 @@ class RecommenderImplTest {
                 }
             db.contentDao().insertContentUpdateWithDetails(entity, articleEntity)
         }
+    }
+
+    private suspend fun seedArticle(
+        id: String,
+        title: String,
+        shortDescription: String,
+        content: String,
+        updatedAt: String,
+        languageCode: String,
+        embedding: FloatArray,
+    ) {
+        db.contentDao().insertContentUpdateWithDetails(
+            ContentEntity(
+                id = id,
+                type = "article",
+                action = "upsert",
+                updatedAt = Instant.parse(updatedAt).toEpochMilli(),
+                mainImageUrl = "https://example.com/$id.png",
+                languageCode = languageCode,
+                tags = listOf(languageCode),
+            ),
+            ArticleAttributesEntity(
+                contentId = id,
+                title = title,
+                shortDescription = shortDescription,
+                content = content,
+                unitEmbedding = EmbeddingIndex.normalize(embedding),
+            ),
+        )
     }
 
     private class FakeUserProfileRepository(

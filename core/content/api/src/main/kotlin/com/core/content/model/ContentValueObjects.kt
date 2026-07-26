@@ -4,6 +4,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.Locale.ROOT
 import java.util.TimeZone
 
 /**
@@ -53,6 +54,66 @@ value class Tags(val value: List<String> = emptyList())
  */
 @JvmInline
 value class ImageUrl(val value: String)
+
+/**
+ * Language tag associated with content.
+ *
+ * Uses a normalized lowercase BCP-47 style code such as `en`, `ru`, or `und`
+ * when the language is not determined.
+ */
+@JvmInline
+value class ContentLanguage(val code: String) {
+    companion object {
+        val UNDETERMINED: ContentLanguage = ContentLanguage("und")
+        val ENGLISH: ContentLanguage = ContentLanguage("en")
+        val RUSSIAN: ContentLanguage = ContentLanguage("ru")
+
+        fun from(raw: String?): ContentLanguage {
+            val normalized = raw?.trim()?.lowercase(ROOT)
+            return if (normalized.isNullOrEmpty()) UNDETERMINED else ContentLanguage(normalized)
+        }
+
+        fun resolve(
+            explicitCode: String?,
+            title: String,
+            shortDescription: String,
+            content: String,
+        ): ContentLanguage {
+            val explicitLanguage = from(explicitCode)
+            return if (explicitLanguage != UNDETERMINED) {
+                explicitLanguage
+            } else {
+                detectFromText(
+                    buildString {
+                        append(title)
+                        append(' ')
+                        append(shortDescription)
+                        append(' ')
+                        append(content)
+                    },
+                )
+            }
+        }
+
+        fun detectFromText(text: String): ContentLanguage {
+            var cyrillicLetters = 0
+            var latinLetters = 0
+
+            text.forEach { char ->
+                when {
+                    char in '\u0400'..'\u04FF' -> cyrillicLetters++
+                    char.isLetter() && char.lowercaseChar() in 'a'..'z' -> latinLetters++
+                }
+            }
+
+            return when {
+                cyrillicLetters > latinLetters && cyrillicLetters > 0 -> RUSSIAN
+                latinLetters > 0 -> ENGLISH
+                else -> UNDETERMINED
+            }
+        }
+    }
+}
 
 /**
  * Value class representing a timestamp of when content was last updated.

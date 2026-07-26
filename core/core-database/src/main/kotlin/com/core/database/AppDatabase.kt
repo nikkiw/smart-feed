@@ -5,7 +5,9 @@ import android.util.Log
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
 import androidx.room.execSQL
+import androidx.sqlite.SQLiteConnection
 import androidx.room.useWriterConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.core.analytics.local.EventLogDao
@@ -62,7 +64,7 @@ import kotlinx.coroutines.runBlocking
         ContentRecommendationEntity::class,
         UserRecommendationEntity::class,
     ],
-    version = 1,
+    version = 2,
 )
 @TypeConverters(Converter::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -83,6 +85,21 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun recommendationDao(): RecommendationDao
 
     companion object {
+        val MIGRATION_1_2: Migration =
+            object : Migration(1, 2) {
+                override fun migrate(connection: SQLiteConnection) {
+                    connection
+                        .prepare(
+                            """
+                            ALTER TABLE content
+                            ADD COLUMN languageCode TEXT NOT NULL DEFAULT 'und'
+                            """.trimIndent(),
+                        ).use { statement ->
+                            statement.step()
+                        }
+                }
+            }
+
         /**
          * Creates necessary SQL triggers on the database.
          *

@@ -21,6 +21,7 @@ import com.feature.feed.component.article.store.ArticleStore
 import com.feature.feed.component.article.store.ArticleStoreFactory
 import com.feature.feed.component.articlerecommendation.ArticleRecommendationsComponentImpl
 import com.feature.feed.domain.usecase.GetContentItemUseCase
+import com.feature.feed.mapper.toArticleRoutePreview
 import com.feature.recommendation.domain.usecase.RecommendForArticleUseCase
 
 @Suppress("LongParameterList")
@@ -93,8 +94,9 @@ class ArticleItemComponentImpl(
 
     override fun onRetry() = store.accept(ArticleStore.Intent.Retry)
 
-    override fun onReadProgressChanged(percentRead: Float) {
-        maxPercentRead = maxOf(maxPercentRead, percentRead.coerceIn(0f, 1f))
+    override fun onReadProgressObserved(snapshot: ArticleItemComponent.ReadProgressSnapshot) {
+        val progress = ArticleReadProgressCalculator.calculate(snapshot)
+        maxPercentRead = maxOf(maxPercentRead, progress.coerceIn(0f, 1f))
     }
 
     override fun onScrollPositionChanged(itemIndex: Int, itemOffsetPx: Int) {
@@ -123,6 +125,9 @@ class ArticleItemComponentImpl(
                     is ArticleStore.State.Content -> ArticleItemComponent.ContentState.Content(state.item)
                     is ArticleStore.State.Failed -> ArticleItemComponent.ContentState.Failed(state.message)
                 },
+                routePreview = (state as? ArticleStore.State.Content)?.item
+                    ?.let { content -> content as? com.feature.feed.domain.model.ContentItem.Article }
+                    ?.toArticleRoutePreview(),
             )
     }
 

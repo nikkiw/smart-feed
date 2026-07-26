@@ -2,6 +2,7 @@ package com.feature.recommendation.data.service
 
 import com.core.content.embedding.EmbeddingIndex
 import com.core.content.model.ContentId
+import com.core.content.model.ContentLanguage
 import com.core.di.ApplicationScope
 import com.core.di.DefaultDispatcher
 import com.core.di.IoDispatcher
@@ -21,8 +22,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import java.util.Locale
 
 typealias ArticleEmbeddings = Pair<String, FloatArray>
+
+private const val TOP_READ_LANGUAGE_SAMPLE_SIZE = 5
 
 /**
  * Implementation of the [Recommender] interface using content embeddings and MMR diversification.
@@ -109,11 +113,12 @@ constructor(
     override suspend fun updateRecommendationsForUser() = withContext(defaultDispatcher) {
         // Fetch latest user profile embedding (nullable for cold start)
         val userProfile = userProfileRepository.getUserProfileEmbeddings().first()
+        val preferredLanguage = resolvePreferredUserLanguage()
 
         val recommendations =
             if (userProfile == null) {
                 // Cold-start: recommend most recent content with uniform score
-                withContext(ioDispatcher) { contentDao.getRecentContent(mmrK) }
+                loadRecentContentForLanguage(preferredLanguage)
                     .map {
                         Recommendation(
                             articleId = ContentId(it.contentUpdate.id),
@@ -121,30 +126,43 @@ constructor(
                         )
                     }
             } else {
+                val allContentEmbeddings =
+                    withContext(ioDispatcher) { articleEmbeddingDao.allEmbeddings() }
+
                 // Build in-memory index of all article embeddings
                 val embeddingIndex =
                     EmbeddingIndex().apply {
-                        withContext(ioDispatcher) { articleEmbeddingDao.allEmbeddings() }
-                            .forEach { articleEmbedding ->
-                                add(articleEmbedding.articleId, articleEmbedding.unitEmbedding)
-                            }
+                        allContentEmbeddings.forEach { articleEmbedding ->
+                            add(articleEmbedding.articleId, articleEmbedding.unitEmbedding)
+                        }
                     }
+                val languageByArticleId = allContentEmbeddings.associate { it.articleId to it.languageCode }
                 // Exclude already read articles
-                val allReadArticles = contentInteractionStatsDao.getAllReadContentIds()
+                val allReadArticles = withContext(ioDispatcher) { contentInteractionStatsDao.getAllReadContentIds() }
 
                 // Find most similar articles to user profile
                 val similarList =
-                    embeddingIndex.search(
-                        userProfile.value,
-                        k = topK,
-                    ).filter { it.first !in allReadArticles } // skip read
+                    languageFilteredCandidates(
+                        candidates =
+                        embeddingIndex.search(
+                            userProfile.value,
+                            k = topK,
+                        ).filter { it.first !in allReadArticles },
+                        preferredLanguage = preferredLanguage,
+                        languageByArticleId = languageByArticleId,
+                    )
                         .sortedByDescending { it.second }
 
                 // Find "cold" items: embeddings farthest (opposite) from profile
                 val cold =
-                    embeddingIndex.search(
-                        EmbeddingIndex.opposite(userProfile.value),
-                        k = coldK,
+                    languageFilteredCandidates(
+                        candidates =
+                        embeddingIndex.search(
+                            EmbeddingIndex.opposite(userProfile.value),
+                            k = coldK,
+                        ).filter { it.first !in allReadArticles },
+                        preferredLanguage = preferredLanguage,
+                        languageByArticleId = languageByArticleId,
                     ).sortedByDescending { it.second }
 
                 // Diversify both similar and cold lists via MMR
@@ -195,6 +213,7 @@ constructor(
                     add(articleEmbedding.articleId, articleEmbedding.unitEmbedding)
                 }
             }
+        val languageByArticleId = allContentEmbeddings.associate { it.articleId to it.languageCode }
 
         val allReadArticles =
             withContext(ioDispatcher) { contentInteractionStatsDao.getAllReadContentIds() }
@@ -205,18 +224,28 @@ constructor(
 
             // Top similar excluding itself and read
             val similarList =
-                embeddingIndex.search(
-                    articleUnitEmbeddings,
-                    k = topK,
-                ).filter { it.first != currentContent.articleId && it.first !in allReadArticles }
+                languageFilteredCandidates(
+                    candidates =
+                    embeddingIndex.search(
+                        articleUnitEmbeddings,
+                        k = topK,
+                    ).filter { it.first != currentContent.articleId && it.first !in allReadArticles },
+                    preferredLanguage = currentContent.languageCode,
+                    languageByArticleId = languageByArticleId,
+                )
                     .sortedByDescending { it.second }
 
             // Cold items for diversity
             val cold =
-                embeddingIndex.search(
-                    EmbeddingIndex.opposite(articleUnitEmbeddings),
-                    k = coldK,
-                ).filter { it.first != currentContent.articleId }
+                languageFilteredCandidates(
+                    candidates =
+                    embeddingIndex.search(
+                        EmbeddingIndex.opposite(articleUnitEmbeddings),
+                        k = coldK,
+                    ).filter { it.first != currentContent.articleId && it.first !in allReadArticles },
+                    preferredLanguage = currentContent.languageCode,
+                    languageByArticleId = languageByArticleId,
+                )
                     .sortedByDescending { it.second }
 
             // Apply MMR diversification
@@ -304,5 +333,54 @@ constructor(
         }
 
         return recommendations
+    }
+
+    private suspend fun loadRecentContentForLanguage(preferredLanguage: String?): List<com.feature.feed.local.content.entity.ContentPreviewWithDetails> {
+        val normalizedLanguage = ContentLanguage.from(preferredLanguage)
+        return withContext(ioDispatcher) {
+            if (normalizedLanguage == ContentLanguage.UNDETERMINED) {
+                contentDao.getRecentContent(mmrK)
+            } else {
+                val localized = contentDao.getRecentContentByLanguage(mmrK, normalizedLanguage.code)
+                if (localized.isNotEmpty()) localized else contentDao.getRecentContent(mmrK)
+            }
+        }
+    }
+
+    private suspend fun resolvePreferredUserLanguage(): String? {
+        val topReadLanguages =
+            withContext(ioDispatcher) {
+                contentInteractionStatsDao.getTopReadLanguageCodes(TOP_READ_LANGUAGE_SAMPLE_SIZE)
+            }
+        val dominantReadLanguage =
+            topReadLanguages
+                .groupingBy { it }
+                .eachCount()
+                .maxByOrNull { it.value }
+                ?.key
+        if (dominantReadLanguage != null) {
+            return dominantReadLanguage
+        }
+
+        val systemLanguage = ContentLanguage.from(Locale.getDefault().language)
+        return systemLanguage.takeUnless { it == ContentLanguage.UNDETERMINED }?.code
+    }
+
+    private fun languageFilteredCandidates(
+        candidates: List<Pair<String, Float>>,
+        preferredLanguage: String?,
+        languageByArticleId: Map<String, String>,
+    ): List<Pair<String, Float>> {
+        val normalizedLanguage = ContentLanguage.from(preferredLanguage)
+        if (normalizedLanguage == ContentLanguage.UNDETERMINED) {
+            return candidates
+        }
+
+        val sameLanguageCandidates =
+            candidates.filter { candidate ->
+                languageByArticleId[candidate.first] == normalizedLanguage.code
+            }
+
+        return if (sameLanguageCandidates.isNotEmpty()) sameLanguageCandidates else candidates
     }
 }

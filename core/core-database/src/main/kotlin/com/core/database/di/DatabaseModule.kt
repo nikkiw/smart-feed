@@ -28,6 +28,7 @@ object DatabaseModule {
                 dbName,
             )
                 .setDriver(BundledSQLiteDriver())
+                .addMigrations(AppDatabase.MIGRATION_1_2)
                 .build()
 
         runBlocking {

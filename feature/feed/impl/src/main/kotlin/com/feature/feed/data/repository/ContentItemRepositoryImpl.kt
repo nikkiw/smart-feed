@@ -8,6 +8,7 @@ import com.core.common.coroutines.runSuspendCatching
 import com.core.common.time.DateTimeConvertors
 import com.core.content.embedding.EmbeddingIndex
 import com.core.content.model.ContentId
+import com.core.content.model.ContentLanguage
 import com.core.content.model.Tags
 import com.core.di.IoDispatcher
 import com.core.networks.datasource.NetworkDataSource
@@ -109,6 +110,15 @@ constructor(
                                     action = update.action,
                                     updatedAt = DateTimeConvertors.parseIsoToLongMs(update.updatedAt),
                                     mainImageUrl = update.mainImageUrl,
+                                    languageCode =
+                                    (update.attributes as? ContentAttributes.Article)?.let {
+                                        ContentLanguage.resolve(
+                                            explicitCode = it.languageCode,
+                                            title = it.title,
+                                            shortDescription = it.shortDescription,
+                                            content = it.content,
+                                        ).code
+                                    } ?: ContentLanguage.UNDETERMINED.code,
                                     tags = update.tags,
                                 )
 

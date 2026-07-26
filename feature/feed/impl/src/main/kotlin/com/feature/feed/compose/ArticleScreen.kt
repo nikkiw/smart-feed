@@ -64,15 +64,10 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.feature.feed.R
 import com.feature.feed.article.ArticleItemComponent
 import com.feature.feed.articlerecommendation.ArticleRecommendationsComponent
-import com.feature.feed.component.root.toArticleRoutePreview
 import com.feature.feed.domain.model.ContentItem
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.root.ArticleRoutePreview
 import kotlinx.coroutines.flow.distinctUntilChanged
-
-private const val ARTICLE_READ_PROGRESS_BEFORE_BODY = 0.1f
-private const val ARTICLE_READ_PROGRESS_AFTER_BODY = 0.9f
-private const val RELATED_CONTENT_START_INDEX = 3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,7 +81,7 @@ internal fun ArticleScreen(
     var topBarVisible by remember { mutableStateOf(true) }
     val loadedArticle =
         ((model.contentState as? ArticleItemComponent.ContentState.Content)?.contentItem as? ContentItem.Article)
-    val previewSnapshot = loadedArticle?.toArticleRoutePreview() ?: routePreview
+    val previewSnapshot = model.routePreview ?: routePreview
 
     LaunchedEffect(model.contentState) {
         if (previewSnapshot == null) {
@@ -112,7 +107,7 @@ internal fun ArticleScreen(
                         (model.contentState as? ArticleItemComponent.ContentState.Failed)?.message,
                         initialScrollPosition = initialScrollPosition,
                         recommendationsComponent = component.articleRecommendationsComponent,
-                        onReadProgressChanged = component::onReadProgressChanged,
+                        onReadProgressObserved = component::onReadProgressObserved,
                         onScrollPositionChanged = component::onScrollPositionChanged,
                         onRetry = component::onRetry,
                         onChromeVisibilityChanged = { visible ->
@@ -190,7 +185,7 @@ private fun ArticleContent(
     loadFailedMessage: String?,
     initialScrollPosition: ArticleItemComponent.ScrollPosition,
     recommendationsComponent: ArticleRecommendationsComponent,
-    onReadProgressChanged: (Float) -> Unit,
+    onReadProgressObserved: (ArticleItemComponent.ReadProgressSnapshot) -> Unit,
     onScrollPositionChanged: (Int, Int) -> Unit,
     onRetry: () -> Unit,
     onChromeVisibilityChanged: (Boolean) -> Unit,
@@ -206,9 +201,9 @@ private fun ArticleContent(
     val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     LaunchedEffect(listState) {
-        snapshotFlow { calculateArticleReadProgress(listState = listState, articleId = articlePreview.id) }
+        snapshotFlow { listState.toReadProgressSnapshot(articleId = articlePreview.id) }
             .distinctUntilChanged()
-            .collect(onReadProgressChanged)
+            .collect(onReadProgressObserved)
     }
 
     ObserveLazyListChrome(
@@ -263,70 +258,30 @@ private fun ArticleContent(
     }
 }
 
-private fun calculateArticleReadProgress(
-    listState: androidx.compose.foundation.lazy.LazyListState,
-    articleId: String,
-): Float {
-    val layoutInfo = listState.layoutInfo
-    val viewportStart = layoutInfo.viewportStartOffset
-    val viewportEnd = layoutInfo.viewportEndOffset
-    val viewportHeight = (viewportEnd - viewportStart).coerceAtLeast(1)
-    val visibleItems = layoutInfo.visibleItemsInfo
-    val bodyItem = visibleItems.firstOrNull { it.key == markdownItemKey(articleId) }
-
-    return when {
-        !listState.canScrollBackward -> 0f
-        !listState.canScrollForward -> 1f
-        bodyItem != null -> {
-            val bodyScrollablePx = (bodyItem.size - viewportHeight).coerceAtLeast(0)
-            val bodyProgress =
-                if (bodyScrollablePx == 0) {
-                    val visiblePx =
-                        (
-                            minOf(bodyItem.offset + bodyItem.size, viewportEnd) -
-                                maxOf(bodyItem.offset, viewportStart)
-                            ).coerceAtLeast(0)
-                    if (bodyItem.size == 0) {
-                        0f
-                    } else {
-                        visiblePx.toFloat() / bodyItem.size.toFloat()
-                    }
-                } else {
-                    (-bodyItem.offset).coerceIn(0, bodyScrollablePx).toFloat() /
-                        bodyScrollablePx.toFloat()
-                }
-
-            (
-                ARTICLE_READ_PROGRESS_BEFORE_BODY +
-                    (ARTICLE_READ_PROGRESS_AFTER_BODY - ARTICLE_READ_PROGRESS_BEFORE_BODY) * bodyProgress
-                ).coerceIn(0f, ARTICLE_READ_PROGRESS_AFTER_BODY)
-        }
-        listState.firstVisibleItemIndex <= 0 -> 0f
-        listState.firstVisibleItemIndex <= 1 -> ARTICLE_READ_PROGRESS_BEFORE_BODY
-        listState.firstVisibleItemIndex <= 2 -> ARTICLE_READ_PROGRESS_AFTER_BODY
-        else -> {
-            val lastVisibleIndex = visibleItems.lastOrNull()?.index ?: listState.firstVisibleItemIndex
-            val relatedItemsDenominator =
-                (layoutInfo.totalItemsCount - 1 - RELATED_CONTENT_START_INDEX).coerceAtLeast(1)
-            val relatedProgress =
-                (
-                    (lastVisibleIndex - RELATED_CONTENT_START_INDEX).toFloat() /
-                        relatedItemsDenominator.toFloat()
-                    ).coerceIn(0f, 1f)
-
-            (
-                ARTICLE_READ_PROGRESS_AFTER_BODY +
-                    (1f - ARTICLE_READ_PROGRESS_AFTER_BODY) * relatedProgress
-                ).coerceIn(ARTICLE_READ_PROGRESS_AFTER_BODY, 1f)
-        }
-    }
-}
-
 private fun heroItemKey(articleId: String): String = "hero_$articleId"
 
 private fun markdownItemKey(articleId: String): String = "markdown_$articleId"
 
 private fun dividerItemKey(articleId: String): String = "divider_$articleId"
+
+private fun androidx.compose.foundation.lazy.LazyListState.toReadProgressSnapshot(
+    articleId: String,
+): ArticleItemComponent.ReadProgressSnapshot {
+    val layoutInfo = layoutInfo
+    val bodyItem = layoutInfo.visibleItemsInfo.firstOrNull { it.key == markdownItemKey(articleId) }
+
+    return ArticleItemComponent.ReadProgressSnapshot(
+        firstVisibleItemIndex = firstVisibleItemIndex,
+        lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: firstVisibleItemIndex,
+        totalItemsCount = layoutInfo.totalItemsCount,
+        canScrollBackward = canScrollBackward,
+        canScrollForward = canScrollForward,
+        viewportStartOffset = layoutInfo.viewportStartOffset,
+        viewportEndOffset = layoutInfo.viewportEndOffset,
+        bodyItemOffset = bodyItem?.offset,
+        bodyItemSize = bodyItem?.size,
+    )
+}
 
 @Composable
 private fun ArticleHeroCard(articlePreview: ArticleRoutePreview) {

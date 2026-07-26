@@ -5,6 +5,7 @@ import androidx.paging.PagingSource
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.core.common.time.DateTimeConvertors
+import com.core.content.model.ContentLanguage
 import com.core.content.model.ContentType
 import com.core.content.model.Tags
 import com.feature.feed.domain.repository.ContentItemsSortedType
@@ -291,5 +292,57 @@ class ContentDaoTest {
         val actualIds = db.contentDao().getRecentContent(1).map { it.contentUpdate.id }
         val exceptedIds = listOf(entity2.id)
         assertEquals(exceptedIds, actualIds)
+    }
+
+    @Test
+    fun test_get_recent_content_by_language() = runTest {
+        val englishEntity =
+            ContentEntity(
+                id = "en-1",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2025-01-01T10:00:00"),
+                mainImageUrl = "url-en",
+                languageCode = ContentLanguage.ENGLISH.code,
+                tags = listOf("news"),
+            )
+        val russianEntity =
+            ContentEntity(
+                id = "ru-1",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2025-01-02T10:00:00"),
+                mainImageUrl = "url-ru",
+                languageCode = ContentLanguage.RUSSIAN.code,
+                tags = listOf("news"),
+            )
+
+        db.contentDao().insertContentUpdateWithDetails(
+            englishEntity,
+            ArticleAttributesEntity(
+                contentId = englishEntity.id,
+                title = "English article",
+                shortDescription = "Short desc",
+                content = "English content body",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            ),
+        )
+        db.contentDao().insertContentUpdateWithDetails(
+            russianEntity,
+            ArticleAttributesEntity(
+                contentId = russianEntity.id,
+                title = "Русская статья",
+                shortDescription = "Короткое описание",
+                content = "Русский текст статьи",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            ),
+        )
+
+        val actualIds =
+            db.contentDao()
+                .getRecentContentByLanguage(limit = 5, languageCode = ContentLanguage.ENGLISH.code)
+                .map { it.contentUpdate.id }
+
+        assertEquals(listOf(englishEntity.id), actualIds)
     }
 }

@@ -4,6 +4,7 @@ import com.arkivanov.decompose.value.Value
 import com.core.content.model.ContentId
 import com.feature.feed.articlerecommendation.ArticleRecommendationsComponent
 import com.feature.feed.domain.model.ContentItem
+import com.feature.feed.root.ArticleRoutePreview
 
 /**
  * A component for displaying a single article (ribbon item).
@@ -22,11 +23,24 @@ interface ArticleItemComponent {
 
     data class Model(
         val contentState: ContentState = ContentState.Loading,
+        val routePreview: ArticleRoutePreview? = null,
     )
 
     data class ScrollPosition(
         val itemIndex: Int = 0,
         val itemOffsetPx: Int = 0,
+    )
+
+    data class ReadProgressSnapshot(
+        val firstVisibleItemIndex: Int,
+        val lastVisibleItemIndex: Int,
+        val totalItemsCount: Int,
+        val canScrollBackward: Boolean,
+        val canScrollForward: Boolean,
+        val viewportStartOffset: Int,
+        val viewportEndOffset: Int,
+        val bodyItemOffset: Int? = null,
+        val bodyItemSize: Int? = null,
     )
 
     sealed interface ContentState {
@@ -41,7 +55,7 @@ interface ArticleItemComponent {
 
     fun onRetry()
 
-    fun onReadProgressChanged(percentRead: Float)
+    fun onReadProgressObserved(snapshot: ReadProgressSnapshot)
 
     fun onScrollPositionChanged(itemIndex: Int, itemOffsetPx: Int)
 }

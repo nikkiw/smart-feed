@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.core.common.time.DateTimeConvertors
+import com.core.content.model.ContentLanguage
 import com.core.content.model.ContentType
 import com.feature.feed.local.content.entity.ArticleAttributesEntity
 import com.feature.feed.local.content.entity.ContentEntity
@@ -41,6 +42,7 @@ class ArticleEmbeddingDaoTest {
                 action = "created",
                 updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
                 mainImageUrl = "url1",
+                languageCode = ContentLanguage.ENGLISH.code,
                 tags = listOf("news", "science"),
             )
         val entity2 =
@@ -50,6 +52,7 @@ class ArticleEmbeddingDaoTest {
                 action = "created",
                 updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-02T10:00:00"),
                 mainImageUrl = "url2",
+                languageCode = ContentLanguage.RUSSIAN.code,
                 tags = listOf("news", "tech"),
             )
 
@@ -75,8 +78,8 @@ class ArticleEmbeddingDaoTest {
         val embeddings = db.articleEmbeddingDao().allEmbeddings().sortedBy { it.articleId }
         val expectedEmbeddings =
             listOf(
-                ArticleEmbedding(entity1.id, attr1.unitEmbedding),
-                ArticleEmbedding(entity2.id, attr2.unitEmbedding),
+                ArticleEmbedding(entity1.id, attr1.unitEmbedding, entity1.languageCode),
+                ArticleEmbedding(entity2.id, attr2.unitEmbedding, entity2.languageCode),
             ).sortedBy { it.articleId }
         assertEquals(expectedEmbeddings, embeddings)
     }

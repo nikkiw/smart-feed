@@ -22,6 +22,7 @@ import com.feature.feed.articlerecommendation.ArticleRecommendationsComponent
 import com.feature.feed.domain.model.ContentItem
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.recommendation.RecommendationListComponent
+import com.feature.feed.root.ArticleRoutePreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import org.junit.Rule
@@ -86,6 +87,15 @@ class ComposeScreenSemanticsTest {
                                     content = Content("# Heading\n\nBody"),
                                 ),
                             ),
+                            routePreview =
+                            ArticleRoutePreview(
+                                id = "article-1",
+                                title = "Accessible Compose article",
+                                shortDescription = "Preview",
+                                updatedAtEpochMillis = 1_721_894_400_000,
+                                mainImageUrl = "",
+                                tags = listOf("Compose", "Accessibility"),
+                            ),
                         ),
                     ),
                 )
@@ -134,7 +144,7 @@ private class FakeArticleItemComponent(
 
     override fun onRetry() = Unit
 
-    override fun onReadProgressChanged(percentRead: Float) = Unit
+    override fun onReadProgressObserved(snapshot: ArticleItemComponent.ReadProgressSnapshot) = Unit
 
     override fun onScrollPositionChanged(itemIndex: Int, itemOffsetPx: Int) = Unit
 }

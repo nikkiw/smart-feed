@@ -26,6 +26,7 @@ import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.usecase.GetContentItemUseCase
 import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import com.feature.feed.list.FeedListComponent
+import com.feature.feed.mapper.toArticleRoutePreviewOrNull
 import com.feature.feed.master.FeedMasterComponent
 import com.feature.feed.recommendation.RecommendationListComponent
 import com.feature.feed.root.FeedRootComponent
