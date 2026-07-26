@@ -12,10 +12,16 @@ class SpotlessConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         pluginManager.apply("com.diffplug.spotless")
 
+        val composeEditorConfigOverrides =
+            mapOf(
+                "ktlint_function_naming_ignore_when_annotated_with" to "Composable",
+            )
+
         configure<SpotlessExtension> {
             this.kotlin {
                 target("src/**/*.kt")
                 ktlint("1.0.1")
+                    .editorConfigOverride(composeEditorConfigOverrides)
                 trimTrailingWhitespace()
                 endWithNewline()
             }
