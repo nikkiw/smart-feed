@@ -110,7 +110,6 @@ smart-feed/
 │   ├── core-networks/      # Retrofit/Ktor config, prod & dev network data sources
 │   ├── coroutines/         # Coroutine Dispatchers DI module
 │   ├── image/api/          # Pure Kotlin ImageLoader contract (KMP-portable)
-│   ├── image-glide/        # Glide implementation of ImageLoader
 │   └── lifecycle/          # AppLifecycleObserver
 ├── docs/
 │   ├── adr/                # Architectural Decision Records
@@ -119,7 +118,7 @@ smart-feed/
     ├── feed/               # Article feed — full vertical slice
     │   ├── api/            #   Component contracts, ContentItem domain model, repository API
     │   ├── local/          #   ContentEntity, ContentDao (feed-owned Room storage)
-    │   └── impl/           #   XML/ViewBinding UI, Hilt modules, repository impls,
+    │   └── impl/           #   Compose UI, Hilt modules, repository impls,
     │                       #   Paging 3 (ContentPagingRepository, GetPagedContentUseCase)
     ├── recommendation/     # Recommendation engine — full vertical slice
     │   ├── api/            #   Recommendation contracts, models (Recommendation, Recommender,
@@ -145,13 +144,13 @@ smart-feed/
 | **1** | Architecture docs, ADRs, diagrams | ✅ Done |
 | **2** | Build logic consolidation (`buildSrc` → `build-logic`), AGP 9.2.1, Kotlin 2.3.21, KSP 2.3.9, Detekt 2 | ✅ Done |
 | **3** | Konsist architecture enforcement module (`:architecture-tests`) | ✅ Done |
-| **4** | `MainActivity` decoupling — `AppStartupCoordinator`, `SystemBarsController`, `FeedRootViewHost` | ✅ Done |
+| **4** | `MainActivity` decoupling — `AppStartupCoordinator`, `SystemBarsController`, Compose app shell | ✅ Done |
 | **5** | AndroidX Paging dependency inversion — extracted to `:core:core-paging`, then **co-located into `:feature:feed:impl`** (sole consumer) | ✅ Done |
 | **6** | Feature API/Impl split — `:feature:feed:api` and `:feature:feed:impl` | ✅ Done |
 | **7** | **Core Layer Modularization** — 3-module feature slices (`api/local/impl`), `:core:core` → `:core:common`, eliminated `core-domain` / `core-data` / `core-paging` monoliths, build noise cleanup | ✅ **Done** |
 | **8** | MVIKotlin stores for Feed List, Recommendations, Article, and Article Recommendations with reducer/component tests | ✅ Done |
 | **9** | Parallel Compose `ArticleCard` track with XML parity, performance comparison, and Baseline Profiles | ✅ Done |
-| **10** | Full Jetpack Compose migration of remaining screens and navigation | 🔜 Next |
+| **10** | Full Jetpack Compose migration of remaining screens and navigation | ✅ Done |
 | **11** | Image Prefetching and migration to Coil for Compose | 📝 Planned |
 
 ---

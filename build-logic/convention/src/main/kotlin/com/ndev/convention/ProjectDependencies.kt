@@ -69,11 +69,7 @@ internal fun Project.configureDependenciesFeature() {
 
     dependencies {
         add("implementation", libs.findLibrary("kotlinx.coroutines.core").get())
-
         add("implementation", libs.findBundle("decompose.libs").get())
-        add("implementation", libs.findLibrary("material").get())
-        add("implementation", libs.findLibrary("swiperefreshlayout").get())
-
     }
 }
 
@@ -87,7 +83,6 @@ internal fun Project.configureDependenciesKotlinxSerialization() {
         add("implementation", libs.findLibrary("kotlinx.serialization.json").get())
     }
 }
-
 
 
 

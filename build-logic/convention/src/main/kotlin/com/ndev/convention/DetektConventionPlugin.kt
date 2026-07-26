@@ -97,7 +97,6 @@ class DetektConventionPlugin : Plugin<Project> {
         ":core:core-data",
         ":core:core-database",
         ":core:core-networks",
-        ":core:image-glide",
         -> "detekt-data.yml"
         else -> "detekt-ui.yml"
     }

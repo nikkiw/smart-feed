@@ -48,7 +48,6 @@ graph TD
         CoreDB[":core:core-database"]
         CoreNet[":core:core-networks"]
         ImageApi[":core:image:api"]
-        ImageGlide[":core:image-glide"]
         Analytics[":core:analytics:api"]
         Connectivity[":core:connectivity"]
         Coroutines[":core:coroutines"]
@@ -79,8 +78,6 @@ graph TD
     CoreDB --> RecLocal
     CoreDB --> UserApi
 
-    ImageGlide --> ImageApi
-    App --> ImageGlide
 ```
 
 > **Note on Room & Circular Dependency Prevention**: Room requires the `@Database` class to enumerate all `@Entity` types at compile time. If entities lived in `:feature:<name>:impl`, then `:core:core-database` would depend on `:feature:<name>:impl`, and `:feature:<name>:impl` on `:core:core-database` — creating a circular Gradle dependency. The `:feature:<name>:local` module breaks this loop: it has no dependency on `:core:core-database`, yet `:core:core-database` can safely depend on it to discover entities.
@@ -95,7 +92,7 @@ Every feature follows a strict 3-module pattern:
 |--------|----------|--------------|
 | `:feature:<name>:api` | Domain models, repository interfaces, component contracts, state objects | Stable contract surface; independent from UI implementations, repositories, Room schemas, and DI. AndroidX or Decompose abstractions may appear when they are part of the contract. |
 | `:feature:<name>:local` | Room `@Entity` classes, `@Dao` interfaces, TypeConverters for this feature | `:feature:<name>:api` only |
-| `:feature:<name>:impl` | Component implementations, current XML/ViewBinding UI, repository implementations, Hilt modules | `:api`, `:local`, `:core:core-database`, `:core:image:api`, etc. |
+| `:feature:<name>:impl` | Component implementations, Compose UI, repository implementations, Hilt modules | `:api`, `:local`, `:core:core-database`, `:core:image:api`, etc. |
 
 ---
 
@@ -147,7 +144,6 @@ For a detailed description, see [Recommendation Engine](recommendation_engine.md
 | `:core:core-database` | `RoomDatabase` orchestrator, cross-feature schema migrations |
 | `:core:core-networks` | Retrofit/Ktor client configuration, dev/prod network data sources |
 | `:core:image:api` | Pure Kotlin `ImageLoader` interface (KMP-portable, no Glide dependency) |
-| `:core:image-glide` | Glide implementation of `ImageLoader` |
 | `:core:analytics:api` | `AnalyticsService` interface |
 | `:core:analytics:impl` | Analytics implementation |
 | `:core:connectivity` | `ConnectivityRepository` — network state monitoring (modern observer-based implementation) |

@@ -33,10 +33,10 @@ dependencies {
     implementation(projects.core.coreDatabase)
     implementation(projects.core.coreNetworks)
     implementation(projects.core.connectivity)
-    implementation(projects.core.image.api)
     implementation(projects.feature.feed.local)
     implementation(projects.feature.recommendation.api)
 
+    implementation(libs.decompose.extensions.compose)
     implementation(libs.mvikotlin.core)
     implementation(libs.mvikotlin.main)
     implementation(libs.mvikotlin.extensions.coroutines)
@@ -44,21 +44,26 @@ dependencies {
     // Pagging
     implementation(libs.room.paging)
     implementation(libs.androidx.pagging.ktx)
+    implementation(libs.androidx.pagging.compose)
 
     // Worker
     implementation(libs.work.runtime.ktx)
     implementation(libs.hilt.work)
     ksp(libs.hilt.compiler.androidx)
 
-    // Markdown
-    implementation(libs.markwon.core)
-    implementation(libs.nikkiw.android.ui.components)
-
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.markdown.renderer)
+    implementation(libs.markdown.renderer.m3)
+    implementation(libs.markdown.renderer.coil3)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     // Unit test

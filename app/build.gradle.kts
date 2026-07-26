@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.smart.feed.android.application)
     alias(libs.plugins.smart.feed.android.application.jacoco)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -34,7 +35,7 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
+        compose = true
     }
 }
 
@@ -48,17 +49,16 @@ dependencies {
     implementation(projects.core.lifecycle)
     implementation(projects.core.connectivity)
     implementation(projects.core.analytics.impl)
-    implementation(projects.core.image.api)
-    implementation(projects.core.imageGlide)
     implementation(projects.feature.feed.impl)
     implementation(projects.feature.recommendation.impl)
     implementation(projects.feature.userprofile.impl)
 
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.material)
-    implementation(libs.bundles.decompose.libs)
+    implementation(libs.decompose)
 
     // Worker
     implementation(libs.work.runtime.ktx)
