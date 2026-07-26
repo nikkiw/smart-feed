@@ -48,8 +48,5 @@ class FeedReducerTest {
             .isEqualTo(FeedState.RefreshState.Idle)
     }
 
-    private fun reduce(
-        state: FeedState,
-        msg: FeedMsg,
-    ): FeedState = FeedReducer.run { state.reduce(msg) }
+    private fun reduce(state: FeedState, msg: FeedMsg): FeedState = FeedReducer.run { state.reduce(msg) }
 }

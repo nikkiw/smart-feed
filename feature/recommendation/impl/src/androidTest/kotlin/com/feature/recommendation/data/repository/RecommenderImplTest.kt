@@ -88,52 +88,50 @@ class RecommenderImplTest {
     }
 
     @Test
-    fun testRecommendForUser_for_empty_profile() =
-        runTest {
-            // когда нет никакого профиля, возвращается 5 последний загруженных статей
-            seedContent()
+    fun testRecommendForUser_for_empty_profile() = runTest {
+        // когда нет никакого профиля, возвращается 5 последний загруженных статей
+        seedContent()
 
-            val expectedRecommendations =
-                db.contentDao().getRecentContent(mmrK).map { it.contentUpdate.id }
+        val expectedRecommendations =
+            db.contentDao().getRecentContent(mmrK).map { it.contentUpdate.id }
 
-            recommender.updateRecommendationsForUser()
+        recommender.updateRecommendationsForUser()
 
-            val actualRecommendations =
-                recommendationRepository.recommendForUser().first().map { it.articleId.value }
+        val actualRecommendations =
+            recommendationRepository.recommendForUser().first().map { it.articleId.value }
 
-            assertEquals(expectedRecommendations, actualRecommendations)
-        }
+        assertEquals(expectedRecommendations, actualRecommendations)
+    }
 
     @Test
-    fun testRecommendForUser_recommendation_after_on_article_read() =
-        runTest {
-            // когда нет никакого профиля, возвращается 5 последний загруженных статей
-            seedContent()
+    fun testRecommendForUser_recommendation_after_on_article_read() = runTest {
+        // когда нет никакого профиля, возвращается 5 последний загруженных статей
+        seedContent()
 
-            val articleRead =
-                db.contentDao().getRecentContent(1).first()
+        val articleRead =
+            db.contentDao().getRecentContent(1).first()
 
-            db.eventLogDao().insertEvent(
-                EventLog(
-                    contentId = articleRead.contentUpdate.id,
-                    eventType = EventType.READ,
-                    readPercentage = 0.3f,
-                    readingTimeMillis = 2000,
-                ),
-            )
+        db.eventLogDao().insertEvent(
+            EventLog(
+                contentId = articleRead.contentUpdate.id,
+                eventType = EventType.READ,
+                readPercentage = 0.3f,
+                readingTimeMillis = 2000,
+            ),
+        )
 
-            userProfileRepository.onArticleVisited(ContentId(articleRead.contentUpdate.id))
+        userProfileRepository.onArticleVisited(ContentId(articleRead.contentUpdate.id))
 
-            val expectedRecommendations =
-                db.contentDao().getRecentContent(mmrK).map { it.contentUpdate.id }
+        val expectedRecommendations =
+            db.contentDao().getRecentContent(mmrK).map { it.contentUpdate.id }
 
-            recommender.updateRecommendationsForUser()
+        recommender.updateRecommendationsForUser()
 
-            val actualRecommendations =
-                recommendationRepository.recommendForUser().first().map { it.articleId.value }
+        val actualRecommendations =
+            recommendationRepository.recommendForUser().first().map { it.articleId.value }
 
-            assertNotEquals(expectedRecommendations, actualRecommendations)
-        }
+        assertNotEquals(expectedRecommendations, actualRecommendations)
+    }
 
     private suspend fun seedContent() {
         val updates = networkDataSource.getUpdates(since = "1970-01-01T00:00:00Z").getOrThrow().data
@@ -157,10 +155,10 @@ class RecommenderImplTest {
                         shortDescription = it.shortDescription,
                         content = it.content,
                         unitEmbedding =
-                            EmbeddingIndex.normalize(
-                                it.embeddings.data.map { embedding -> embedding.toFloat() }
-                                    .toFloatArray(),
-                            ),
+                        EmbeddingIndex.normalize(
+                            it.embeddings.data.map { embedding -> embedding.toFloat() }
+                                .toFloatArray(),
+                        ),
                     )
                 }
             db.contentDao().insertContentUpdateWithDetails(entity, articleEntity)

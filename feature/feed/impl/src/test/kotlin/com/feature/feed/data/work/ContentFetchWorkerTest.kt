@@ -30,39 +30,37 @@ class ContentFetchWorkerTest {
     }
 
     @Test
-    fun `doWork returns Success when orchestrated sync succeeds`() =
-        coroutineRule.runBlockingTest {
-            coEvery { syncContentUseCase() } returns Result.success(Unit)
+    fun `doWork returns Success when orchestrated sync succeeds`() = coroutineRule.runBlockingTest {
+        coEvery { syncContentUseCase() } returns Result.success(Unit)
 
-            val worker =
-                TestListenableWorkerBuilder<ContentFetchWorker>(context)
-                    .setWorkerFactory(TestWorkerFactory(syncContentUseCase))
-                    .build()
+        val worker =
+            TestListenableWorkerBuilder<ContentFetchWorker>(context)
+                .setWorkerFactory(TestWorkerFactory(syncContentUseCase))
+                .build()
 
-            val result = worker.startWork().get()
-            assertTrue(result is ListenableWorker.Result.Success)
+        val result = worker.startWork().get()
+        assertTrue(result is ListenableWorker.Result.Success)
 
-            coVerify(exactly = 1) { syncContentUseCase() }
-        }
+        coVerify(exactly = 1) { syncContentUseCase() }
+    }
 
     @Test
-    fun `doWork returns Failure and includes error message when syncContent fails`() =
-        coroutineRule.runBlockingTest {
-            val error = RuntimeException("Sync failed")
-            coEvery { syncContentUseCase() } returns Result.failure(error)
+    fun `doWork returns Failure and includes error message when syncContent fails`() = coroutineRule.runBlockingTest {
+        val error = RuntimeException("Sync failed")
+        coEvery { syncContentUseCase() } returns Result.failure(error)
 
-            val worker =
-                TestListenableWorkerBuilder<ContentFetchWorker>(context)
-                    .setWorkerFactory(TestWorkerFactory(syncContentUseCase))
-                    .build()
+        val worker =
+            TestListenableWorkerBuilder<ContentFetchWorker>(context)
+                .setWorkerFactory(TestWorkerFactory(syncContentUseCase))
+                .build()
 
-            val result = worker.startWork().get()
-            assertTrue(result is ListenableWorker.Result.Failure)
+        val result = worker.startWork().get()
+        assertTrue(result is ListenableWorker.Result.Failure)
 
-            val failure = result as ListenableWorker.Result.Failure
-            val errorMsg = failure.outputData.getString(ContentFetchWorker.KEY_ERROR_MESSAGE)
-            assertEquals("Sync failed", errorMsg)
+        val failure = result as ListenableWorker.Result.Failure
+        val errorMsg = failure.outputData.getString(ContentFetchWorker.KEY_ERROR_MESSAGE)
+        assertEquals("Sync failed", errorMsg)
 
-            coVerify(exactly = 1) { syncContentUseCase() }
-        }
+        coVerify(exactly = 1) { syncContentUseCase() }
+    }
 }

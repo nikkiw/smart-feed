@@ -19,6 +19,7 @@ import com.feature.feed.bottombar.model.BottomBarState
 import com.feature.feed.component.bottombar.BottomBarComponentImpl
 import com.feature.feed.component.root.FeedRootComponentImpl
 import com.feature.feed.domain.model.ContentItem.Article
+import com.feature.feed.domain.model.ContentItemPreview
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -54,23 +55,18 @@ class NavigationIntegrationTest {
         // Setup mock behaviors
         every { mockDependencies.connectivityRepository.isConnected } returns MutableStateFlow(true)
 
-        val articleId = "test-article-nav"
-        val fakeArticle =
-            Article(
-                id = ContentId(articleId),
-                updatedAt = UpdatedAt.now(),
-                mainImageUrl = ImageUrl("https://example.com/img.png"),
-                tags = Tags(listOf("tag1", "tag2")),
-                title = Title("Test Title"),
-                short = ShortDescription("Short desc"),
-                content = Content("Full article text"),
-            )
-        coEvery { mockDependencies.getContentItemUseCase.invoke(any()) } returns
-            Result.success(
-                fakeArticle,
-            )
+        coEvery { mockDependencies.getContentItemUseCase.invoke(any()) } answers {
+            val itemId =
+                when (val rawArg = firstArg<Any>()) {
+                    is ContentId -> rawArg.value
+                    is String -> rawArg
+                    else -> error("Unsupported content item id argument: ${rawArg::class.qualifiedName}")
+                }
+            Result.success(createArticle(itemId))
+        }
 
         every { mockDependencies.recommendForUserUseCase.invoke() } returns flowOf(emptyList())
+        every { mockDependencies.recommendForArticleUseCase.invoke(any()) } returns flowOf(emptyList())
 
         feedRootComponent =
             FeedTestDataBuilder.createFeedRootComponent(
@@ -85,172 +81,252 @@ class NavigationIntegrationTest {
     }
 
     @Test
-    fun `navigation flow from feed to article should work correctly`() =
-        runTest {
-            // Given - Start at feed screen
-            NavigationTestScenarios.verifyInitialState(feedRootComponent)
+    fun `navigation flow from feed to article should work correctly`() = runTest {
+        // Given - Start at feed screen
+        NavigationTestScenarios.verifyInitialState(feedRootComponent)
 
-            // When - Navigate to article
-            val articleId = "navigation-test-article"
-            val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
+        // When - Navigate to article
+        val articleId = "navigation-test-article"
+        val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
 
-            // Simulate navigation by creating the child directly
-            // In real integration test, this would be triggered by user interaction
-            val articleChild =
-                feedRootComponent.createChild(articleConfig, testContext.componentContext)
+        // Simulate navigation by creating the child directly
+        // In real integration test, this would be triggered by user interaction
+        val articleChild =
+            feedRootComponent.createChild(articleConfig, testContext.componentContext)
 
-            // Then
-            assertThat(articleChild).isInstanceOf(FeedRootComponent.Child.ArticleScreen::class.java)
-            coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) }
-        }
-
-    @Test
-    fun `navigation flow from feed to recommendations should work correctly`() =
-        runTest {
-            // Given - Start at feed screen
-            NavigationTestScenarios.verifyInitialState(feedRootComponent)
-
-            // When - Navigate to recommendations via bottom bar
-            val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
-            bottomBar.onClickTabBar(BottomBarState.Recommendation)
-
-            // Then
-            NavigationTestScenarios.verifyNavigationToRecommendations(feedRootComponent)
-        }
+        // Then
+        assertThat(articleChild).isInstanceOf(FeedRootComponent.Child.ArticleScreen::class.java)
+        coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) }
+    }
 
     @Test
-    fun `deep navigation flow should maintain proper stack`() =
-        runTest {
-            // Given - Start at feed screen
-            FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
-                .hasActiveConfiguration(FeedRootComponent.Config.FeedScreenConfig)
-                .hasEmptyBackStack()
+    fun `feed list item click navigates through component and store path`() = runTest {
+        val preview = createPreview("feed-click-article")
+        val feedScreen = feedRootComponent.childStack.value.active.instance as FeedRootComponent.Child.FeedScreen
 
-            // When - Navigate through multiple screens
-            val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
+        feedScreen.component.feedListComponent.onListItemClick(preview)
 
-            // Navigate to recommendations
-            bottomBar.onClickTabBar(BottomBarState.Recommendation)
-            FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
-                .hasActiveConfiguration(FeedRootComponent.Config.RecommendationScreenConfig)
-                .hasEmptyBackStack() // replaceAll clears the stack
-
-            // Navigate back to feed
-            bottomBar.onClickTabBar(BottomBarState.List)
-            FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
-                .hasActiveConfiguration(FeedRootComponent.Config.FeedScreenConfig)
-                .hasEmptyBackStack()
-        }
+        val activeConfig =
+            feedRootComponent.childStack.value.active.configuration as
+                FeedRootComponent.Config.ArticleScreenConfig
+        assertThat(activeConfig.itemId).isEqualTo(preview.id.value)
+        assertThat(activeConfig.preview?.id).isEqualTo(preview.id.value)
+        FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
+            .hasActiveChildOfType(FeedRootComponent.Child.ArticleScreen::class.java)
+            .hasBackStackContaining(FeedRootComponent.Config.FeedScreenConfig)
+        coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(preview.id.value)) }
+    }
 
     @Test
-    fun `article navigation from recommendations should work`() =
-        runTest {
-            // Given - Start at recommendations screen
-            val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
-            bottomBar.onClickTabBar(BottomBarState.Recommendation)
+    fun `navigation flow from feed to recommendations should work correctly`() = runTest {
+        // Given - Start at feed screen
+        NavigationTestScenarios.verifyInitialState(feedRootComponent)
 
-            // When - Navigate to article from recommendations
-            val articleId = "recommendation-article-123"
-            val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
-            val articleChild =
-                feedRootComponent.createChild(articleConfig, testContext.componentContext)
+        // When - Navigate to recommendations via bottom bar
+        val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
+        bottomBar.onClickTabBar(BottomBarState.Recommendation)
 
-            // Then
-            assertThat(articleChild).isInstanceOf(FeedRootComponent.Child.ArticleScreen::class.java)
-            coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) }
-        }
+        // Then
+        NavigationTestScenarios.verifyNavigationToRecommendations(feedRootComponent)
+    }
 
     @Test
-    fun `pop navigation should handle callbacks properly`() =
-        runTest {
-            // Given
-            var popCompleted = false
-            var popResult: Boolean? = null
+    fun `deep navigation flow should maintain proper stack`() = runTest {
+        // Given - Start at feed screen
+        FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
+            .hasActiveConfiguration(FeedRootComponent.Config.FeedScreenConfig)
+            .hasEmptyBackStack()
 
-            val popCallback: (Boolean) -> Unit = { result ->
-                popCompleted = true
-                popResult = result
-            }
+        // When - Navigate through multiple screens
+        val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
 
-            // When
-            feedRootComponent.pop(popCallback)
+        // Navigate to recommendations
+        bottomBar.onClickTabBar(BottomBarState.Recommendation)
+        FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
+            .hasActiveConfiguration(FeedRootComponent.Config.RecommendationScreenConfig)
+            .hasEmptyBackStack() // replaceAll clears the stack
 
-            // Then
-            assertThat(popCompleted).isTrue()
-            assertThat(popResult).isNotNull()
+        // Navigate back to feed
+        bottomBar.onClickTabBar(BottomBarState.List)
+        FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
+            .hasActiveConfiguration(FeedRootComponent.Config.FeedScreenConfig)
+            .hasEmptyBackStack()
+    }
+
+    @Test
+    fun `article navigation from recommendations should work`() = runTest {
+        // Given - Start at recommendations screen
+        val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
+        bottomBar.onClickTabBar(BottomBarState.Recommendation)
+
+        // When - Navigate to article from recommendations
+        val articleId = "recommendation-article-123"
+        val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
+        val articleChild =
+            feedRootComponent.createChild(articleConfig, testContext.componentContext)
+
+        // Then
+        assertThat(articleChild).isInstanceOf(FeedRootComponent.Child.ArticleScreen::class.java)
+        coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) }
+    }
+
+    @Test
+    fun `recommendation list item click navigates through component and store path`() = runTest {
+        val preview = createPreview("recommendation-click-article")
+        every { mockDependencies.recommendForUserUseCase.invoke() } returns flowOf(listOf(preview))
+
+        val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
+        bottomBar.onClickTabBar(BottomBarState.Recommendation)
+
+        val recommendationScreen =
+            feedRootComponent.childStack.value.active.instance as FeedRootComponent.Child.RecommendationScreen
+
+        recommendationScreen.component.onListItemClick(preview)
+
+        val activeConfig =
+            feedRootComponent.childStack.value.active.configuration as
+                FeedRootComponent.Config.ArticleScreenConfig
+        assertThat(activeConfig.itemId).isEqualTo(preview.id.value)
+        assertThat(activeConfig.preview?.id).isEqualTo(preview.id.value)
+        FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
+            .hasActiveChildOfType(FeedRootComponent.Child.ArticleScreen::class.java)
+            .hasBackStackContaining(FeedRootComponent.Config.RecommendationScreenConfig)
+        coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(preview.id.value)) }
+    }
+
+    @Test
+    fun `pop navigation should handle callbacks properly`() = runTest {
+        // Given
+        var popCompleted = false
+        var popResult: Boolean? = null
+
+        val popCallback: (Boolean) -> Unit = { result ->
+            popCompleted = true
+            popResult = result
         }
+
+        // When
+        feedRootComponent.pop(popCallback)
+
+        // Then
+        assertThat(popCompleted).isTrue()
+        assertThat(popResult).isNotNull()
+    }
 
     @OptIn(DelicateDecomposeApi::class)
     @Test
-    fun `multiple article navigations should work independently`() =
-        runTest {
-            // Given
-            val articleId1 = "article-001"
-            val articleId2 = "article-002"
+    fun `multiple article navigations should work independently`() = runTest {
+        // Given
+        val articleId1 = "article-001"
+        val articleId2 = "article-002"
 
-            // When - Create multiple article children
-            val config1 = FeedRootComponent.Config.ArticleScreenConfig(articleId1)
-            val config2 = FeedRootComponent.Config.ArticleScreenConfig(articleId2)
+        // When - Create multiple article children
+        val config1 = FeedRootComponent.Config.ArticleScreenConfig(articleId1)
+        val config2 = FeedRootComponent.Config.ArticleScreenConfig(articleId2)
 
-            navigation.push(config1)
-            navigation.push(config2)
+        navigation.push(config1)
+        navigation.push(config2)
+
+        // Then
+        val stack = feedRootComponent.childStack.value
+        // Then: verify default configuration and empty back stack
+        FeedComponentSubjects.assertThat(stack)
+            .hasActiveConfiguration(config2)
+            .hasBackStackContaining(config1)
+            .hasBackStackSize(2)
+
+        // Verify each article was loaded independently
+        coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId1)) }
+        coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId2)) }
+    }
+
+    @Test
+    fun `bottom bar state changes should trigger correct navigation`() = runTest {
+        // Given
+        val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
+
+        // Test sequence of navigation changes
+        val navigationSequence =
+            listOf(
+                BottomBarState.Recommendation to FeedRootComponent.Config.RecommendationScreenConfig,
+                BottomBarState.List to FeedRootComponent.Config.FeedScreenConfig,
+                BottomBarState.Recommendation to FeedRootComponent.Config.RecommendationScreenConfig,
+            )
+
+        navigationSequence.forEach { (barState, expectedConfig) ->
+            // When
+            bottomBar.onClickTabBar(barState)
 
             // Then
-            val stack = feedRootComponent.childStack.value
-            // Then: verify default configuration and empty back stack
-            FeedComponentSubjects.assertThat(stack)
-                .hasActiveConfiguration(config2)
-                .hasBackStackContaining(config1)
-                .hasBackStackSize(2)
-
-            // Verify each article was loaded independently
-            coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId1)) }
-            coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId2)) }
+            FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
+                .hasActiveConfiguration(expectedConfig)
+                .hasEmptyBackStack()
         }
+    }
 
     @Test
-    fun `bottom bar state changes should trigger correct navigation`() =
-        runTest {
-            // Given
-            val bottomBar = feedRootComponent.bottomBar as BottomBarComponentImpl
+    fun `article component callbacks should handle navigation and completion`() = runTest {
+        // Given
+        val articleId = "callback-article-test"
+        val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
+        val articleChild =
+            feedRootComponent.createChild(
+                articleConfig,
+                testContext.componentContext,
+            ) as FeedRootComponent.Child.ArticleScreen
 
-            // Test sequence of navigation changes
-            val navigationSequence =
-                listOf(
-                    BottomBarState.Recommendation to FeedRootComponent.Config.RecommendationScreenConfig,
-                    BottomBarState.List to FeedRootComponent.Config.FeedScreenConfig,
-                    BottomBarState.Recommendation to FeedRootComponent.Config.RecommendationScreenConfig,
-                )
+        // When - Test that callbacks are properly set up
+        assertThat(articleChild.component).isInstanceOf(ArticleItemComponent::class.java)
 
-            navigationSequence.forEach { (barState, expectedConfig) ->
-                // When
-                bottomBar.onClickTabBar(barState)
+        // Then - Verify component was created with proper callbacks
+        // The onFinished callback should trigger navigation.pop()
+        // The onClickItem callback should trigger navigation to another article
+        coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) }
+    }
 
-                // Then
-                FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
-                    .hasActiveConfiguration(expectedConfig)
-                    .hasEmptyBackStack()
-            }
-        }
-
+    @OptIn(DelicateDecomposeApi::class)
     @Test
-    fun `article component callbacks should handle navigation and completion`() =
-        runTest {
-            // Given
-            val articleId = "callback-article-test"
-            val articleConfig = FeedRootComponent.Config.ArticleScreenConfig(articleId)
-            val articleChild =
-                feedRootComponent.createChild(
-                    articleConfig,
-                    testContext.componentContext,
-                ) as FeedRootComponent.Child.ArticleScreen
+    fun `article recommendations item click navigates through component and store path`() = runTest {
+        val currentArticleId = "article-host"
+        val recommendedPreview = createPreview("article-recommended-1")
+        every { mockDependencies.recommendForArticleUseCase.invoke(ContentId(currentArticleId)) } returns
+            flowOf(listOf(recommendedPreview))
 
-            // When - Test that callbacks are properly set up
-            assertThat(articleChild.component).isInstanceOf(ArticleItemComponent::class.java)
+        navigation.push(FeedRootComponent.Config.ArticleScreenConfig(currentArticleId))
 
-            // Then - Verify component was created with proper callbacks
-            // The onFinished callback should trigger navigation.pop()
-            // The onClickItem callback should trigger navigation to another article
-            coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(articleId)) }
-        }
+        val articleScreen =
+            feedRootComponent.childStack.value.active.instance as
+                FeedRootComponent.Child.ArticleScreen
+
+        articleScreen.component.articleRecommendationsComponent.onListItemClick(recommendedPreview)
+
+        val activeConfig =
+            feedRootComponent.childStack.value.active.configuration as
+                FeedRootComponent.Config.ArticleScreenConfig
+        assertThat(activeConfig.itemId).isEqualTo(recommendedPreview.id.value)
+        assertThat(activeConfig.preview?.id).isEqualTo(recommendedPreview.id.value)
+        FeedComponentSubjects.assertThat(feedRootComponent.childStack.value)
+            .hasActiveChildOfType(FeedRootComponent.Child.ArticleScreen::class.java)
+            .hasBackStackContaining(FeedRootComponent.Config.ArticleScreenConfig(currentArticleId))
+        coVerify { mockDependencies.getContentItemUseCase.invoke(ContentId(recommendedPreview.id.value)) }
+    }
+
+    private fun createPreview(id: String): ContentItemPreview.ArticlePreview = ContentItemPreview.ArticlePreview(
+        id = ContentId(id),
+        updatedAt = UpdatedAt.now(),
+        mainImageUrl = ImageUrl("https://example.com/$id.png"),
+        tags = Tags(listOf("compose", "android")),
+        title = Title("Title $id"),
+        short = ShortDescription("Short $id"),
+    )
+
+    private fun createArticle(id: String): Article = Article(
+        id = ContentId(id),
+        updatedAt = UpdatedAt.now(),
+        mainImageUrl = ImageUrl("https://example.com/$id.png"),
+        tags = Tags(listOf("tag1", "tag2")),
+        title = Title("Test Title $id"),
+        short = ShortDescription("Short desc $id"),
+        content = Content("Full article text for $id"),
+    )
 }

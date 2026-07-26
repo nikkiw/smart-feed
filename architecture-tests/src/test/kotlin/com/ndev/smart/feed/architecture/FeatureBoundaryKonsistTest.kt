@@ -17,19 +17,19 @@ class FeatureBoundaryKonsistTest {
 
         apiFiles.assertNoImports(
             forbiddenPrefixes =
-                listOf(
-                    "com.feature.feed.impl.",
-                    "android.view.",
-                    "android.widget.",
-                    "androidx.recyclerview.",
-                    "com.google.android.material.",
-                    "io.noties.markwon.",
-                    "com.bumptech.glide.",
-                    "com.image.glide.",
-                    "com.core.data.",
-                    "com.core.database.",
-                    "com.core.networks.",
-                ),
+            listOf(
+                "com.feature.feed.impl.",
+                "android.view.",
+                "android.widget.",
+                "androidx.recyclerview.",
+                "com.google.android.material.",
+                "com.mikepenz.markdown.",
+                "com.bumptech.glide.",
+                "com.image.glide.",
+                "com.core.data.",
+                "com.core.database.",
+                "com.core.networks.",
+            ),
             reason = "Feed API module must expose contracts without implementation or UI dependencies.",
         )
 
@@ -53,18 +53,18 @@ class FeatureBoundaryKonsistTest {
 
         contractFiles.assertNoImports(
             forbiddenPrefixes =
-                listOf(
-                    "android.view.",
-                    "android.widget.",
-                    "androidx.recyclerview.",
-                    "com.google.android.material.",
-                    "io.noties.markwon.",
-                    "com.bumptech.glide.",
-                    "com.image.glide.",
-                    "com.core.data.",
-                    "com.core.database.",
-                    "com.core.networks.",
-                ),
+            listOf(
+                "android.view.",
+                "android.widget.",
+                "androidx.recyclerview.",
+                "com.google.android.material.",
+                "com.mikepenz.markdown.",
+                "com.bumptech.glide.",
+                "com.image.glide.",
+                "com.core.data.",
+                "com.core.database.",
+                "com.core.networks.",
+            ),
             reason = "Feed component contracts must stay usable as feature API contracts.",
         )
 
@@ -92,24 +92,24 @@ class FeatureBoundaryKonsistTest {
 
         localFiles.assertNoImports(
             forbiddenPrefixes =
-                listOf(
-                    "com.feature.feed.impl.",
-                    "com.core.database.",
-                    "com.core.data.",
-                    "com.core.networks.",
-                    "com.ndev.android.smart.feed.",
-                    "android.view.",
-                    "android.widget.",
-                    "androidx.recyclerview.",
-                    "androidx.work.",
-                    "retrofit2.",
-                    "okhttp3.",
-                    "io.noties.markwon.",
-                ),
+            listOf(
+                "com.feature.feed.impl.",
+                "com.core.database.",
+                "com.core.data.",
+                "com.core.networks.",
+                "com.ndev.android.smart.feed.",
+                "android.view.",
+                "android.widget.",
+                "androidx.recyclerview.",
+                "androidx.work.",
+                "retrofit2.",
+                "okhttp3.",
+                "com.mikepenz.markdown.",
+            ),
             reason =
-                "feature:feed:local is a storage schema module. It may use Room annotations " +
-                    "and feature API types, but must not depend on runtime implementation, app, " +
-                    "network, WorkManager, or UI code.",
+            "feature:feed:local is a storage schema module. It may use Room annotations " +
+                "and feature API types, but must not depend on runtime implementation, app, " +
+                "network, WorkManager, or UI code.",
         )
     }
 
@@ -123,24 +123,24 @@ class FeatureBoundaryKonsistTest {
 
         localFiles.assertNoImports(
             forbiddenPrefixes =
-                listOf(
-                    "com.feature.recommendation.impl.",
-                    "com.feature.recommendation.data.",
-                    "com.core.database.",
-                    "com.core.data.",
-                    "com.core.networks.",
-                    "com.ndev.android.smart.feed.",
-                    "android.view.",
-                    "android.widget.",
-                    "androidx.recyclerview.",
-                    "androidx.work.",
-                    "retrofit2.",
-                    "okhttp3.",
-                    "io.noties.markwon.",
-                ),
+            listOf(
+                "com.feature.recommendation.impl.",
+                "com.feature.recommendation.data.",
+                "com.core.database.",
+                "com.core.data.",
+                "com.core.networks.",
+                "com.ndev.android.smart.feed.",
+                "android.view.",
+                "android.widget.",
+                "androidx.recyclerview.",
+                "androidx.work.",
+                "retrofit2.",
+                "okhttp3.",
+                "com.mikepenz.markdown.",
+            ),
             reason =
-                "feature:recommendation:local is a storage schema module. It may use Room annotations, " +
-                    "but must not depend on runtime implementation, app, network, WorkManager, or UI code.",
+            "feature:recommendation:local is a storage schema module. It may use Room annotations, " +
+                "but must not depend on runtime implementation, app, network, WorkManager, or UI code.",
         )
     }
 
@@ -154,23 +154,23 @@ class FeatureBoundaryKonsistTest {
 
         localFiles.assertNoImports(
             forbiddenPrefixes =
-                listOf(
-                    "com.feature.userprofile.impl.",
-                    "com.feature.userprofile.data.",
-                    "com.core.database.",
-                    "com.core.data.",
-                    "com.core.networks.",
-                    "com.ndev.android.smart.feed.",
-                    "android.view.",
-                    "android.widget.",
-                    "androidx.recyclerview.",
-                    "androidx.work.",
-                    "retrofit2.",
-                    "okhttp3.",
-                ),
+            listOf(
+                "com.feature.userprofile.impl.",
+                "com.feature.userprofile.data.",
+                "com.core.database.",
+                "com.core.data.",
+                "com.core.networks.",
+                "com.ndev.android.smart.feed.",
+                "android.view.",
+                "android.widget.",
+                "androidx.recyclerview.",
+                "androidx.work.",
+                "retrofit2.",
+                "okhttp3.",
+            ),
             reason =
-                "feature:userprofile:local is a storage schema module. It may use Room annotations, " +
-                    "but must not depend on runtime implementation, app, network, WorkManager, or UI code.",
+            "feature:userprofile:local is a storage schema module. It may use Room annotations, " +
+                "but must not depend on runtime implementation, app, network, WorkManager, or UI code.",
         )
     }
 
@@ -184,24 +184,24 @@ class FeatureBoundaryKonsistTest {
 
         localFiles.assertNoImports(
             forbiddenPrefixes =
-                listOf(
-                    "com.core.analytics.impl.",
-                    "com.core.analytics.api.",
-                    "com.core.database.",
-                    "com.core.data.",
-                    "com.core.networks.",
-                    "com.feature.",
-                    "com.ndev.android.smart.feed.",
-                    "android.view.",
-                    "android.widget.",
-                    "androidx.recyclerview.",
-                    "androidx.work.",
-                    "retrofit2.",
-                    "okhttp3.",
-                ),
+            listOf(
+                "com.core.analytics.impl.",
+                "com.core.analytics.api.",
+                "com.core.database.",
+                "com.core.data.",
+                "com.core.networks.",
+                "com.feature.",
+                "com.ndev.android.smart.feed.",
+                "android.view.",
+                "android.widget.",
+                "androidx.recyclerview.",
+                "androidx.work.",
+                "retrofit2.",
+                "okhttp3.",
+            ),
             reason =
-                "core:analytics:local is a storage schema module. It may use Room annotations, " +
-                    "but must not depend on runtime implementation, app, network, WorkManager, or UI code.",
+            "core:analytics:local is a storage schema module. It may use Room annotations, " +
+                "but must not depend on runtime implementation, app, network, WorkManager, or UI code.",
         )
     }
 
@@ -211,15 +211,15 @@ class FeatureBoundaryKonsistTest {
             .filter { it.relativePath.endsWith("ViewExt.kt") }
             .assertNoImports(
                 forbiddenPrefixes =
-                    listOf(
-                        "com.core.data.",
-                        "com.core.database.",
-                        "com.core.networks.",
-                        "com.arkivanov.mvikotlin.",
-                    ),
+                listOf(
+                    "com.core.data.",
+                    "com.core.database.",
+                    "com.core.networks.",
+                    "com.arkivanov.mvikotlin.",
+                ),
                 reason =
-                    "ViewExt files render component state and dispatch component " +
-                        "events; they must not reach data or MVI internals directly.",
+                "ViewExt files render component state and dispatch component " +
+                    "events; they must not reach data or MVI internals directly.",
             )
     }
 
@@ -261,22 +261,21 @@ class FeatureBoundaryKonsistTest {
             .filter { it.relativePath.endsWith("ComponentImpl.kt") }
             .assertTextDoesNotContain(
                 forbiddenSnippets =
-                    listOf(
-                        " is FeedListComponentImpl",
-                        " as FeedListComponentImpl",
-                        "import com.feature.feed.list.FeedListComponentImpl",
-                    ),
+                listOf(
+                    " is FeedListComponentImpl",
+                    " as FeedListComponentImpl",
+                    "import com.feature.feed.list.FeedListComponentImpl",
+                ),
                 reason =
-                    "Parent components must coordinate through public child component " +
-                        "contracts, not implementation casts.",
+                "Parent components must coordinate through public child component " +
+                    "contracts, not implementation casts.",
             )
     }
 
     private fun String.hasImplementationType(): Boolean = substringAfterLast('.').endsWith("Impl") || contains(".impl.")
 
-    private fun String.isInfrastructureImport(): Boolean =
-        startsWith("androidx.work.") ||
-            startsWith("androidx.room.") ||
-            startsWith("retrofit2.") ||
-            startsWith("okhttp3.")
+    private fun String.isInfrastructureImport(): Boolean = startsWith("androidx.work.") ||
+        startsWith("androidx.room.") ||
+        startsWith("retrofit2.") ||
+        startsWith("okhttp3.")
 }

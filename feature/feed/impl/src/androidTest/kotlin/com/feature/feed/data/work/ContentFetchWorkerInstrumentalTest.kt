@@ -58,34 +58,32 @@ class ContentFetchWorkerInstrumentalTest {
     }
 
     @Test
-    fun doWork_successful_invokes_orchestrated_sync_and_returns_success() =
-        runTest {
-            // arrange
-            fakeSyncContentUseCase.shouldFail = false
+    fun doWork_successful_invokes_orchestrated_sync_and_returns_success() = runTest {
+        // arrange
+        fakeSyncContentUseCase.shouldFail = false
 
-            // act
-            val worker = buildWorker()
-            val result = worker.doWork()
+        // act
+        val worker = buildWorker()
+        val result = worker.doWork()
 
-            // assert
-            assertThat(result).isEqualTo(ListenableWorker.Result.success())
-            assertThat(fakeSyncContentUseCase.invoked.get()).isTrue()
-        }
+        // assert
+        assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        assertThat(fakeSyncContentUseCase.invoked.get()).isTrue()
+    }
 
     @Test
-    fun doWork_failure_returns_failure_with_error_message() =
-        runTest {
-            // arrange
-            fakeSyncContentUseCase.shouldFail = true
+    fun doWork_failure_returns_failure_with_error_message() = runTest {
+        // arrange
+        fakeSyncContentUseCase.shouldFail = true
 
-            // act
-            val worker = buildWorker()
-            val result = worker.doWork()
+        // act
+        val worker = buildWorker()
+        val result = worker.doWork()
 
-            // assert
-            assertThat(result).isInstanceOf(ListenableWorker.Result.Failure::class.java)
-            val failure = result as ListenableWorker.Result.Failure
-            val msg = failure.outputData.getString(ContentFetchWorker.KEY_ERROR_MESSAGE)
-            assertThat(msg).isEqualTo("Test failure")
-        }
+        // assert
+        assertThat(result).isInstanceOf(ListenableWorker.Result.Failure::class.java)
+        val failure = result as ListenableWorker.Result.Failure
+        val msg = failure.outputData.getString(ContentFetchWorker.KEY_ERROR_MESSAGE)
+        assertThat(msg).isEqualTo("Test failure")
+    }
 }

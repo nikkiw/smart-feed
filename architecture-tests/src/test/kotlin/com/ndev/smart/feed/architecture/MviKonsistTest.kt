@@ -27,20 +27,20 @@ class MviKonsistTest {
             .filter { it.relativePath.endsWith("Reducer.kt") }
             .assertNoImports(
                 forbiddenPrefixes =
-                    listOf(
-                        "android.",
-                        "androidx.",
-                        "com.arkivanov.decompose.",
-                        "com.core.domain.repository.",
-                        "com.core.domain.usecase.",
-                        "com.core.data.",
-                        "dagger.",
-                        "javax.inject.",
-                        "kotlinx.coroutines.",
-                    ),
+                listOf(
+                    "android.",
+                    "androidx.",
+                    "com.arkivanov.decompose.",
+                    "com.core.domain.repository.",
+                    "com.core.domain.usecase.",
+                    "com.core.data.",
+                    "dagger.",
+                    "javax.inject.",
+                    "kotlinx.coroutines.",
+                ),
                 reason =
-                    "Reducers must be pure state transformers without IO, DI, " +
-                        "Android, Decompose, or coroutine dependencies.",
+                "Reducers must be pure state transformers without IO, DI, " +
+                    "Android, Decompose, or coroutine dependencies.",
             )
     }
 

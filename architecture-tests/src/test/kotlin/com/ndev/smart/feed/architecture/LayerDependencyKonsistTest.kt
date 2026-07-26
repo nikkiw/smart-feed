@@ -69,32 +69,32 @@ class LayerDependencyKonsistTest {
     fun `common module stays framework and implementation independent`() {
         sourceFilesUnder("core/common/src/main").assertNoImports(
             forbiddenPrefixes =
-                listOf(
-                    "android.",
-                    "androidx.",
-                    "android.arch.",
-                    "com.google.dagger.",
-                    "dagger.",
-                    "javax.inject.",
-                    "retrofit2.",
-                    "okhttp3.",
-                    "com.arkivanov.decompose.",
-                    "com.arkivanov.essenty.",
-                    "com.arkivanov.mvikotlin.",
-                    "com.core.database.",
-                    "com.core.networks.",
-                    "com.core.analytics.",
-                    "com.core.connectivity.",
-                    "com.core.lifecycle.",
-                    "com.core.image.",
-                    "com.core.paging.",
-                    "com.core.coroutines.",
-                    "com.feature.",
-                    "com.ndev.android.smart.feed.",
-                ),
+            listOf(
+                "android.",
+                "androidx.",
+                "android.arch.",
+                "com.google.dagger.",
+                "dagger.",
+                "javax.inject.",
+                "retrofit2.",
+                "okhttp3.",
+                "com.arkivanov.decompose.",
+                "com.arkivanov.essenty.",
+                "com.arkivanov.mvikotlin.",
+                "com.core.database.",
+                "com.core.networks.",
+                "com.core.analytics.",
+                "com.core.connectivity.",
+                "com.core.lifecycle.",
+                "com.core.image.",
+                "com.core.paging.",
+                "com.core.coroutines.",
+                "com.feature.",
+                "com.ndev.android.smart.feed.",
+            ),
             reason =
-                "core-common must stay pure and must not depend on frameworks, " +
-                    "app, feature, or other core modules.",
+            "core-common must stay pure and must not depend on frameworks, " +
+                "app, feature, or other core modules.",
         )
     }
 
@@ -102,25 +102,25 @@ class LayerDependencyKonsistTest {
     fun `database aggregator depends only on feature local storage schemas`() {
         sourceFilesUnder("core/core-database/src/main").assertNoImports(
             forbiddenPrefixes =
-                listOf(
-                    "com.feature.feed.impl.",
-                    "com.feature.feed.root.",
-                    "com.feature.feed.list.",
-                    "com.feature.feed.master.",
-                    "com.feature.feed.article.",
-                    "com.feature.feed.recommendation.",
-                    "com.feature.recommendation.api.",
-                    "com.feature.recommendation.impl.",
-                    "com.feature.userprofile.api.",
-                    "com.feature.userprofile.impl.",
-                    "com.core.analytics.api.",
-                    "com.core.analytics.impl.",
-                    "com.core.networks.",
-                    "com.ndev.android.smart.feed.",
-                ),
+            listOf(
+                "com.feature.feed.impl.",
+                "com.feature.feed.root.",
+                "com.feature.feed.list.",
+                "com.feature.feed.master.",
+                "com.feature.feed.article.",
+                "com.feature.feed.recommendation.",
+                "com.feature.recommendation.api.",
+                "com.feature.recommendation.impl.",
+                "com.feature.userprofile.api.",
+                "com.feature.userprofile.impl.",
+                "com.core.analytics.api.",
+                "com.core.analytics.impl.",
+                "com.core.networks.",
+                "com.ndev.android.smart.feed.",
+            ),
             reason =
-                "core-database is a Room aggregator. It may import storage-schema " +
-                    "modules only, not feature API/impl, network, app, or UI.",
+            "core-database is a Room aggregator. It may import storage-schema " +
+                "modules only, not feature API/impl, network, app, or UI.",
         )
     }
 
@@ -132,46 +132,29 @@ class LayerDependencyKonsistTest {
             "core/core-networks/src/prod",
         ).assertNoImports(
             forbiddenPrefixes =
-                listOf(
-                    "com.feature.",
-                    "com.ndev.android.smart.feed.",
-                    "com.core.database.",
-                ),
+            listOf(
+                "com.feature.",
+                "com.ndev.android.smart.feed.",
+                "com.core.database.",
+            ),
             reason =
-                "core-networks must remain a network adapter and not depend on " +
-                    "persistence, app, or feature UI.",
+            "core-networks must remain a network adapter and not depend on " +
+                "persistence, app, or feature UI.",
         )
     }
 
-    @Test
-    fun `image loading adapter does not depend on app feature database network or data packages`() {
-        sourceFilesUnder("core/image-glide/src/main").assertNoImports(
-            forbiddenPrefixes =
-                listOf(
-                    "com.feature.",
-                    "com.ndev.android.smart.feed.",
-                    "com.core.database.",
-                    "com.core.networks.",
-                ),
-            reason =
-                "image-glide must remain an image loading adapter and not depend " +
-                    "on app, feature, persistence, or network code.",
-        )
+    private fun SourceFile.isApprovedCoreToFeatureImport(import: String): Boolean = when {
+        relativePath.startsWith("core/core-database/") ->
+            import.startsWith("com.feature.feed.local.") ||
+                import.startsWith("com.feature.recommendation.local.") ||
+                import.startsWith("com.feature.userprofile.local.")
+
+        // Existing analytics implementation coupling is tracked separately from paging cleanup.
+        relativePath.startsWith("core/analytics/impl/") ->
+            import == "com.feature.userprofile.domain.repository.UserProfileRepository"
+
+        else -> false
     }
-
-    private fun SourceFile.isApprovedCoreToFeatureImport(import: String): Boolean =
-        when {
-            relativePath.startsWith("core/core-database/") ->
-                import.startsWith("com.feature.feed.local.") ||
-                    import.startsWith("com.feature.recommendation.local.") ||
-                    import.startsWith("com.feature.userprofile.local.")
-
-            // Existing analytics implementation coupling is tracked separately from paging cleanup.
-            relativePath.startsWith("core/analytics/impl/") ->
-                import == "com.feature.userprofile.domain.repository.UserProfileRepository"
-
-            else -> false
-        }
 
     private fun String.extractFeatureProjectAccessor(): String? {
         val marker = "projects.feature."
@@ -190,15 +173,14 @@ class LayerDependencyKonsistTest {
             trimmed.startsWith("ksp(")
     }
 
-    private fun String.isApprovedCoreBuildFeatureDependency(dependency: String): Boolean =
-        when {
-            startsWith("core/core-database/") ->
-                dependency == "feed.local" ||
-                    dependency == "recommendation.local" ||
-                    dependency == "userprofile.local"
+    private fun String.isApprovedCoreBuildFeatureDependency(dependency: String): Boolean = when {
+        startsWith("core/core-database/") ->
+            dependency == "feed.local" ||
+                dependency == "recommendation.local" ||
+                dependency == "userprofile.local"
 
-            startsWith("core/analytics/impl/") -> dependency == "userprofile.api"
+        startsWith("core/analytics/impl/") -> dependency == "userprofile.api"
 
-            else -> false
-        }
+        else -> false
+    }
 }

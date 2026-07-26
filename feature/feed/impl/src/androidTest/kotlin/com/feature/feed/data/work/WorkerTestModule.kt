@@ -12,35 +12,26 @@ import javax.inject.Singleton
 
 @Singleton
 class FakeSyncContentUseCase
-    @Inject
-    constructor() : SyncContentUseCase {
-        var shouldFail = false
-        val invoked = AtomicBoolean(false)
+@Inject
+constructor() : SyncContentUseCase {
+    var shouldFail = false
+    val invoked = AtomicBoolean(false)
 
-        override suspend fun invoke(): Result<Unit> {
-            invoked.set(true)
-            return if (shouldFail) {
-                Result.failure(Exception("Test failure"))
-            } else {
-                Result.success(Unit)
-            }
+    override suspend fun invoke(): Result<Unit> {
+        invoked.set(true)
+        return if (shouldFail) {
+            Result.failure(Exception("Test failure"))
+        } else {
+            Result.success(Unit)
         }
     }
+}
 
 @Singleton
 class FakeImageLoader
-    @Inject
-    constructor() : ImageLoader {
-        override fun load(
-            context: Context,
-            imageSource: ImageSource,
-            imageView: ImageView,
-            options: ImageOptions,
-        ) = Unit
+@Inject
+constructor() : ImageLoader {
+    override fun load(context: Context, imageSource: ImageSource, imageView: ImageView, options: ImageOptions) = Unit
 
-        override fun preload(
-            context: Context,
-            imageSource: ImageSource,
-            options: ImageOptions,
-        ) = Unit
-    }
+    override fun preload(context: Context, imageSource: ImageSource, options: ImageOptions) = Unit
+}
