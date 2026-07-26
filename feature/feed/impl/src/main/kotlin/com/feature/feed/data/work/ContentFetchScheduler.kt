@@ -21,39 +21,39 @@ import javax.inject.Singleton
  */
 @Singleton
 class ContentFetchScheduler
-    @Inject
-    constructor(
-        private val workManager: WorkManager,
-        private val config: WorkerScheduleConfig,
-        @Named("workName") private val workName: String,
-    ) {
-        /**
-         * Schedules a periodic background job to fetch new content.
-         *
-         * - Requires network connectivity.
-         * - Uses [ContentFetchWorker] as the worker class.
-         * - Enqueues the work as a unique periodic job with policy [ExistingPeriodicWorkPolicy.KEEP].
-         */
-        fun schedule() {
-            val work =
-                PeriodicWorkRequestBuilder<ContentFetchWorker>(
-                    config.fetchInterval.toMillis(),
-                    TimeUnit.MILLISECONDS,
-                    config.fetchFlex.toMillis(),
-                    TimeUnit.MILLISECONDS,
+@Inject
+constructor(
+    private val workManager: WorkManager,
+    private val config: WorkerScheduleConfig,
+    @Named("workName") private val workName: String,
+) {
+    /**
+     * Schedules a periodic background job to fetch new content.
+     *
+     * - Requires network connectivity.
+     * - Uses [ContentFetchWorker] as the worker class.
+     * - Enqueues the work as a unique periodic job with policy [ExistingPeriodicWorkPolicy.KEEP].
+     */
+    fun schedule() {
+        val work =
+            PeriodicWorkRequestBuilder<ContentFetchWorker>(
+                config.fetchInterval.toMillis(),
+                TimeUnit.MILLISECONDS,
+                config.fetchFlex.toMillis(),
+                TimeUnit.MILLISECONDS,
+            )
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build(),
                 )
-                    .setConstraints(
-                        Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build(),
-                    )
-                    .build()
+                .build()
 
-            workManager
-                .enqueueUniquePeriodicWork(
-                    workName,
-                    ExistingPeriodicWorkPolicy.KEEP,
-                    work,
-                )
-        }
+        workManager
+            .enqueueUniquePeriodicWork(
+                workName,
+                ExistingPeriodicWorkPolicy.KEEP,
+                work,
+            )
     }
+}

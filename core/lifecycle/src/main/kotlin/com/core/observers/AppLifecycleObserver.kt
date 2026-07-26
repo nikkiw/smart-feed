@@ -20,23 +20,23 @@ import kotlinx.coroutines.launch
  */
 @Singleton
 class AppLifecycleObserver
-    @Inject
-    constructor(
-        @ApplicationScope private val applicationScope: CoroutineScope,
-        @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
-    ) {
-        /**
-         * Registers the given [LifecycleObserver] with the application's process lifecycle.
-         *
-         * Uses [applicationScope] and launches a coroutine on [mainDispatcher]
-         * to add the observer to [ProcessLifecycleOwner].
-         *
-         * @param observer The [androidx.lifecycle.LifecycleObserver] instance
-         *                 that will receive lifecycle callbacks.
-         */
-        fun addObserver(observer: androidx.lifecycle.LifecycleObserver) {
-            applicationScope.launch(mainDispatcher) {
-                ProcessLifecycleOwner.get().lifecycle.addObserver(observer)
-            }
+@Inject
+constructor(
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+) {
+    /**
+     * Registers the given [LifecycleObserver] with the application's process lifecycle.
+     *
+     * Uses [applicationScope] and launches a coroutine on [mainDispatcher]
+     * to add the observer to [ProcessLifecycleOwner].
+     *
+     * @param observer The [androidx.lifecycle.LifecycleObserver] instance
+     *                 that will receive lifecycle callbacks.
+     */
+    fun addObserver(observer: androidx.lifecycle.LifecycleObserver) {
+        applicationScope.launch(mainDispatcher) {
+            ProcessLifecycleOwner.get().lifecycle.addObserver(observer)
         }
     }
+}

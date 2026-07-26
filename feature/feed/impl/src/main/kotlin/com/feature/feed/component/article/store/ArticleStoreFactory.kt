@@ -16,17 +16,16 @@ internal class ArticleStoreFactory(
     private val itemId: ContentId,
     private val getContentItemUseCase: GetContentItemUseCase,
 ) {
-    fun create(): ArticleStore =
-        object :
-            ArticleStore,
-            Store<ArticleStore.Intent, ArticleStore.State, ArticleStore.Label> by
-            storeFactory.create(
-                name = "ArticleStore",
-                initialState = ArticleStore.State.Loading,
-                bootstrapper = SimpleBootstrapper(Action.Bootstrap),
-                executorFactory = ::ExecutorImpl,
-                reducer = ReducerImpl,
-            ) {}
+    fun create(): ArticleStore = object :
+        ArticleStore,
+        Store<ArticleStore.Intent, ArticleStore.State, ArticleStore.Label> by
+        storeFactory.create(
+            name = "ArticleStore",
+            initialState = ArticleStore.State.Loading,
+            bootstrapper = SimpleBootstrapper(Action.Bootstrap),
+            executorFactory = ::ExecutorImpl,
+            reducer = ReducerImpl,
+        ) {}
 
     private sealed interface Action {
         data object Bootstrap : Action
@@ -67,11 +66,10 @@ internal class ArticleStoreFactory(
     }
 
     private object ReducerImpl : Reducer<ArticleStore.State, Msg> {
-        override fun ArticleStore.State.reduce(msg: Msg): ArticleStore.State =
-            when (msg) {
-                Msg.Loading -> ArticleStore.State.Loading
-                is Msg.Loaded -> ArticleStore.State.Content(msg.item)
-                is Msg.Failed -> ArticleStore.State.Failed(msg.message)
-            }
+        override fun ArticleStore.State.reduce(msg: Msg): ArticleStore.State = when (msg) {
+            Msg.Loading -> ArticleStore.State.Loading
+            is Msg.Loaded -> ArticleStore.State.Content(msg.item)
+            is Msg.Failed -> ArticleStore.State.Failed(msg.message)
+        }
     }
 }

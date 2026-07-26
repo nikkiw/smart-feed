@@ -1,10 +1,10 @@
 package com.feature.feed.component.list.store
 
-import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItemPreview
 
 sealed interface FeedLabel {
     data class OpenArticle(
-        val contentId: ContentId,
+        val preview: ContentItemPreview,
     ) : FeedLabel
 
     data object OpenInternetSettings : FeedLabel

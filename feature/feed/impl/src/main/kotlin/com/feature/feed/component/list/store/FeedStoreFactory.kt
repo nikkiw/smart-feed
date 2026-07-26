@@ -22,20 +22,19 @@ class FeedStoreFactory(
     private val connectivityRepository: ConnectivityRepository,
     private val contentItemRepository: ContentItemRepository,
 ) {
-    fun create(): FeedStore =
-        object :
-            FeedStore,
-            Store<FeedIntent, FeedState, FeedLabel> by storeFactory.create(
-                name = "FeedStore",
-                initialState =
-                    FeedState(
-                        query = initialQuery,
-                        isOnline = connectivityRepository.isConnected.value,
-                    ),
-                bootstrapper = SimpleBootstrapper(FeedAction.Bootstrap),
-                executorFactory = ::ExecutorImpl,
-                reducer = FeedReducer,
-            ) {}
+    fun create(): FeedStore = object :
+        FeedStore,
+        Store<FeedIntent, FeedState, FeedLabel> by storeFactory.create(
+            name = "FeedStore",
+            initialState =
+            FeedState(
+                query = initialQuery,
+                isOnline = connectivityRepository.isConnected.value,
+            ),
+            bootstrapper = SimpleBootstrapper(FeedAction.Bootstrap),
+            executorFactory = ::ExecutorImpl,
+            reducer = FeedReducer,
+        ) {}
 
     private inner class ExecutorImpl :
         CoroutineExecutor<FeedIntent, FeedAction, FeedState, FeedMsg, FeedLabel>() {
@@ -74,7 +73,7 @@ class FeedStoreFactory(
                     publish(FeedLabel.OpenInternetSettings)
                 }
 
-                is FeedIntent.ArticleClicked -> publish(FeedLabel.OpenArticle(intent.contentId))
+                is FeedIntent.ArticleClicked -> publish(FeedLabel.OpenArticle(intent.preview))
             }
         }
 

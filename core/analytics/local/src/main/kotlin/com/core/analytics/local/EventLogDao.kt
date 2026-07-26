@@ -72,8 +72,5 @@ interface EventLogDao {
      * @return The count of matching events as an integer.
      */
     @Query("SELECT COUNT(*) FROM event_log WHERE contentId = :contentId AND eventType = :eventType")
-    suspend fun countEventsForContent(
-        contentId: String,
-        eventType: EventType,
-    ): Int
+    suspend fun countEventsForContent(contentId: String, eventType: EventType): Int
 }

@@ -13,10 +13,7 @@ interface ContentApi {
      * Return UpdatesResponse в JSON.
      */
     @GET("updates")
-    suspend fun getUpdates(
-        @Query("since") since: String,
-        @Query("limit") limit: Int,
-    ): UpdatesResponse
+    suspend fun getUpdates(@Query("since") since: String, @Query("limit") limit: Int): UpdatesResponse
 
     /**
      * Request example:
@@ -24,8 +21,5 @@ interface ContentApi {
      * Return single object ContentUpdate.
      */
     @GET("content/{type}/{id}")
-    suspend fun getContentById(
-        @Path("type") type: String,
-        @Path("id") id: String,
-    ): ContentUpdate
+    suspend fun getContentById(@Path("type") type: String, @Path("id") id: String): ContentUpdate
 }

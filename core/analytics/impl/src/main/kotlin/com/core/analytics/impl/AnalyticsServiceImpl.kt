@@ -16,31 +16,27 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class AnalyticsServiceImpl
-    @Inject
-    constructor(
-        private val eventLogDao: EventLogDao,
-        private val userProfileRepository: UserProfileRepository,
-        @ApplicationScope private val applicationScope: CoroutineScope,
-        @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    ) : AnalyticsService {
-        override fun trackEventReadContent(
-            contentId: ContentId,
-            readingTimeMillis: Long,
-            readPercentage: Float,
-        ) {
-            applicationScope.launch(defaultDispatcher) {
-                val event =
-                    EventLog(
-                        contentId = contentId.value,
-                        eventType = EventType.READ,
-                        readingTimeMillis = readingTimeMillis,
-                        readPercentage = readPercentage,
-                    )
-                withContext(ioDispatcher) {
-                    eventLogDao.insertEvent(event)
-                    userProfileRepository.onArticleVisited(contentId)
-                }
+@Inject
+constructor(
+    private val eventLogDao: EventLogDao,
+    private val userProfileRepository: UserProfileRepository,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : AnalyticsService {
+    override fun trackEventReadContent(contentId: ContentId, readingTimeMillis: Long, readPercentage: Float) {
+        applicationScope.launch(defaultDispatcher) {
+            val event =
+                EventLog(
+                    contentId = contentId.value,
+                    eventType = EventType.READ,
+                    readingTimeMillis = readingTimeMillis,
+                    readPercentage = readPercentage,
+                )
+            withContext(ioDispatcher) {
+                eventLogDao.insertEvent(event)
+                userProfileRepository.onArticleVisited(contentId)
             }
         }
     }
+}

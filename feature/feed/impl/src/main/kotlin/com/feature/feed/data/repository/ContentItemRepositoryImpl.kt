@@ -38,112 +38,110 @@ import javax.inject.Inject
 private const val DEFAULT_SYNC_START_DATE = "1970-01-01T00:00:00Z"
 
 class ContentItemRepositoryImpl
-    @Inject
-    constructor(
-        private val contentDao: ContentDao,
-        private val contentTagsDao: ContentTagsDao,
-        private val updatesMetaDao: UpdatesMetaDao,
-        private val networkDataSource: NetworkDataSource,
-        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    ) : ContentItemRepository, ContentPagingRepository {
-        private val mutex = Mutex()
+@Inject
+constructor(
+    private val contentDao: ContentDao,
+    private val contentTagsDao: ContentTagsDao,
+    private val updatesMetaDao: UpdatesMetaDao,
+    private val networkDataSource: NetworkDataSource,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : ContentItemRepository, ContentPagingRepository {
+    private val mutex = Mutex()
 
-        override fun flowContent(query: Query): Flow<PagingData<ContentItemPreview>> {
-            // Pager config can be tuned as needed
-            return Pager(
-                config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-                pagingSourceFactory = {
-                    contentItemPagingSource(
-                        query = query,
-                        contentDao = contentDao,
-                    )
-                },
-            )
-                .flow
-                .mapNotNull { pagingData ->
-                    pagingData.map { it.toContentPreview() }
-                }
-                .flowOn(ioDispatcher)
-        }
-
-        override suspend fun getContentById(itemId: ContentId): Result<ContentItem> =
-            withContext(ioDispatcher) {
-                runSuspendCatching {
-                    contentDao.getContentById(itemId.value).toContentItem()
-                }
+    override fun flowContent(query: Query): Flow<PagingData<ContentItemPreview>> {
+        // Pager config can be tuned as needed
+        return Pager(
+            config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+            pagingSourceFactory = {
+                contentItemPagingSource(
+                    query = query,
+                    contentDao = contentDao,
+                )
+            },
+        )
+            .flow
+            .mapNotNull { pagingData ->
+                pagingData.map { it.toContentPreview() }
             }
+            .flowOn(ioDispatcher)
+    }
 
-        override suspend fun isEmpty(): Boolean =
-            withContext(ioDispatcher) {
-                !contentDao.isNotEmpty()
-            }
-
-        override fun observeHasContent(): Flow<Boolean> = contentDao.observeIsNotEmpty().flowOn(ioDispatcher)
-
-        override fun flowAllTags(): Flow<Tags> {
-            return contentTagsDao.allTags()
-                .map {
-                    Tags(it)
-                }.flowOn(ioDispatcher)
+    override suspend fun getContentById(itemId: ContentId): Result<ContentItem> = withContext(ioDispatcher) {
+        runSuspendCatching {
+            contentDao.getContentById(itemId.value).toContentItem()
         }
+    }
 
-        override suspend fun syncContent(): Result<Unit> {
-            return runSuspendCatching {
-                withContext(ioDispatcher) {
-                    mutex.withLock {
-                        var since = updatesMetaDao.getMeta()?.lastSyncAt ?: DEFAULT_SYNC_START_DATE
-                        do {
-                            val networkResult = networkDataSource.getUpdates(since = since)
-                            if (networkResult.isFailure) {
-                                val error =
-                                    networkResult.exceptionOrNull() ?: Exception("Unknown error")
-                                throw error
-                            }
-                            val response = networkResult.getOrThrow()
-                            val updates = response.data
+    override suspend fun isEmpty(): Boolean = withContext(ioDispatcher) {
+        !contentDao.isNotEmpty()
+    }
 
-                            // Сохраняем данные в БД
-                            updates.forEach { update ->
-                                val entity =
-                                    ContentEntity(
-                                        id = update.id,
-                                        type = update.type,
-                                        action = update.action,
-                                        updatedAt = DateTimeConvertors.parseIsoToLongMs(update.updatedAt),
-                                        mainImageUrl = update.mainImageUrl,
-                                        tags = update.tags,
-                                    )
+    override fun observeHasContent(): Flow<Boolean> = contentDao.observeIsNotEmpty().flowOn(ioDispatcher)
 
-                                val articleEntity =
-                                    (update.attributes as? ContentAttributes.Article)?.let {
-                                        ArticleAttributesEntity(
-                                            contentId = update.id,
-                                            title = it.title,
-                                            shortDescription = it.shortDescription,
-                                            content = it.content,
-                                            unitEmbedding =
-                                                EmbeddingIndex.normalize(
-                                                    it.embeddings.data.map { it.toFloat() }
-                                                        .toFloatArray(),
-                                                ),
-                                        )
-                                    }
-                                contentDao.insertContentUpdateWithDetails(
-                                    contentUpdate = entity,
-                                    article = articleEntity,
+    override fun flowAllTags(): Flow<Tags> {
+        return contentTagsDao.allTags()
+            .map {
+                Tags(it)
+            }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun syncContent(): Result<Unit> {
+        return runSuspendCatching {
+            withContext(ioDispatcher) {
+                mutex.withLock {
+                    var since = updatesMetaDao.getMeta()?.lastSyncAt ?: DEFAULT_SYNC_START_DATE
+                    do {
+                        val networkResult = networkDataSource.getUpdates(since = since)
+                        if (networkResult.isFailure) {
+                            val error =
+                                networkResult.exceptionOrNull() ?: Exception("Unknown error")
+                            throw error
+                        }
+                        val response = networkResult.getOrThrow()
+                        val updates = response.data
+
+                        // Сохраняем данные в БД
+                        updates.forEach { update ->
+                            val entity =
+                                ContentEntity(
+                                    id = update.id,
+                                    type = update.type,
+                                    action = update.action,
+                                    updatedAt = DateTimeConvertors.parseIsoToLongMs(update.updatedAt),
+                                    mainImageUrl = update.mainImageUrl,
+                                    tags = update.tags,
                                 )
-                            }
 
-                            // Обновляем since для следующей итерации
-                            since = response.meta.nextSince
-                            // Цикл повторится, пока сервер говорит, что есть ещё
-                        } while (response.meta.hasMore)
+                            val articleEntity =
+                                (update.attributes as? ContentAttributes.Article)?.let {
+                                    ArticleAttributesEntity(
+                                        contentId = update.id,
+                                        title = it.title,
+                                        shortDescription = it.shortDescription,
+                                        content = it.content,
+                                        unitEmbedding =
+                                        EmbeddingIndex.normalize(
+                                            it.embeddings.data.map { it.toFloat() }
+                                                .toFloatArray(),
+                                        ),
+                                    )
+                                }
+                            contentDao.insertContentUpdateWithDetails(
+                                contentUpdate = entity,
+                                article = articleEntity,
+                            )
+                        }
 
-                        // После загрузки всех страниц сохраняем новую точку синка
-                        updatesMetaDao.saveMeta(UpdatesMetaEntity(lastSyncAt = since))
-                        Result.success(Unit)
-                    }
+                        // Обновляем since для следующей итерации
+                        since = response.meta.nextSince
+                        // Цикл повторится, пока сервер говорит, что есть ещё
+                    } while (response.meta.hasMore)
+
+                    // После загрузки всех страниц сохраняем новую точку синка
+                    updatesMetaDao.saveMeta(UpdatesMetaEntity(lastSyncAt = since))
+                    Result.success(Unit)
                 }
             }
         }
     }
+}

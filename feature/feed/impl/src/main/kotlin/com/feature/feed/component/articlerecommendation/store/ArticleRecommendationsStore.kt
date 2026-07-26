@@ -1,7 +1,6 @@
 package com.feature.feed.component.articlerecommendation.store
 
 import com.arkivanov.mvikotlin.core.store.Store
-import com.core.content.model.ContentId
 import com.feature.feed.domain.model.ContentItemPreview
 
 internal interface ArticleRecommendationsStore :
@@ -9,7 +8,7 @@ internal interface ArticleRecommendationsStore :
     sealed interface Intent {
         data object Retry : Intent
 
-        data class ArticleClicked(val id: ContentId) : Intent
+        data class ArticleClicked(val preview: ContentItemPreview) : Intent
     }
 
     sealed interface State {
@@ -23,6 +22,6 @@ internal interface ArticleRecommendationsStore :
     }
 
     sealed interface Label {
-        data class OpenArticle(val id: ContentId) : Label
+        data class OpenArticle(val preview: ContentItemPreview) : Label
     }
 }

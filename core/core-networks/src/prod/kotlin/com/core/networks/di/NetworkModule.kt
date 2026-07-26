@@ -34,16 +34,14 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideGson(): Gson =
-        GsonBuilder()
-            .serializeNulls()
-            .create()
+    fun provideGson(): Gson = GsonBuilder()
+        .serializeNulls()
+        .create()
 
     @Provides
     @Singleton
-    fun provideSharedPreferences(
-        @ApplicationContext context: Context,
-    ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
 
     @Provides
     @Singleton
@@ -66,11 +64,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(
-        @Named("BASE_URL") baseUrl: String,
-        gson: Gson,
-        okHttpClient: OkHttpClient,
-    ): Retrofit {
+    fun provideRetrofit(@Named("BASE_URL") baseUrl: String, gson: Gson, okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(okHttpClient)

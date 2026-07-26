@@ -1,6 +1,6 @@
 package com.feature.feed.component.list.store
 
-import com.core.content.model.ContentId
+import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.Query
 
 sealed interface FeedIntent {
@@ -15,6 +15,6 @@ sealed interface FeedIntent {
     data object EnableInternetClicked : FeedIntent
 
     data class ArticleClicked(
-        val contentId: ContentId,
+        val preview: ContentItemPreview,
     ) : FeedIntent
 }

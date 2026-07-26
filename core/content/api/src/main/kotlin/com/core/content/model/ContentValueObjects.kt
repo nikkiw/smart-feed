@@ -146,10 +146,9 @@ enum class ContentType(private val typeName: String) {
     override fun toString(): String = typeName
 
     companion object {
-        fun fromString(type: String): ContentType =
-            when (type.lowercase()) {
-                "article" -> ARTICLE
-                else -> UNKNOWN
-            }
+        fun fromString(type: String): ContentType = when (type.lowercase()) {
+            "article" -> ARTICLE
+            else -> UNKNOWN
+        }
     }
 }

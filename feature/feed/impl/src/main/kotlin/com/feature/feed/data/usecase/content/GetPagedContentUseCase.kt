@@ -8,10 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetPagedContentUseCase
-    @Inject
-    constructor(
-        private val contentPagingRepository: ContentPagingRepository,
-    ) {
-        operator fun invoke(query: Query): Flow<PagingData<ContentItemPreview>> =
-            contentPagingRepository.flowContent(query)
-    }
+@Inject
+constructor(
+    private val contentPagingRepository: ContentPagingRepository,
+) {
+    operator fun invoke(query: Query): Flow<PagingData<ContentItemPreview>> = contentPagingRepository.flowContent(query)
+}

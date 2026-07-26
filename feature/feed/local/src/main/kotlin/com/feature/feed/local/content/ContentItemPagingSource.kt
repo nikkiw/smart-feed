@@ -42,10 +42,7 @@ import com.feature.feed.local.content.entity.ContentPreviewWithDetails
  * ```
  */
 @Suppress("CyclomaticComplexMethod")
-fun contentItemPagingSource(
-    query: Query,
-    contentDao: ContentDao,
-): PagingSource<Int, ContentPreviewWithDetails> {
+fun contentItemPagingSource(query: Query, contentDao: ContentDao): PagingSource<Int, ContentPreviewWithDetails> {
     val sqlBuilder = StringBuilder()
     val args = mutableListOf<Any>()
 
