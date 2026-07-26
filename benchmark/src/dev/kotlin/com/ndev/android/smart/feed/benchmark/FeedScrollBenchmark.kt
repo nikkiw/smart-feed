@@ -25,19 +25,17 @@ class FeedScrollBenchmark {
     val benchmarkRule = MacrobenchmarkRule()
 
     private val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-    private val renderer = ArticleCardRenderer.fromInstrumentationArguments()
 
     @Before
     fun prepareDataAndCaches() {
         prepareFeed(
             device = device,
             warmScrollCache = true,
-            renderer = renderer,
         )
     }
 
     @Test
-    fun recyclerViewScrollNoCompilation() {
+    fun feedListScrollNoCompilation() {
         benchmarkRule.measureRepeated(
             packageName = TARGET_PACKAGE,
             metrics = listOf(FrameTimingMetric()),
@@ -59,7 +57,7 @@ class FeedScrollBenchmark {
 
     @OptIn(androidx.benchmark.macro.ExperimentalMacrobenchmarkApi::class)
     @Test
-    fun recyclerViewScrollWithProfile() {
+    fun feedListScrollWithProfile() {
         benchmarkRule.measureRepeated(
             packageName = TARGET_PACKAGE,
             metrics = listOf(FrameTimingMetric()),
@@ -77,7 +75,7 @@ class FeedScrollBenchmark {
 
     @OptIn(ExperimentalMetricApi::class)
     @Test
-    fun recyclerViewMemoryNoCompilation() {
+    fun feedListMemoryNoCompilation() {
         benchmarkRule.measureRepeated(
             packageName = TARGET_PACKAGE,
             metrics = listOf(MemoryUsageMetric(MemoryUsageMetric.Mode.Max)),
@@ -92,7 +90,7 @@ class FeedScrollBenchmark {
 
     @OptIn(ExperimentalMetricApi::class, androidx.benchmark.macro.ExperimentalMacrobenchmarkApi::class)
     @Test
-    fun recyclerViewMemoryWithProfile() {
+    fun feedListMemoryWithProfile() {
         benchmarkRule.measureRepeated(
             packageName = TARGET_PACKAGE,
             metrics = listOf(MemoryUsageMetric(MemoryUsageMetric.Mode.Max)),
@@ -106,12 +104,12 @@ class FeedScrollBenchmark {
     }
 
     private fun MacrobenchmarkScope.scrollFeed() {
-        startActivityAndWait { launchIntent ->
-            launchIntent.putExtra(ARTICLE_CARD_RENDERER_EXTRA, renderer.wireValue)
-        }
+        startActivityAndWait()
+        device.waitForFeedScreen()
         val feed = device.waitForFeed().apply {
             setGestureMargin(device.displayWidth / 5)
         }
+        device.waitForPreviewCard()
         device.waitForIdle()
 
         repeat(5) {

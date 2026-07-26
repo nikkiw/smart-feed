@@ -9,43 +9,47 @@ import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
 
 internal const val TARGET_PACKAGE = "com.ndev.android.smart.feed"
-internal const val ARTICLE_CARD_RENDERER_ARGUMENT = "articleCardRenderer"
-internal const val ARTICLE_CARD_RENDERER_EXTRA =
-    "com.ndev.android.smart.feed.extra.ARTICLE_CARD_RENDERER"
+private const val FEED_SCREEN_TAG = "feed_screen"
+private const val FEED_LIST_TAG = "feed_list"
+private const val PREVIEW_CARD_TAG = "preview_card"
+private const val ARTICLE_SCREEN_TAG = "article_screen"
+private const val ARTICLE_CONTENT_TAG = "article_content"
+private const val RECOMMENDATION_LIST_TAG = "recommendation_list"
+private const val TAB_FEED_TAG = "tab_feed"
+private const val TAB_RECOMMENDATIONS_TAG = "tab_recommendations"
 
-private const val FEED_RESOURCE_ID = "recyclerFeed"
 private const val FEED_TIMEOUT_MS = 60_000L
-private const val CONTENT_SETTLE_MS = 2_000L
-
-internal enum class ArticleCardRenderer(
-    val wireValue: String,
-) {
-    Xml("xml"),
-    Compose("compose"),
-    ;
-
-    companion object {
-        fun fromInstrumentationArguments(): ArticleCardRenderer {
-            val value =
-                InstrumentationRegistry.getArguments().getString(ARTICLE_CARD_RENDERER_ARGUMENT)
-                    ?: Xml.wireValue
-            return entries.firstOrNull { it.wireValue == value }
-                ?: error(
-                    "Unknown $ARTICLE_CARD_RENDERER_ARGUMENT=$value. " +
-                        "Expected ${entries.joinToString { it.wireValue }}.",
-                )
-        }
-    }
-}
 
 internal fun UiDevice.waitForFeed(): UiObject2 =
-    requireNotNull(
-        wait(
-            Until.findObject(By.res(TARGET_PACKAGE, FEED_RESOURCE_ID)),
-            FEED_TIMEOUT_MS,
-        ),
-    ) {
-        "Feed RecyclerView was not found within $FEED_TIMEOUT_MS ms"
+    waitForTag(FEED_LIST_TAG, "Feed list")
+
+internal fun UiDevice.waitForFeedScreen(): UiObject2 =
+    waitForTag(FEED_SCREEN_TAG, "Feed screen")
+
+internal fun UiDevice.waitForPreviewCard(): UiObject2 =
+    waitForTag(PREVIEW_CARD_TAG, "Preview card")
+
+internal fun UiDevice.waitForArticleScreen(): UiObject2 =
+    waitForTag(ARTICLE_SCREEN_TAG, "Article screen")
+
+internal fun UiDevice.waitForArticleContent(): UiObject2 =
+    waitForTag(ARTICLE_CONTENT_TAG, "Article content")
+
+internal fun UiDevice.waitForRecommendationList(): UiObject2 =
+    waitForTag(RECOMMENDATION_LIST_TAG, "Recommendation list")
+
+internal fun UiDevice.waitForRecommendationsTab(): UiObject2 =
+    waitForTag(TAB_RECOMMENDATIONS_TAG, "Recommendations tab")
+
+internal fun UiDevice.waitForFeedTab(): UiObject2 =
+    waitForTag(TAB_FEED_TAG, "Feed tab")
+
+private fun UiDevice.waitForTag(
+    tag: String,
+    elementName: String,
+): UiObject2 =
+    requireNotNull(wait(Until.findObject(By.res(tag)), FEED_TIMEOUT_MS)) {
+        "$elementName was not found within $FEED_TIMEOUT_MS ms (tag=$tag)"
     }
 
 /**
@@ -56,7 +60,6 @@ internal fun UiDevice.waitForFeed(): UiObject2 =
 internal fun prepareFeed(
     device: UiDevice,
     warmScrollCache: Boolean,
-    renderer: ArticleCardRenderer,
 ) {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
     val launchIntent = checkNotNull(
@@ -65,14 +68,14 @@ internal fun prepareFeed(
         "No launcher activity found for $TARGET_PACKAGE"
     }
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        .putExtra(ARTICLE_CARD_RENDERER_EXTRA, renderer.wireValue)
 
     device.executeShellCommand("am force-stop $TARGET_PACKAGE")
     instrumentation.context.startActivity(launchIntent)
 
+    device.waitForFeedScreen()
     val feed = device.waitForFeed()
+    device.waitForPreviewCard()
     device.waitForIdle()
-    Thread.sleep(CONTENT_SETTLE_MS)
 
     if (warmScrollCache) {
         feed.setGestureMargin(device.displayWidth / 5)
@@ -84,7 +87,7 @@ internal fun prepareFeed(
             feed.fling(Direction.UP)
             device.waitForIdle()
         }
-        Thread.sleep(CONTENT_SETTLE_MS)
+        device.waitForPreviewCard()
     }
 
     device.pressHome()

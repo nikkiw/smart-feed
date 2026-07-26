@@ -17,24 +17,61 @@ class BaselineProfileGenerator {
     val baselineRule = BaselineProfileRule()
 
     private val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-    private val renderer = ArticleCardRenderer.fromInstrumentationArguments()
 
     @Test
     fun generate() = baselineRule.collect(
         packageName = TARGET_PACKAGE,
         profileBlock = {
-            startActivityAndWait { launchIntent ->
-                launchIntent.putExtra(ARTICLE_CARD_RENDERER_EXTRA, renderer.wireValue)
-            }
+            val gestureMargin = device.displayWidth / 5
+
+            startActivityAndWait()
             val feed = device.waitForFeed().apply {
-                setGestureMargin(device.displayWidth / 5)
+                setGestureMargin(gestureMargin)
             }
+            device.waitForPreviewCard()
             device.waitForIdle()
 
-            repeat(3) {
+            repeat(2) {
                 feed.fling(androidx.test.uiautomator.Direction.DOWN)
                 device.waitForIdle()
             }
+
+            requireNotNull(feed.findObject(androidx.test.uiautomator.By.res("preview_card"))) {
+                "No preview card was found inside the feed list"
+            }.click()
+
+            val article = device.waitForArticleContent().apply {
+                setGestureMargin(gestureMargin)
+            }
+            device.waitForArticleScreen()
+            device.waitForIdle()
+
+            repeat(2) {
+                article.fling(androidx.test.uiautomator.Direction.DOWN)
+                device.waitForIdle()
+            }
+
+            device.pressBack()
+            device.waitForFeedScreen()
+            device.waitForFeed()
+            device.waitForPreviewCard()
+            device.waitForIdle()
+
+            device.waitForRecommendationsTab().click()
+            val recommendationList = device.waitForRecommendationList().apply {
+                setGestureMargin(gestureMargin)
+            }
+            device.waitForPreviewCard()
+            device.waitForIdle()
+            recommendationList.fling(androidx.test.uiautomator.Direction.DOWN)
+            device.waitForIdle()
+
+            device.waitForFeedTab().click()
+            val feedAfterTabSwitch = device.waitForFeed().apply {
+                setGestureMargin(gestureMargin)
+            }
+            feedAfterTabSwitch.fling(androidx.test.uiautomator.Direction.UP)
+            device.waitForIdle()
         }
     )
 }

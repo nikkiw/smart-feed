@@ -43,6 +43,7 @@ android {
                     device = "Pixel 6"
                     apiLevel = 31
                     systemImageSource = "aosp"
+                    testedAbi = "x86_64"
                 }
             }
         }
