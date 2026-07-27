@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="item_article_image_content_description">"Main image for article"</string>
-    <string name="article_state_is_loaded">"Loaded…"</string>
+    <string name="article_main_image_content_description">Main image for %1$s</string>
+    <string name="article_state_is_loaded">Loaded…</string>
 
-    <string name="bottom_list">"Feed"</string>
-    <string name="bottom_recommendation">"Recommendations"</string>
+    <string name="bottom_list">Feed</string>
+    <string name="bottom_recommendation">Recommendations</string>
+    <string name="feed_filters_title">Filters</string>
 
     <!-- Content description for the error icon -->
-    <string name="error_icon">"Error icon"</string>
+    <string name="error_icon">Error icon</string>
 
     <!-- Full-screen loading error message -->
-    <string name="error_loading_data">"Internet access is required to retrieve data. Please check your connection and try again."</string>
+    <string name="error_loading_data">Internet access is required to retrieve data. Please check your connection and try again.</string>
 
-    <string name="recommended_reading">"Recommended reading"</string>
+    <string name="recommended_reading">Recommended reading</string>
     <string name="enable_internet">Enable internet</string>
     <string name="retry">Retry</string>
     <string name="feed_empty">No articles match the selected filters.</string>
     <string name="feed_initial_loading_title">Preparing your feed</string>
     <string name="feed_initial_loading_message">Loading saved articles and checking for updates</string>
+    <string name="article_loading_title">Preparing article</string>
+    <string name="article_back">Back</string>
     <string name="recommendations_empty">No recommendations yet.</string>
     <string name="related_articles_empty">No related articles.</string>
     <string name="error_loading_unknown">Unable to load data.</string>
-    <string name="sorted_by">"Sorted by:"</string>
+    <string name="sorted_by">Sorted by:</string>
+    <string name="sort_name_asc">Name A–Z</string>
+    <string name="sort_name_desc">Name Z–A</string>
+    <string name="sort_date_newest">Newest first</string>
+    <string name="sort_date_oldest">Oldest first</string>
+    <string name="article_tags">Article tags</string>
 </resources>

@@ -27,17 +27,17 @@ import javax.inject.Inject
  * @see ContentItemRepository for data source details
  */
 class GetContentItemUseCaseImpl
-    @Inject
-    constructor(
-        private val contentItemRepository: ContentItemRepository,
-    ) : GetContentItemUseCase {
-        /**
-         * Retrieves the content item with the given ID using the underlying repository.
-         *
-         * @param itemId The unique identifier of the content item to retrieve.
-         * @return A [Result] containing the requested [ContentItem], or an error if retrieval failed.
-         */
-        override suspend fun invoke(itemId: ContentId): Result<ContentItem> {
-            return contentItemRepository.getContentById(itemId)
-        }
+@Inject
+constructor(
+    private val contentItemRepository: ContentItemRepository,
+) : GetContentItemUseCase {
+    /**
+     * Retrieves the content item with the given ID using the underlying repository.
+     *
+     * @param itemId The unique identifier of the content item to retrieve.
+     * @return A [Result] containing the requested [ContentItem], or an error if retrieval failed.
+     */
+    override suspend fun invoke(itemId: ContentId): Result<ContentItem> {
+        return contentItemRepository.getContentById(itemId)
     }
+}

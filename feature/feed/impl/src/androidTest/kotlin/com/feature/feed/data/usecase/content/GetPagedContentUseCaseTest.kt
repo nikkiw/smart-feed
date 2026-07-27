@@ -91,158 +91,151 @@ class GetPagedContentUseCaseTest {
     }
 
     @Test
-    fun invoke_emptyQuery_returnsAllContent() =
-        runTest {
-            // Preparation: insertion of 3 elements of different types
-            insertContent("id1", type = "article", tags = listOf("tag1"))
-            insertContent("id2", type = "video", tags = listOf("tag2"))
-            insertContent("id3", type = "article", tags = listOf("tag1", "tag2"))
+    fun invoke_emptyQuery_returnsAllContent() = runTest {
+        // Preparation: insertion of 3 elements of different types
+        insertContent("id1", type = "article", tags = listOf("tag1"))
+        insertContent("id2", type = "video", tags = listOf("tag2"))
+        insertContent("id3", type = "article", tags = listOf("tag1", "tag2"))
 
-            // Request without filtering
-            val query =
-                Query(
-                    types = emptyList(),
-                    tags = Tags(emptyList()),
-                    sortedBy = ContentItemsSortedType.ByDateOldestFirst,
-                )
+        // Request without filtering
+        val query =
+            Query(
+                types = emptyList(),
+                tags = Tags(emptyList()),
+                sortedBy = ContentItemsSortedType.ByDateOldestFirst,
+            )
 
-            // Check: all items must be returned
-            val result = useCase(query).asSnapshot().map { it.id.value }
-            assertEquals(setOf("id1", "id2", "id3"), result.toSet())
-        }
-
-    @Test
-    fun invoke_noMatchingTags_returnsEmpty() =
-        runTest {
-            // Preparation: inserting elements with tags tag1 and tag2
-            insertContent("id1", tags = listOf("tag1", "tag2"))
-
-            // Request with inappropriate tag
-            val query =
-                Query(
-                    types = listOf(ContentType.ARTICLE),
-                    tags = Tags(listOf("tag3")),
-                    sortedBy = ContentItemsSortedType.ByDateOldestFirst,
-                )
-
-            // Check: the result is empty
-            val result = useCase(query).asSnapshot().map { it.id.value }
-            assertTrue(result.isEmpty())
-        }
+        // Check: all items must be returned
+        val result = useCase(query).asSnapshot().map { it.id.value }
+        assertEquals(setOf("id1", "id2", "id3"), result.toSet())
+    }
 
     @Test
-    fun invoke_multipleTags_returnsOnlyMatching() =
-        runTest {
-            // Preparation: different combinations of tags
-            insertContent("id1", tags = listOf("tag1"))
-            insertContent("id2", tags = listOf("tag2"))
-            insertContent("id3", tags = listOf("tag1", "tag2"))
+    fun invoke_noMatchingTags_returnsEmpty() = runTest {
+        // Preparation: inserting elements with tags tag1 and tag2
+        insertContent("id1", tags = listOf("tag1", "tag2"))
 
-            // Query with two tags
-            val query =
-                Query(
-                    types = listOf(ContentType.ARTICLE),
-                    tags = Tags(listOf("tag1")),
-                    sortedBy = ContentItemsSortedType.ByDateOldestFirst,
-                )
+        // Request with inappropriate tag
+        val query =
+            Query(
+                types = listOf(ContentType.ARTICLE),
+                tags = Tags(listOf("tag3")),
+                sortedBy = ContentItemsSortedType.ByDateOldestFirst,
+            )
 
-            // Check: only element with both tags
-            val result = useCase(query).asSnapshot().map { it.id.value }
-            assertEquals(listOf("id1", "id3"), result)
-        }
+        // Check: the result is empty
+        val result = useCase(query).asSnapshot().map { it.id.value }
+        assertTrue(result.isEmpty())
+    }
 
     @Test
-    fun invoke_sortByNewestFirst_returnsCorrectOrder() =
-        runTest {
-            // Preparation: insertion with different update times
-            val timeOldest = 1000L
-            val timeMiddle = 2000L
-            val timeNewest = 3000L
+    fun invoke_multipleTags_returnsOnlyMatching() = runTest {
+        // Preparation: different combinations of tags
+        insertContent("id1", tags = listOf("tag1"))
+        insertContent("id2", tags = listOf("tag2"))
+        insertContent("id3", tags = listOf("tag1", "tag2"))
 
-            insertContent("id1", updatedAt = timeOldest)
-            insertContent("id2", updatedAt = timeMiddle)
-            insertContent("id3", updatedAt = timeNewest)
+        // Query with two tags
+        val query =
+            Query(
+                types = listOf(ContentType.ARTICLE),
+                tags = Tags(listOf("tag1")),
+                sortedBy = ContentItemsSortedType.ByDateOldestFirst,
+            )
 
-            // Query sorted by newness
-            val query =
-                Query(
-                    types = listOf(ContentType.ARTICLE),
-                    tags = Tags(emptyList()),
-                    sortedBy = ContentItemsSortedType.ByDateNewestFirst,
-                )
-
-            // Check: items in descending date order
-            val result = useCase(query).asSnapshot().map { it.id.value }
-            assertEquals(listOf("id3", "id2", "id1"), result)
-        }
+        // Check: only element with both tags
+        val result = useCase(query).asSnapshot().map { it.id.value }
+        assertEquals(listOf("id1", "id3"), result)
+    }
 
     @Test
-    fun invoke_noContent_returnsEmpty() =
-        runTest {
-            // Request without preliminary data insertion
-            val query =
-                Query(
-                    types = listOf(ContentType.ARTICLE),
-                    tags = Tags(emptyList()),
-                    sortedBy = ContentItemsSortedType.ByDateNewestFirst,
-                )
+    fun invoke_sortByNewestFirst_returnsCorrectOrder() = runTest {
+        // Preparation: insertion with different update times
+        val timeOldest = 1000L
+        val timeMiddle = 2000L
+        val timeNewest = 3000L
 
-            // Check: the result is empty
-            val result = useCase(query).asSnapshot().map { it.id.value }
-            assertTrue(result.isEmpty())
-        }
+        insertContent("id1", updatedAt = timeOldest)
+        insertContent("id2", updatedAt = timeMiddle)
+        insertContent("id3", updatedAt = timeNewest)
+
+        // Query sorted by newness
+        val query =
+            Query(
+                types = listOf(ContentType.ARTICLE),
+                tags = Tags(emptyList()),
+                sortedBy = ContentItemsSortedType.ByDateNewestFirst,
+            )
+
+        // Check: items in descending date order
+        val result = useCase(query).asSnapshot().map { it.id.value }
+        assertEquals(listOf("id3", "id2", "id1"), result)
+    }
 
     @Test
-    fun invoke_multipleTypes_returnsAllMatching() =
-        runTest {
-            // Preparation: different types of content
-            insertContent("id1", type = "article")
-            insertContent("id2", type = "article")
-            insertContent("id3", type = "article")
+    fun invoke_noContent_returnsEmpty() = runTest {
+        // Request without preliminary data insertion
+        val query =
+            Query(
+                types = listOf(ContentType.ARTICLE),
+                tags = Tags(emptyList()),
+                sortedBy = ContentItemsSortedType.ByDateNewestFirst,
+            )
 
-            // Query with multiple types
-            val query =
-                Query(
-                    types = listOf(ContentType.ARTICLE),
-                    tags = Tags(emptyList()),
-                    sortedBy = ContentItemsSortedType.ByDateNewestFirst,
-                )
+        // Check: the result is empty
+        val result = useCase(query).asSnapshot().map { it.id.value }
+        assertTrue(result.isEmpty())
+    }
 
-            // Check: all elements are returned
-            val result = useCase(query).asSnapshot().map { it.id.value }
-            assertEquals(setOf("id1", "id2", "id3"), result.toSet())
-        }
+    @Test
+    fun invoke_multipleTypes_returnsAllMatching() = runTest {
+        // Preparation: different types of content
+        insertContent("id1", type = "article")
+        insertContent("id2", type = "article")
+        insertContent("id3", type = "article")
+
+        // Query with multiple types
+        val query =
+            Query(
+                types = listOf(ContentType.ARTICLE),
+                tags = Tags(emptyList()),
+                sortedBy = ContentItemsSortedType.ByDateNewestFirst,
+            )
+
+        // Check: all elements are returned
+        val result = useCase(query).asSnapshot().map { it.id.value }
+        assertEquals(setOf("id1", "id2", "id3"), result.toSet())
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun invoke_databaseUpdates_flowEmitsNewData() =
-        runTest {
-            val query =
-                Query(
-                    types = listOf(ContentType.ARTICLE),
-                    tags = Tags(emptyList()),
-                    sortedBy = ContentItemsSortedType.ByDateNewestFirst,
-                )
+    fun invoke_databaseUpdates_flowEmitsNewData() = runTest {
+        val query =
+            Query(
+                types = listOf(ContentType.ARTICLE),
+                tags = Tags(emptyList()),
+                sortedBy = ContentItemsSortedType.ByDateNewestFirst,
+            )
 
-            // First start of the stream
-            val job =
-                launch {
-                    useCase(query).collect {}
-                }
-            advanceUntilIdle()
+        // First start of the stream
+        val job =
+            launch {
+                useCase(query).collect {}
+            }
+        advanceUntilIdle()
 
-            // Inserting the first element
-            insertContent("id1")
-            advanceUntilIdle()
-            var result = useCase(query).asSnapshot().map { it.id.value }
-            assertEquals(listOf("id1"), result)
+        // Inserting the first element
+        insertContent("id1")
+        advanceUntilIdle()
+        var result = useCase(query).asSnapshot().map { it.id.value }
+        assertEquals(listOf("id1"), result)
 
-            // Inserting the second element
-            insertContent("id2")
-            advanceUntilIdle()
-            result = useCase(query).asSnapshot().map { it.id.value }
-            assertEquals(listOf("id2", "id1"), result)
+        // Inserting the second element
+        insertContent("id2")
+        advanceUntilIdle()
+        result = useCase(query).asSnapshot().map { it.id.value }
+        assertEquals(listOf("id2", "id1"), result)
 
-            job.cancel()
-        }
+        job.cancel()
+    }
 }

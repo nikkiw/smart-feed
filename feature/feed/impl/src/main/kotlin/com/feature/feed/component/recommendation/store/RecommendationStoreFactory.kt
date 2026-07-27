@@ -22,17 +22,16 @@ internal class RecommendationStoreFactory(
     private val contentItemRepository: ContentItemRepository,
     private val syncContentUseCase: SyncContentUseCase,
 ) {
-    fun create(): RecommendationStore =
-        object :
-            RecommendationStore,
-            Store<RecommendationStore.Intent, RecommendationStore.State, RecommendationStore.Label> by
-            storeFactory.create(
-                name = "RecommendationStore",
-                initialState = RecommendationStore.State(isOnline = connectivityRepository.isConnected.value),
-                bootstrapper = SimpleBootstrapper(Action.Bootstrap),
-                executorFactory = ::ExecutorImpl,
-                reducer = ReducerImpl,
-            ) {}
+    fun create(): RecommendationStore = object :
+        RecommendationStore,
+        Store<RecommendationStore.Intent, RecommendationStore.State, RecommendationStore.Label> by
+        storeFactory.create(
+            name = "RecommendationStore",
+            initialState = RecommendationStore.State(isOnline = connectivityRepository.isConnected.value),
+            bootstrapper = SimpleBootstrapper(Action.Bootstrap),
+            executorFactory = ::ExecutorImpl,
+            reducer = ReducerImpl,
+        ) {}
 
     private sealed interface Action {
         data object Bootstrap : Action
@@ -90,7 +89,7 @@ internal class RecommendationStoreFactory(
                     publish(RecommendationStore.Label.OpenInternetSettings)
                 }
                 is RecommendationStore.Intent.ArticleClicked ->
-                    publish(RecommendationStore.Label.OpenArticle(intent.id))
+                    publish(RecommendationStore.Label.OpenArticle(intent.preview))
             }
         }
 
@@ -110,13 +109,12 @@ internal class RecommendationStoreFactory(
     }
 
     private object ReducerImpl : Reducer<RecommendationStore.State, Msg> {
-        override fun RecommendationStore.State.reduce(msg: Msg): RecommendationStore.State =
-            when (msg) {
-                Msg.Loading -> copy(loadState = RecommendationStore.LoadState.Loading)
-                is Msg.ItemsLoaded -> copy(items = msg.items, loadState = RecommendationStore.LoadState.Idle)
-                is Msg.Failed -> copy(loadState = RecommendationStore.LoadState.Failed(msg.message))
-                is Msg.ConnectivityChanged -> copy(isOnline = msg.value)
-                is Msg.LocalAvailabilityChanged -> copy(hasLocalContent = msg.value)
-            }
+        override fun RecommendationStore.State.reduce(msg: Msg): RecommendationStore.State = when (msg) {
+            Msg.Loading -> copy(loadState = RecommendationStore.LoadState.Loading)
+            is Msg.ItemsLoaded -> copy(items = msg.items, loadState = RecommendationStore.LoadState.Idle)
+            is Msg.Failed -> copy(loadState = RecommendationStore.LoadState.Failed(msg.message))
+            is Msg.ConnectivityChanged -> copy(isOnline = msg.value)
+            is Msg.LocalAvailabilityChanged -> copy(hasLocalContent = msg.value)
+        }
     }
 }

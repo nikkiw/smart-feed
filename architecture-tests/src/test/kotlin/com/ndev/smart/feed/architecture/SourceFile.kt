@@ -23,20 +23,18 @@ internal val projectRoot: Path =
         },
     )
 
-fun sourceFilesUnder(vararg roots: String): List<SourceFile> =
-    roots
-        .map { projectRoot.resolve(it) }
-        .filter(Files::exists)
-        .flatMap(::sourceFilesFrom)
+fun sourceFilesUnder(vararg roots: String): List<SourceFile> = roots
+    .map { projectRoot.resolve(it) }
+    .filter(Files::exists)
+    .flatMap(::sourceFilesFrom)
 
-private fun sourceFilesFrom(root: Path): List<SourceFile> =
-    Files.walk(root).use { stream ->
-        stream
-            .filter { it.extension == "kt" }
-            .filter { !it.invariantSeparatorsPathString.contains("/build/") }
-            .map(::parseSourceFile)
-            .toList()
-    }
+private fun sourceFilesFrom(root: Path): List<SourceFile> = Files.walk(root).use { stream ->
+    stream
+        .filter { it.extension == "kt" }
+        .filter { !it.invariantSeparatorsPathString.contains("/build/") }
+        .map(::parseSourceFile)
+        .toList()
+}
 
 private fun parseSourceFile(path: Path): SourceFile {
     val text = path.readText()
@@ -44,21 +42,18 @@ private fun parseSourceFile(path: Path): SourceFile {
     return SourceFile(
         path = path,
         packageName =
-            lines.firstOrNull { it.startsWith("package ") }
-                ?.removePrefix("package ")
-                ?.trim(),
+        lines.firstOrNull { it.startsWith("package ") }
+            ?.removePrefix("package ")
+            ?.trim(),
         imports =
-            lines
-                .filter { it.startsWith("import ") }
-                .map { it.removePrefix("import ").substringBefore(" as ").trim() },
+        lines
+            .filter { it.startsWith("import ") }
+            .map { it.removePrefix("import ").substringBefore(" as ").trim() },
         text = text,
     )
 }
 
-fun List<SourceFile>.assertNoImports(
-    forbiddenPrefixes: List<String>,
-    reason: String,
-) {
+fun List<SourceFile>.assertNoImports(forbiddenPrefixes: List<String>, reason: String) {
     val violations =
         flatMap { file ->
             file.imports
@@ -74,10 +69,7 @@ fun List<SourceFile>.assertNoImports(
     }
 }
 
-fun List<SourceFile>.assertTextDoesNotContain(
-    forbiddenSnippets: List<String>,
-    reason: String,
-) {
+fun List<SourceFile>.assertTextDoesNotContain(forbiddenSnippets: List<String>, reason: String) {
     val violations =
         flatMap { file ->
             forbiddenSnippets

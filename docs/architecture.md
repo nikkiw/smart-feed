@@ -48,7 +48,6 @@ graph TD
         CoreDB[":core:core-database"]
         CoreNet[":core:core-networks"]
         ImageApi[":core:image:api"]
-        ImageGlide[":core:image-glide"]
         Analytics[":core:analytics:api"]
         Connectivity[":core:connectivity"]
         Coroutines[":core:coroutines"]
@@ -79,8 +78,6 @@ graph TD
     CoreDB --> RecLocal
     CoreDB --> UserApi
 
-    ImageGlide --> ImageApi
-    App --> ImageGlide
 ```
 
 > **Note on Room & Circular Dependency Prevention**: Room requires the `@Database` class to enumerate all `@Entity` types at compile time. If entities lived in `:feature:<name>:impl`, then `:core:core-database` would depend on `:feature:<name>:impl`, and `:feature:<name>:impl` on `:core:core-database` — creating a circular Gradle dependency. The `:feature:<name>:local` module breaks this loop: it has no dependency on `:core:core-database`, yet `:core:core-database` can safely depend on it to discover entities.
@@ -95,7 +92,7 @@ Every feature follows a strict 3-module pattern:
 |--------|----------|--------------|
 | `:feature:<name>:api` | Domain models, repository interfaces, component contracts, state objects | Stable contract surface; independent from UI implementations, repositories, Room schemas, and DI. AndroidX or Decompose abstractions may appear when they are part of the contract. |
 | `:feature:<name>:local` | Room `@Entity` classes, `@Dao` interfaces, TypeConverters for this feature | `:feature:<name>:api` only |
-| `:feature:<name>:impl` | Component implementations, current XML/ViewBinding UI, repository implementations, Hilt modules | `:api`, `:local`, `:core:core-database`, `:core:image:api`, etc. |
+| `:feature:<name>:impl` | Component implementations, Compose UI, repository implementations, Hilt modules | `:api`, `:local`, `:core:core-database`, `:core:image:api`, etc. |
 
 ---
 
@@ -147,7 +144,6 @@ For a detailed description, see [Recommendation Engine](recommendation_engine.md
 | `:core:core-database` | `RoomDatabase` orchestrator, cross-feature schema migrations |
 | `:core:core-networks` | Retrofit/Ktor client configuration, dev/prod network data sources |
 | `:core:image:api` | Pure Kotlin `ImageLoader` interface (KMP-portable, no Glide dependency) |
-| `:core:image-glide` | Glide implementation of `ImageLoader` |
 | `:core:analytics:api` | `AnalyticsService` interface |
 | `:core:analytics:impl` | Analytics implementation |
 | `:core:connectivity` | `ConnectivityRepository` — network state monitoring (modern observer-based implementation) |
@@ -175,7 +171,7 @@ graph TD
 ```
 
 ### Component Responsibilities
-* **`FeedRootComponent`**: Manages the `ChildStack` navigation between Feed, Details, and Recommendations. Handles shared-element transition registration via `TransitionRegistry`.
+* **`FeedRootComponent`**: Manages the `ChildStack` navigation between Feed, Details, and Recommendations. The Compose renderer layers shared transitions on top of this navigation state.
 * **`FeedMasterComponent`**: Orchestrates filter/sort state and coordinates feed list loading.
 * **`FeedListComponent`**: Encapsulates Paging 3 data loading, loading/error/empty state tracking, and swipe-to-refresh.
 * **`ArticleItemComponent`**: Renders Markdown content (Markwon), tracks read-percentage analytics, and loads contextual article recommendations.
@@ -184,13 +180,13 @@ graph TD
 Complex Feed components (`FeedListComponent`, `RecommendationListComponent`, `ArticleItemComponent`,
 and `ArticleRecommendationsComponent`) retain MVIKotlin stores and expose only component models
 and effects to the UI layer. `FeedRootComponent`, `FeedMasterComponent`, `FilterSortComponent`,
-and `BottomBarComponent` remain lightweight Decompose coordinators. The current rendering layer is
-XML/ViewBinding with RecyclerView; Compose is intentionally not part of the production path yet.
+and `BottomBarComponent` remain lightweight Decompose coordinators. The current production
+rendering layer is Jetpack Compose.
 
-The planned migration starts with a parallel Compose `ArticleCard` implementation using the same
-component contract and data model. XML remains available as a control path while startup time,
-scrolling smoothness, frame timing, memory, and recomposition behavior are measured on the same
-dataset. A broader XML-to-Compose migration is considered only after that comparison.
+The project reached this state through an incremental migration that started with a parallel
+Compose `ArticleCard` implementation measured against the XML baseline. Those comparison artifacts
+remain useful as historical evidence and as a benchmark reference, but they no longer describe the
+active production UI path.
 
 ---
 

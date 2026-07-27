@@ -18,7 +18,5 @@ import javax.inject.Singleton
 object DatabaseTestModule {
     @Singleton
     @Provides
-    fun provideDatabase(
-        @ApplicationContext context: Context,
-    ): AppDatabase = AppDatabase.getTestDatabase(context)
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase = AppDatabase.getTestDatabase(context)
 }

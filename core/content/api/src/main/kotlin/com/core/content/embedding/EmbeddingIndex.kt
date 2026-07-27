@@ -50,10 +50,7 @@ class EmbeddingIndex {
      * @param unitVector The already-normalized embedding vector (unit length). If not normalized,
      *                   consider calling [normalize] first to ensure correct similarity.
      */
-    fun add(
-        id: String,
-        unitVector: FloatArray,
-    ) {
+    fun add(id: String, unitVector: FloatArray) {
         embeddings.add(id to unitVector)
     }
 
@@ -80,10 +77,7 @@ class EmbeddingIndex {
      * @param k Number of nearest neighbors to retrieve.
      * @return A list of pairs (contentId, similarityScore), sorted descending by similarity.
      */
-    fun search(
-        queryUnit: FloatArray,
-        k: Int,
-    ): List<ArticleScore> {
+    fun search(queryUnit: FloatArray, k: Int): List<ArticleScore> {
         // Min-heap to store top-k results; root has the smallest similarity in the heap
         val pq =
             PriorityQueue<ArticleScore>(
@@ -149,10 +143,7 @@ class EmbeddingIndex {
          * @param b Second vector.
          * @return The dot product sum(a[i] * b[i]).
          */
-        fun dot(
-            a: FloatArray,
-            b: FloatArray,
-        ): Float {
+        fun dot(a: FloatArray, b: FloatArray): Float {
             var sum = 0f
             for (i in a.indices) sum += a[i] * b[i]
             return sum

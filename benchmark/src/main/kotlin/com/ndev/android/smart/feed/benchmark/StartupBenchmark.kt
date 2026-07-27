@@ -21,14 +21,12 @@ class StartupBenchmark {
     val benchmarkRule = MacrobenchmarkRule()
 
     private val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-    private val renderer = ArticleCardRenderer.fromInstrumentationArguments()
 
     @Before
     fun prepareData() {
         prepareFeed(
             device = device,
             warmScrollCache = false,
-            renderer = renderer,
         )
     }
 
@@ -43,9 +41,7 @@ class StartupBenchmark {
             pressHome()
         },
     ) {
-        startActivityAndWait { launchIntent ->
-            launchIntent.putExtra(ARTICLE_CARD_RENDERER_EXTRA, renderer.wireValue)
-        }
+        startActivityAndWait()
     }
 
     @OptIn(androidx.benchmark.macro.ExperimentalMacrobenchmarkApi::class)
@@ -60,8 +56,6 @@ class StartupBenchmark {
             pressHome()
         },
     ) {
-        startActivityAndWait { launchIntent ->
-            launchIntent.putExtra(ARTICLE_CARD_RENDERER_EXTRA, renderer.wireValue)
-        }
+        startActivityAndWait()
     }
 }

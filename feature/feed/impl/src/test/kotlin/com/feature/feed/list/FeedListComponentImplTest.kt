@@ -4,11 +4,16 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.core.content.model.ContentId
 import com.core.content.model.ContentType
+import com.core.content.model.ImageUrl
+import com.core.content.model.ShortDescription
 import com.core.content.model.Tags
+import com.core.content.model.Title
+import com.core.content.model.UpdatedAt
 import com.core.observers.ConnectivityRepository
 import com.feature.feed.DecomposeTestUtils
 import com.feature.feed.component.list.FeedListComponentImpl
 import com.feature.feed.data.usecase.content.GetPagedContentUseCase
+import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.repository.ContentItemsSortedType
 import com.feature.feed.domain.repository.Query
@@ -86,242 +91,244 @@ class FeedListComponentImplTest {
     }
 
     @Test
-    fun `initial load starts the initial query`() =
-        runTest(dispatcher) {
-            val initialLoadStarted = AtomicBoolean(false)
-            val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
-            every { getPagedContentUseCase.invoke(initialQuery) } returns
-                flow {
-                    initialLoadStarted.set(true)
+    fun `initial load starts the initial query`() = runTest(dispatcher) {
+        val initialLoadStarted = AtomicBoolean(false)
+        val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
+        every { getPagedContentUseCase.invoke(initialQuery) } returns
+            flow {
+                initialLoadStarted.set(true)
+                awaitCancellation()
+            }
+        val syncContentUseCase = mockk<SyncContentUseCase>()
+        coEvery { syncContentUseCase.invoke() } returns Result.success(Unit)
+
+        val component =
+            createComponent(
+                getPagedContentUseCase = getPagedContentUseCase,
+                syncContentUseCase = syncContentUseCase,
+            )
+
+        testContext.startLifecycle()
+        backgroundScope.launch(dispatcher) { component.pagingItems.collect() }
+        advanceUntilIdle()
+
+        assertThat(initialLoadStarted.get()).isTrue()
+        assertThat(component.model.value.refreshState)
+            .isEqualTo(FeedListComponent.RefreshState.Idle)
+        assertThat(component.model.value.isOnline).isTrue()
+        verify(exactly = 1) {
+            getPagedContentUseCase.invoke(initialQuery)
+        }
+    }
+
+    @Test
+    fun `query change cancels active load and starts a new one`() = runTest(dispatcher) {
+        val initialCancelled = AtomicBoolean(false)
+        val updatedStarted = AtomicBoolean(false)
+
+        val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
+        every { getPagedContentUseCase.invoke(initialQuery) } returns
+            flow {
+                try {
                     awaitCancellation()
+                } finally {
+                    initialCancelled.set(true)
                 }
-            val syncContentUseCase = mockk<SyncContentUseCase>()
-            coEvery { syncContentUseCase.invoke() } returns Result.success(Unit)
-
-            val component =
-                createComponent(
-                    getPagedContentUseCase = getPagedContentUseCase,
-                    syncContentUseCase = syncContentUseCase,
-                )
-
-            testContext.startLifecycle()
-            backgroundScope.launch(dispatcher) { component.pagingItems.collect() }
-            advanceUntilIdle()
-
-            assertThat(initialLoadStarted.get()).isTrue()
-            assertThat(component.model.value.refreshState)
-                .isEqualTo(FeedListComponent.RefreshState.Idle)
-            assertThat(component.model.value.isOnline).isTrue()
-            verify(exactly = 1) {
-                getPagedContentUseCase.invoke(initialQuery)
             }
+        every { getPagedContentUseCase.invoke(updatedQuery) } returns
+            flow {
+                updatedStarted.set(true)
+                awaitCancellation()
+            }
+        val syncContentUseCase = mockk<SyncContentUseCase>()
+        coEvery { syncContentUseCase.invoke() } returns Result.success(Unit)
+
+        val component =
+            createComponent(
+                getPagedContentUseCase = getPagedContentUseCase,
+                syncContentUseCase = syncContentUseCase,
+            )
+
+        testContext.startLifecycle()
+        backgroundScope.launch(dispatcher) { component.pagingItems.collect() }
+        advanceUntilIdle()
+
+        component.updateQuery(updatedQuery)
+        advanceUntilIdle()
+
+        assertThat(initialCancelled.get()).isTrue()
+        assertThat(updatedStarted.get()).isTrue()
+        assertThat(component.model.value.refreshState)
+            .isEqualTo(FeedListComponent.RefreshState.Idle)
+        verify(exactly = 1) {
+            getPagedContentUseCase.invoke(initialQuery)
         }
+        verify(exactly = 1) {
+            getPagedContentUseCase.invoke(updatedQuery)
+        }
+    }
 
     @Test
-    fun `query change cancels active load and starts a new one`() =
-        runTest(dispatcher) {
-            val initialCancelled = AtomicBoolean(false)
-            val updatedStarted = AtomicBoolean(false)
+    fun `same query does not restart active load`() = runTest(dispatcher) {
+        val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
+        every { getPagedContentUseCase.invoke(initialQuery) } returns
+            flow { awaitCancellation() }
+        val syncContentUseCase = mockk<SyncContentUseCase>()
+        coEvery { syncContentUseCase.invoke() } returns Result.success(Unit)
+        val component =
+            createComponent(
+                getPagedContentUseCase = getPagedContentUseCase,
+                syncContentUseCase = syncContentUseCase,
+            )
 
-            val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
-            every { getPagedContentUseCase.invoke(initialQuery) } returns
-                flow {
-                    try {
-                        awaitCancellation()
-                    } finally {
-                        initialCancelled.set(true)
-                    }
-                }
-            every { getPagedContentUseCase.invoke(updatedQuery) } returns
-                flow {
-                    updatedStarted.set(true)
+        backgroundScope.launch(dispatcher) { component.pagingItems.collect() }
+
+        component.updateQuery(initialQuery)
+        advanceUntilIdle()
+
+        verify(exactly = 1) { getPagedContentUseCase.invoke(initialQuery) }
+    }
+
+    @Test
+    fun `refresh request cancels active refresh before restarting`() = runTest(dispatcher) {
+        val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
+        every { getPagedContentUseCase.invoke(initialQuery) } returns emptyFlow()
+        val firstRefreshCancelled = AtomicBoolean(false)
+        val refreshCalls = AtomicInteger(0)
+        val syncContentUseCase = mockk<SyncContentUseCase>()
+        coEvery { syncContentUseCase.invoke() } coAnswers {
+            if (refreshCalls.incrementAndGet() == 1) {
+                try {
                     awaitCancellation()
+                } finally {
+                    firstRefreshCancelled.set(true)
                 }
-            val syncContentUseCase = mockk<SyncContentUseCase>()
-            coEvery { syncContentUseCase.invoke() } returns Result.success(Unit)
-
-            val component =
-                createComponent(
-                    getPagedContentUseCase = getPagedContentUseCase,
-                    syncContentUseCase = syncContentUseCase,
-                )
-
-            testContext.startLifecycle()
-            backgroundScope.launch(dispatcher) { component.pagingItems.collect() }
-            advanceUntilIdle()
-
-            component.updateQuery(updatedQuery)
-            advanceUntilIdle()
-
-            assertThat(initialCancelled.get()).isTrue()
-            assertThat(updatedStarted.get()).isTrue()
-            assertThat(component.model.value.refreshState)
-                .isEqualTo(FeedListComponent.RefreshState.Idle)
-            verify(exactly = 1) {
-                getPagedContentUseCase.invoke(initialQuery)
             }
-            verify(exactly = 1) {
-                getPagedContentUseCase.invoke(updatedQuery)
-            }
+            Result.success(Unit)
         }
+        val component =
+            createComponent(
+                getPagedContentUseCase = getPagedContentUseCase,
+                syncContentUseCase = syncContentUseCase,
+            )
+
+        component.onRefresh()
+        advanceUntilIdle()
+        component.onRefresh()
+        advanceUntilIdle()
+
+        assertThat(firstRefreshCancelled.get()).isTrue()
+        assertThat(refreshCalls.get()).isEqualTo(2)
+        assertThat(component.model.value.refreshState)
+            .isEqualTo(FeedListComponent.RefreshState.Idle)
+    }
 
     @Test
-    fun `same query does not restart active load`() =
-        runTest(dispatcher) {
-            val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
-            every { getPagedContentUseCase.invoke(initialQuery) } returns
-                flow { awaitCancellation() }
-            val syncContentUseCase = mockk<SyncContentUseCase>()
-            coEvery { syncContentUseCase.invoke() } returns Result.success(Unit)
-            val component =
-                createComponent(
-                    getPagedContentUseCase = getPagedContentUseCase,
-                    syncContentUseCase = syncContentUseCase,
-                )
+    fun `refresh failure emits a one-shot message effect and stores error state`() = runTest(dispatcher) {
+        val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
+        every { getPagedContentUseCase.invoke(initialQuery) } returns emptyFlow()
 
-            backgroundScope.launch(dispatcher) { component.pagingItems.collect() }
-
-            component.updateQuery(initialQuery)
-            advanceUntilIdle()
-
-            verify(exactly = 1) { getPagedContentUseCase.invoke(initialQuery) }
+        val syncContentUseCase = mockk<SyncContentUseCase>()
+        coEvery { syncContentUseCase.invoke() } coAnswers {
+            delay(1.milliseconds)
+            Result.failure(RuntimeException("refresh failed"))
         }
+
+        val component =
+            createComponent(
+                getPagedContentUseCase = getPagedContentUseCase,
+                syncContentUseCase = syncContentUseCase,
+            )
+
+        testContext.startLifecycle()
+        advanceUntilIdle()
+
+        component.onRefresh()
+        assertThat(component.model.value.refreshState)
+            .isEqualTo(FeedListComponent.RefreshState.Refreshing)
+
+        advanceUntilIdle()
+
+        assertThat(component.model.value.refreshState)
+            .isEqualTo(FeedListComponent.RefreshState.Failed("refresh failed"))
+    }
 
     @Test
-    fun `refresh request cancels active refresh before restarting`() =
-        runTest(dispatcher) {
-            val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
-            every { getPagedContentUseCase.invoke(initialQuery) } returns emptyFlow()
-            val firstRefreshCancelled = AtomicBoolean(false)
-            val refreshCalls = AtomicInteger(0)
-            val syncContentUseCase = mockk<SyncContentUseCase>()
-            coEvery { syncContentUseCase.invoke() } coAnswers {
-                if (refreshCalls.incrementAndGet() == 1) {
-                    try {
-                        awaitCancellation()
-                    } finally {
-                        firstRefreshCancelled.set(true)
-                    }
-                }
-                Result.success(Unit)
-            }
-            val component =
-                createComponent(
-                    getPagedContentUseCase = getPagedContentUseCase,
-                    syncContentUseCase = syncContentUseCase,
-                )
+    fun `refresh timeout stops spinner and emits a stable error`() = runTest(dispatcher) {
+        val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
+        every { getPagedContentUseCase.invoke(initialQuery) } returns emptyFlow()
+        val syncContentUseCase = mockk<SyncContentUseCase>()
+        coEvery { syncContentUseCase.invoke() } coAnswers { awaitCancellation() }
+        val component =
+            createComponent(
+                getPagedContentUseCase = getPagedContentUseCase,
+                syncContentUseCase = syncContentUseCase,
+            )
 
-            component.onRefresh()
-            advanceUntilIdle()
-            component.onRefresh()
-            advanceUntilIdle()
+        testContext.startLifecycle()
+        advanceUntilIdle()
+        component.onRefresh()
+        assertThat(component.model.value.refreshState)
+            .isEqualTo(FeedListComponent.RefreshState.Refreshing)
 
-            assertThat(firstRefreshCancelled.get()).isTrue()
-            assertThat(refreshCalls.get()).isEqualTo(2)
-            assertThat(component.model.value.refreshState)
-                .isEqualTo(FeedListComponent.RefreshState.Idle)
-        }
+        advanceTimeBy(10_001L.milliseconds)
+        advanceUntilIdle()
+
+        assertThat(component.model.value.refreshState)
+            .isEqualTo(
+                FeedListComponent.RefreshState.Failed(
+                    "Refresh timed out. Please try again.",
+                ),
+            )
+    }
 
     @Test
-    fun `refresh failure emits a one-shot message effect and stores error state`() =
-        runTest(dispatcher) {
-            val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
-            every { getPagedContentUseCase.invoke(initialQuery) } returns emptyFlow()
+    fun `article click delegates to the provided callback`() = runTest(dispatcher) {
+        val clickedItems = mutableListOf<ContentItemPreview>()
+        val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
+        every { getPagedContentUseCase.invoke(initialQuery) } returns emptyFlow()
+        val syncContentUseCase = mockk<SyncContentUseCase>()
+        coEvery { syncContentUseCase.invoke() } returns Result.success(Unit)
 
-            val syncContentUseCase = mockk<SyncContentUseCase>()
-            coEvery { syncContentUseCase.invoke() } coAnswers {
-                delay(1.milliseconds)
-                Result.failure(RuntimeException("refresh failed"))
-            }
+        val component =
+            createComponent(
+                getPagedContentUseCase = getPagedContentUseCase,
+                syncContentUseCase = syncContentUseCase,
+                onItemClick = clickedItems::add,
+            )
 
-            val component =
-                createComponent(
-                    getPagedContentUseCase = getPagedContentUseCase,
-                    syncContentUseCase = syncContentUseCase,
-                )
+        testContext.startLifecycle()
+        advanceUntilIdle()
 
-            testContext.startLifecycle()
-            advanceUntilIdle()
+        val preview = testArticlePreview("article-1")
+        component.onListItemClick(preview)
 
-            component.onRefresh()
-            assertThat(component.model.value.refreshState)
-                .isEqualTo(FeedListComponent.RefreshState.Refreshing)
-
-            advanceUntilIdle()
-
-            assertThat(component.model.value.refreshState)
-                .isEqualTo(FeedListComponent.RefreshState.Failed("refresh failed"))
-        }
-
-    @Test
-    fun `refresh timeout stops spinner and emits a stable error`() =
-        runTest(dispatcher) {
-            val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
-            every { getPagedContentUseCase.invoke(initialQuery) } returns emptyFlow()
-            val syncContentUseCase = mockk<SyncContentUseCase>()
-            coEvery { syncContentUseCase.invoke() } coAnswers { awaitCancellation() }
-            val component =
-                createComponent(
-                    getPagedContentUseCase = getPagedContentUseCase,
-                    syncContentUseCase = syncContentUseCase,
-                )
-
-            testContext.startLifecycle()
-            advanceUntilIdle()
-            component.onRefresh()
-            assertThat(component.model.value.refreshState)
-                .isEqualTo(FeedListComponent.RefreshState.Refreshing)
-
-            advanceTimeBy(10_001L.milliseconds)
-            advanceUntilIdle()
-
-            assertThat(component.model.value.refreshState)
-                .isEqualTo(
-                    FeedListComponent.RefreshState.Failed(
-                        "Refresh timed out. Please try again.",
-                    ),
-                )
-        }
-
-    @Test
-    fun `article click delegates to the provided callback`() =
-        runTest(dispatcher) {
-            val clickedIds = mutableListOf<ContentId>()
-            val getPagedContentUseCase = mockk<GetPagedContentUseCase>()
-            every { getPagedContentUseCase.invoke(initialQuery) } returns emptyFlow()
-            val syncContentUseCase = mockk<SyncContentUseCase>()
-            coEvery { syncContentUseCase.invoke() } returns Result.success(Unit)
-
-            val component =
-                createComponent(
-                    getPagedContentUseCase = getPagedContentUseCase,
-                    syncContentUseCase = syncContentUseCase,
-                    onItemClick = clickedIds::add,
-                )
-
-            testContext.startLifecycle()
-            advanceUntilIdle()
-
-            component.onListItemClick(ContentId("article-1"))
-
-            assertThat(clickedIds)
-                .containsExactly(ContentId("article-1"))
-        }
+        assertThat(clickedItems)
+            .containsExactly(preview)
+    }
 
     private fun createComponent(
         componentContext: ComponentContext = testContext.componentContext,
         getPagedContentUseCase: GetPagedContentUseCase,
         syncContentUseCase: SyncContentUseCase,
-        onItemClick: (ContentId) -> Unit = {},
-    ): FeedListComponentImpl =
-        FeedListComponentImpl(
-            componentContext = componentContext,
-            storeFactory = DefaultStoreFactory(),
-            getPagedContentUseCase = getPagedContentUseCase,
-            syncContentUseCase = syncContentUseCase,
-            connectivityRepository = connectivityRepository,
-            contentItemRepository = contentItemRepository,
-            initialQuery = initialQuery,
-            onItemClick = onItemClick,
-        )
+        onItemClick: (ContentItemPreview) -> Unit = {},
+    ): FeedListComponentImpl = FeedListComponentImpl(
+        componentContext = componentContext,
+        storeFactory = DefaultStoreFactory(),
+        getPagedContentUseCase = getPagedContentUseCase,
+        syncContentUseCase = syncContentUseCase,
+        connectivityRepository = connectivityRepository,
+        contentItemRepository = contentItemRepository,
+        initialQuery = initialQuery,
+        onItemClick = onItemClick,
+    )
+
+    private fun testArticlePreview(id: String): ContentItemPreview.ArticlePreview = ContentItemPreview.ArticlePreview(
+        id = ContentId(id),
+        updatedAt = UpdatedAt(1_721_894_400_000),
+        mainImageUrl = ImageUrl(""),
+        tags = Tags(listOf("compose")),
+        title = Title("Compose article"),
+        short = ShortDescription("Preview"),
+    )
 }

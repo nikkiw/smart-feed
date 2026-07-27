@@ -30,6 +30,18 @@ interface ContentInteractionStatsDao {
     @Query("SELECT * FROM content_interaction_stats ORDER BY readCount DESC LIMIT :limit")
     suspend fun getTopContentByReadCount(limit: Int): List<ContentInteractionStats>
 
+    @Query(
+        """
+        SELECT c.languageCode
+        FROM content_interaction_stats s
+        JOIN content c ON c.id = s.contentId
+        WHERE c.languageCode != :unknownLanguage
+        ORDER BY s.readCount DESC, s.avgReadPercentage DESC, s.avgReadingTime DESC
+        LIMIT :limit
+        """,
+    )
+    suspend fun getTopReadLanguageCodes(limit: Int, unknownLanguage: String = "und"): List<String>
+
     /**
      * Retrieves the interaction statistics for a specific article identified by its ID.
      *

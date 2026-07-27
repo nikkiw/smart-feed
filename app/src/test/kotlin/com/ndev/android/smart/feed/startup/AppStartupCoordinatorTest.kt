@@ -33,66 +33,62 @@ class AppStartupCoordinatorTest {
     }
 
     @Test
-    fun `does not bootstrap before lifecycle reaches started`() =
-        runTest(dispatcher) {
-            val bootstrapper = RecordingBootstrapper()
-            val reporter = RecordingStartupErrorReporter()
-            val owner = TestLifecycleOwner()
-            val coordinator = AppStartupCoordinator(bootstrapper, reporter)
+    fun `does not bootstrap before lifecycle reaches started`() = runTest(dispatcher) {
+        val bootstrapper = RecordingBootstrapper()
+        val reporter = RecordingStartupErrorReporter()
+        val owner = TestLifecycleOwner()
+        val coordinator = AppStartupCoordinator(bootstrapper, reporter)
 
-            coordinator.attach(owner)
-            advanceUntilIdle()
+        coordinator.attach(owner)
+        advanceUntilIdle()
 
-            assertEquals(0, bootstrapper.calls)
-        }
-
-    @Test
-    fun `bootstraps once when lifecycle reaches started`() =
-        runTest(dispatcher) {
-            val bootstrapper = RecordingBootstrapper()
-            val reporter = RecordingStartupErrorReporter()
-            val owner = TestLifecycleOwner()
-            val coordinator = AppStartupCoordinator(bootstrapper, reporter)
-
-            coordinator.attach(owner)
-            owner.moveToStarted()
-            advanceUntilIdle()
-
-            assertEquals(1, bootstrapper.calls)
-        }
+        assertEquals(0, bootstrapper.calls)
+    }
 
     @Test
-    fun `attaching twice still starts only one bootstrap job`() =
-        runTest(dispatcher) {
-            val bootstrapper = RecordingBootstrapper()
-            val reporter = RecordingStartupErrorReporter()
-            val owner = TestLifecycleOwner()
-            val coordinator = AppStartupCoordinator(bootstrapper, reporter)
+    fun `bootstraps once when lifecycle reaches started`() = runTest(dispatcher) {
+        val bootstrapper = RecordingBootstrapper()
+        val reporter = RecordingStartupErrorReporter()
+        val owner = TestLifecycleOwner()
+        val coordinator = AppStartupCoordinator(bootstrapper, reporter)
 
-            coordinator.attach(owner)
-            coordinator.attach(owner)
-            owner.moveToStarted()
-            advanceUntilIdle()
+        coordinator.attach(owner)
+        owner.moveToStarted()
+        advanceUntilIdle()
 
-            assertEquals(1, bootstrapper.calls)
-        }
+        assertEquals(1, bootstrapper.calls)
+    }
 
     @Test
-    fun `reports bootstrap failure`() =
-        runTest(dispatcher) {
-            val failure = IllegalStateException("startup failed")
-            val bootstrapper = RecordingBootstrapper { throw failure }
-            val reporter = RecordingStartupErrorReporter()
-            val owner = TestLifecycleOwner()
-            val coordinator = AppStartupCoordinator(bootstrapper, reporter)
+    fun `attaching twice still starts only one bootstrap job`() = runTest(dispatcher) {
+        val bootstrapper = RecordingBootstrapper()
+        val reporter = RecordingStartupErrorReporter()
+        val owner = TestLifecycleOwner()
+        val coordinator = AppStartupCoordinator(bootstrapper, reporter)
 
-            coordinator.attach(owner)
-            owner.moveToStarted()
-            advanceUntilIdle()
+        coordinator.attach(owner)
+        coordinator.attach(owner)
+        owner.moveToStarted()
+        advanceUntilIdle()
 
-            assertEquals(1, reporter.errors.size)
-            assertEquals(failure, reporter.errors.single())
-        }
+        assertEquals(1, bootstrapper.calls)
+    }
+
+    @Test
+    fun `reports bootstrap failure`() = runTest(dispatcher) {
+        val failure = IllegalStateException("startup failed")
+        val bootstrapper = RecordingBootstrapper { throw failure }
+        val reporter = RecordingStartupErrorReporter()
+        val owner = TestLifecycleOwner()
+        val coordinator = AppStartupCoordinator(bootstrapper, reporter)
+
+        coordinator.attach(owner)
+        owner.moveToStarted()
+        advanceUntilIdle()
+
+        assertEquals(1, reporter.errors.size)
+        assertEquals(failure, reporter.errors.single())
+    }
 
     private class RecordingBootstrapper(
         private val onBootstrap: suspend () -> Unit = {},

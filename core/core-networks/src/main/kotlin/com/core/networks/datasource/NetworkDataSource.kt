@@ -18,10 +18,7 @@ interface NetworkDataSource {
      * @param limit Maximum number of update records to retrieve. Defaults to 100.
      * @return A [Result] wrapping [UpdatesResponse] on success or an error on failure.
      */
-    suspend fun getUpdates(
-        since: String,
-        limit: Int = 100,
-    ): Result<UpdatesResponse>
+    suspend fun getUpdates(since: String, limit: Int = 100): Result<UpdatesResponse>
 
     /**
      * Fetches a specific content update by its type and identifier.
@@ -30,10 +27,7 @@ interface NetworkDataSource {
      * @param id   The unique identifier of the content item.
      * @return A [Result] wrapping the [ContentUpdate] on success or an error on failure.
      */
-    suspend fun getContentById(
-        type: String,
-        id: String,
-    ): Result<ContentUpdate>
+    suspend fun getContentById(type: String, id: String): Result<ContentUpdate>
 
     /**
      * Returns the currently stored access token used for authenticated requests.

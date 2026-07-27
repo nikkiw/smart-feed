@@ -41,88 +41,88 @@ interface ConnectivityRepository {
  * @param context Application [Context] used to access connectivity services and register receivers.
  */
 class ConnectivityRepositoryImpl
-    @Inject
-    constructor(
-        private val context: Context,
-    ) : DefaultLifecycleObserver, ConnectivityRepository {
-        // Backing StateFlow for network connectivity status
-        private val _isConnected = MutableStateFlow(false)
-        override val isConnected: StateFlow<Boolean> = _isConnected
-        private var isCallbackRegistered = false
+@Inject
+constructor(
+    private val context: Context,
+) : DefaultLifecycleObserver, ConnectivityRepository {
+    // Backing StateFlow for network connectivity status
+    private val _isConnected = MutableStateFlow(false)
+    override val isConnected: StateFlow<Boolean> = _isConnected
+    private var isCallbackRegistered = false
 
-        override fun isInternetAvailable(): Boolean = _isConnected.value
+    override fun isInternetAvailable(): Boolean = _isConnected.value
 
-        init {
-            // Initialize connectivity status on creation
-            updateConnectivityStatus()
-        }
+    init {
+        // Initialize connectivity status on creation
+        updateConnectivityStatus()
+    }
 
-        /**
-         * Checks the current network state and updates [_isConnected].
-         *
-         * Uses [ConnectivityManager.getNetworkCapabilities] because the app minSdk is 23.
-         */
-        private fun updateConnectivityStatus() {
-            Log.d(TAG, "updateConnectivityStatus start")
-            val connectivityManager =
-                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    /**
+     * Checks the current network state and updates [_isConnected].
+     *
+     * Uses [ConnectivityManager.getNetworkCapabilities] because the app minSdk is 23.
+     */
+    private fun updateConnectivityStatus() {
+        Log.d(TAG, "updateConnectivityStatus start")
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-            val activeNetwork = connectivityManager.activeNetwork
-            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-            _isConnected.value =
-                capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-            Log.d(TAG, "updateConnectivityStatus end ${_isConnected.value}")
-        }
+        val activeNetwork = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+        _isConnected.value =
+            capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        Log.d(TAG, "updateConnectivityStatus end ${_isConnected.value}")
+    }
 
-        /**
-         * Called when the application moves to the foreground.
-         * Registers network callbacks while the application is foregrounded.
-         */
-        override fun onStart(owner: LifecycleOwner) {
-            Log.d(TAG, "onStart start")
-            if (isCallbackRegistered) return
+    /**
+     * Called when the application moves to the foreground.
+     * Registers network callbacks while the application is foregrounded.
+     */
+    override fun onStart(owner: LifecycleOwner) {
+        Log.d(TAG, "onStart start")
+        if (isCallbackRegistered) return
 
-            val connectivityManager =
-                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
-            isCallbackRegistered = true
-        }
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+        isCallbackRegistered = true
+    }
 
-        /**
-         * Called when the application moves to the background.
-         * Unregisters network callbacks while the application is backgrounded.
-         */
-        override fun onStop(owner: LifecycleOwner) {
-            Log.d(TAG, "onStop start")
-            if (!isCallbackRegistered) return
+    /**
+     * Called when the application moves to the background.
+     * Unregisters network callbacks while the application is backgrounded.
+     */
+    override fun onStop(owner: LifecycleOwner) {
+        Log.d(TAG, "onStop start")
+        if (!isCallbackRegistered) return
 
-            val connectivityManager =
-                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            connectivityManager.unregisterNetworkCallback(networkCallback)
-            isCallbackRegistered = false
-        }
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.unregisterNetworkCallback(networkCallback)
+        isCallbackRegistered = false
+    }
 
-        private val networkRequest =
-            NetworkRequest.Builder()
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                .build()
+    private val networkRequest =
+        NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
 
-        private val networkCallback =
-            object : ConnectivityManager.NetworkCallback() {
-                override fun onAvailable(network: Network) {
-                    super.onAvailable(network)
-                    Log.d(TAG, "networkCallback onAvailable")
-                    _isConnected.update { true }
-                }
-
-                override fun onLost(network: Network) {
-                    super.onLost(network)
-                    Log.d(TAG, "networkCallback onLost")
-                    _isConnected.update { false }
-                }
+    private val networkCallback =
+        object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                Log.d(TAG, "networkCallback onAvailable")
+                _isConnected.update { true }
             }
 
-        companion object {
-            private const val TAG = "ConnectivityRepository"
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                Log.d(TAG, "networkCallback onLost")
+                _isConnected.update { false }
+            }
         }
+
+    companion object {
+        private const val TAG = "ConnectivityRepository"
     }
+}

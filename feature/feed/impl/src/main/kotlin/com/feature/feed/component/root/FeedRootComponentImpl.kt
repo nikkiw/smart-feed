@@ -21,14 +21,12 @@ import com.feature.feed.component.article.ArticleItemComponentImpl
 import com.feature.feed.component.bottombar.BottomBarComponentImpl
 import com.feature.feed.component.master.FeedMasterComponentImpl
 import com.feature.feed.component.recommendation.RecommendationListComponentImpl
-import com.feature.feed.component.root.ui.ComplexBoundsTransformTransition
-import com.feature.feed.component.root.ui.SlideFadeDelayedTransitionBack
-import com.feature.feed.component.root.ui.SlideFadeDelayedTransitionTo
-import com.feature.feed.component.root.ui.TransitionRegistry
+import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.ContentItemRepository
 import com.feature.feed.domain.usecase.GetContentItemUseCase
 import com.feature.feed.domain.usecase.sync.SyncContentUseCase
 import com.feature.feed.list.FeedListComponent
+import com.feature.feed.mapper.toArticleRoutePreviewOrNull
 import com.feature.feed.master.FeedMasterComponent
 import com.feature.feed.recommendation.RecommendationListComponent
 import com.feature.feed.root.FeedRootComponent
@@ -44,157 +42,132 @@ import dagger.assisted.AssistedInject
 
 @Suppress("LongParameterList")
 class FeedRootComponentImpl
-    @AssistedInject
-    constructor(
-        @Assisted componentContext: ComponentContext,
-        private val contentItemRepository: ContentItemRepository,
-        private val feedListComponentFactory: FeedListComponent.Factory,
-        private val getContentItemUseCase: GetContentItemUseCase,
-        private val analyticsService: AnalyticsService,
-        private val recommendForUserUseCase: RecommendForUserUseCase,
-        private val recommendForArticleUseCase: RecommendForArticleUseCase,
-        private val connectivityRepository: ConnectivityRepository,
-        private val syncContentUseCase: SyncContentUseCase,
-        private val storeFactory: StoreFactory,
-    ) : FeedRootComponent, ComponentContext by componentContext {
-        @AssistedFactory
-        interface FeedRootComponentFactory : FeedRootComponent.Factory {
-            override fun invoke(componentContext: ComponentContext): FeedRootComponentImpl
-        }
-
-        internal val navigation = StackNavigation<Config>()
-
-        override val childStack: Value<ChildStack<*, FeedRootComponent.Child>> =
-            childStack(
-                source = navigation,
-                // Or null to disable navigation state saving
-                serializer = Config.serializer(),
-                initialConfiguration = Config.FeedScreenConfig,
-                // Pop the back stack on back button press
-                handleBackButton = true,
-                childFactory = ::createChild,
-            )
-
-        override val bottomBar: BottomBarComponent =
-            BottomBarComponentImpl(
-                componentContext = childContext(key = "bottomBar"),
-                onTabBarChanged = {
-                    when (it) {
-                        BottomBarState.List -> {
-                            navigation.replaceAll(Config.FeedScreenConfig)
-                        }
-
-                        BottomBarState.Recommendation -> {
-                            navigation.replaceAll(Config.RecommendationScreenConfig)
-                        }
-                    }
-                },
-            )
-
-        override fun pop(onComplete: (Boolean) -> Unit) {
-            navigation.pop(onComplete)
-        }
-
-        internal fun createChild(
-            config: Config,
-            componentContext: ComponentContext,
-        ): FeedRootComponent.Child =
-            when (config) {
-                is Config.FeedScreenConfig ->
-                    FeedScreen(
-                        itemList(
-                            componentContext,
-                        ),
-                    )
-
-                is Config.ArticleScreenConfig ->
-                    ArticleScreen(
-                        itemDetails(
-                            componentContext,
-                            config,
-                        ),
-                    )
-
-                Config.RecommendationScreenConfig ->
-                    RecommendationScreen(
-                        recommendationList(
-                            componentContext,
-                        ),
-                    )
-            }
-
-        @OptIn(DelicateDecomposeApi::class)
-        private fun itemList(componentContext: ComponentContext): FeedMasterComponent =
-            FeedMasterComponentImpl(
-                componentContext = componentContext,
-                contentItemRepository = contentItemRepository,
-                feedListComponentFactory = feedListComponentFactory,
-                onListItemClick = {
-                    navigation.pushToFront(Config.ArticleScreenConfig(itemId = it.value))
-                },
-            )
-
-        @OptIn(DelicateDecomposeApi::class)
-        private fun recommendationList(componentContext: ComponentContext): RecommendationListComponent =
-            RecommendationListComponentImpl(
-                componentContext = componentContext,
-                recommendForUserUseCase = recommendForUserUseCase,
-                connectivityRepository = connectivityRepository,
-                contentItemRepository = contentItemRepository,
-                syncContentUseCase = syncContentUseCase,
-                storeFactory = storeFactory,
-                onItemClick = {
-                    navigation.pushToFront(Config.ArticleScreenConfig(itemId = it.value))
-                },
-            )
-
-        @OptIn(DelicateDecomposeApi::class)
-        private fun itemDetails(
-            componentContext: ComponentContext,
-            config: Config.ArticleScreenConfig,
-        ): ArticleItemComponent =
-            ArticleItemComponentImpl(
-                componentContext = componentContext,
-                storeFactory = storeFactory,
-                getContentItemUseCase = getContentItemUseCase,
-                recommendForArticleUseCase = recommendForArticleUseCase,
-                analyticsService = analyticsService,
-                itemId = ContentId(config.itemId),
-                onFinished = {
-                    navigation.pop()
-                },
-                onClickItem = {
-                    navigation.pushToFront(Config.ArticleScreenConfig(itemId = it.value))
-                },
-            )
-
-        init {
-            TransitionRegistry.apply {
-                register(
-                    from = Config.FeedScreenConfig::class,
-                    to = Config.ArticleScreenConfig::class,
-                    transition = ComplexBoundsTransformTransition,
-                )
-                register(
-                    from = Config.RecommendationScreenConfig::class,
-                    to = Config.ArticleScreenConfig::class,
-                    transition = ComplexBoundsTransformTransition,
-                )
-                register(
-                    from = Config.ArticleScreenConfig::class,
-                    to = Config.ArticleScreenConfig::class,
-                    transition = ComplexBoundsTransformTransition,
-                )
-                register(
-                    from = Config.FeedScreenConfig::class,
-                    to = Config.RecommendationScreenConfig::class,
-                    transition = SlideFadeDelayedTransitionTo,
-                )
-                register(
-                    from = Config.RecommendationScreenConfig::class,
-                    to = Config.FeedScreenConfig::class,
-                    transition = SlideFadeDelayedTransitionBack,
-                )
-            }
-        }
+@AssistedInject
+constructor(
+    @Assisted componentContext: ComponentContext,
+    private val contentItemRepository: ContentItemRepository,
+    private val feedListComponentFactory: FeedListComponent.Factory,
+    private val getContentItemUseCase: GetContentItemUseCase,
+    private val analyticsService: AnalyticsService,
+    private val recommendForUserUseCase: RecommendForUserUseCase,
+    private val recommendForArticleUseCase: RecommendForArticleUseCase,
+    private val connectivityRepository: ConnectivityRepository,
+    private val syncContentUseCase: SyncContentUseCase,
+    private val storeFactory: StoreFactory,
+) : FeedRootComponent, ComponentContext by componentContext {
+    @AssistedFactory
+    interface FeedRootComponentFactory : FeedRootComponent.Factory {
+        override fun invoke(componentContext: ComponentContext): FeedRootComponentImpl
     }
+
+    internal val navigation = StackNavigation<Config>()
+
+    override val childStack: Value<ChildStack<*, FeedRootComponent.Child>> =
+        childStack(
+            source = navigation,
+            // Or null to disable navigation state saving
+            serializer = Config.serializer(),
+            initialConfiguration = Config.FeedScreenConfig,
+            // Pop the back stack on back button press
+            handleBackButton = true,
+            childFactory = ::createChild,
+        )
+
+    override val bottomBar: BottomBarComponent =
+        BottomBarComponentImpl(
+            componentContext = childContext(key = "bottomBar"),
+            onTabBarChanged = {
+                when (it) {
+                    BottomBarState.List -> {
+                        navigation.replaceAll(Config.FeedScreenConfig)
+                    }
+
+                    BottomBarState.Recommendation -> {
+                        navigation.replaceAll(Config.RecommendationScreenConfig)
+                    }
+                }
+            },
+        )
+
+    override fun pop(onComplete: (Boolean) -> Unit) {
+        navigation.pop(onComplete)
+    }
+
+    internal fun createChild(config: Config, componentContext: ComponentContext): FeedRootComponent.Child =
+        when (config) {
+            is Config.FeedScreenConfig ->
+                FeedScreen(
+                    itemList(
+                        componentContext,
+                    ),
+                )
+
+            is Config.ArticleScreenConfig ->
+                ArticleScreen(
+                    component = itemDetails(
+                        componentContext,
+                        config,
+                    ),
+                    preview = config.preview,
+                )
+
+            Config.RecommendationScreenConfig ->
+                RecommendationScreen(
+                    recommendationList(
+                        componentContext,
+                    ),
+                )
+        }
+
+    @OptIn(DelicateDecomposeApi::class)
+    private fun itemList(componentContext: ComponentContext): FeedMasterComponent = FeedMasterComponentImpl(
+        componentContext = componentContext,
+        contentItemRepository = contentItemRepository,
+        feedListComponentFactory = feedListComponentFactory,
+        onListItemClick = { preview ->
+            openArticle(preview)
+        },
+    )
+
+    @OptIn(DelicateDecomposeApi::class)
+    private fun recommendationList(componentContext: ComponentContext): RecommendationListComponent =
+        RecommendationListComponentImpl(
+            componentContext = componentContext,
+            recommendForUserUseCase = recommendForUserUseCase,
+            connectivityRepository = connectivityRepository,
+            contentItemRepository = contentItemRepository,
+            syncContentUseCase = syncContentUseCase,
+            storeFactory = storeFactory,
+            onItemClick = { preview ->
+                openArticle(preview)
+            },
+        )
+
+    @OptIn(DelicateDecomposeApi::class)
+    private fun itemDetails(
+        componentContext: ComponentContext,
+        config: Config.ArticleScreenConfig,
+    ): ArticleItemComponent = ArticleItemComponentImpl(
+        componentContext = componentContext,
+        storeFactory = storeFactory,
+        getContentItemUseCase = getContentItemUseCase,
+        recommendForArticleUseCase = recommendForArticleUseCase,
+        analyticsService = analyticsService,
+        itemId = ContentId(config.itemId),
+        onFinished = {
+            navigation.pop()
+        },
+        onClickItem = { preview ->
+            openArticle(preview)
+        },
+    )
+
+    private fun openArticle(preview: ContentItemPreview) {
+        navigation.pushToFront(
+            Config.ArticleScreenConfig(
+                itemId = preview.id.value,
+                preview = preview.toArticleRoutePreviewOrNull(),
+            ),
+        )
+    }
+}

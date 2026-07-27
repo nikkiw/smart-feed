@@ -40,12 +40,7 @@ interface ImageLoader {
      * @param imageView Target ImageView in which to display the loaded image.
      * @param options Options to customize how the image is loaded and displayed.
      */
-    fun load(
-        context: Context,
-        imageSource: ImageSource,
-        imageView: ImageView,
-        options: ImageOptions = ImageOptions(),
-    )
+    fun load(context: Context, imageSource: ImageSource, imageView: ImageView, options: ImageOptions = ImageOptions())
 
     /**
      * Preload an image into cache without displaying it, for later display.
@@ -54,9 +49,5 @@ interface ImageLoader {
      * @param imageSource Source of the image (URL, file, resource, etc.).
      * @param options Options to customize how the image is preloaded.
      */
-    fun preload(
-        context: Context,
-        imageSource: ImageSource,
-        options: ImageOptions = ImageOptions(),
-    )
+    fun preload(context: Context, imageSource: ImageSource, options: ImageOptions = ImageOptions())
 }

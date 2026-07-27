@@ -18,21 +18,20 @@ internal class ArticleRecommendationsStoreFactory(
     private val articleId: ContentId,
     private val recommendForArticleUseCase: RecommendForArticleUseCase,
 ) {
-    fun create(): ArticleRecommendationsStore =
-        object :
-            ArticleRecommendationsStore,
-            Store<
-                ArticleRecommendationsStore.Intent,
-                ArticleRecommendationsStore.State,
-                ArticleRecommendationsStore.Label,
-                > by
-            storeFactory.create(
-                name = "ArticleRecommendationsStore",
-                initialState = ArticleRecommendationsStore.State.Loading,
-                bootstrapper = SimpleBootstrapper(Action.Bootstrap),
-                executorFactory = ::ExecutorImpl,
-                reducer = ReducerImpl,
-            ) {}
+    fun create(): ArticleRecommendationsStore = object :
+        ArticleRecommendationsStore,
+        Store<
+            ArticleRecommendationsStore.Intent,
+            ArticleRecommendationsStore.State,
+            ArticleRecommendationsStore.Label,
+            > by
+        storeFactory.create(
+            name = "ArticleRecommendationsStore",
+            initialState = ArticleRecommendationsStore.State.Loading,
+            bootstrapper = SimpleBootstrapper(Action.Bootstrap),
+            executorFactory = ::ExecutorImpl,
+            reducer = ReducerImpl,
+        ) {}
 
     private sealed interface Action {
         data object Bootstrap : Action
@@ -62,7 +61,7 @@ internal class ArticleRecommendationsStoreFactory(
             when (intent) {
                 ArticleRecommendationsStore.Intent.Retry -> load()
                 is ArticleRecommendationsStore.Intent.ArticleClicked ->
-                    publish(ArticleRecommendationsStore.Label.OpenArticle(intent.id))
+                    publish(ArticleRecommendationsStore.Label.OpenArticle(intent.preview))
             }
         }
 

@@ -11,6 +11,7 @@ package com.feature.recommendation.local.embedding
 data class ArticleEmbedding(
     val articleId: String,
     val unitEmbedding: FloatArray,
+    val languageCode: String,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

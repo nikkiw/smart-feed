@@ -52,11 +52,11 @@ object DecomposeTestUtils {
 
         return TestComponentContext(
             componentContext =
-                DefaultComponentContext(
-                    lifecycle = lifecycle,
-                    stateKeeper = stateKeeper,
-                    instanceKeeper = instanceKeeper,
-                ),
+            DefaultComponentContext(
+                lifecycle = lifecycle,
+                stateKeeper = stateKeeper,
+                instanceKeeper = instanceKeeper,
+            ),
             lifecycle = lifecycle,
             instanceKeeper = instanceKeeper,
         )
@@ -80,11 +80,11 @@ object DecomposeTestUtils {
             val recreatedLifecycle = LifecycleRegistry()
             return TestComponentContext(
                 componentContext =
-                    DefaultComponentContext(
-                        lifecycle = recreatedLifecycle,
-                        stateKeeper = StateKeeperDispatcher(),
-                        instanceKeeper = instanceKeeper,
-                    ),
+                DefaultComponentContext(
+                    lifecycle = recreatedLifecycle,
+                    stateKeeper = StateKeeperDispatcher(),
+                    instanceKeeper = instanceKeeper,
+                ),
                 lifecycle = recreatedLifecycle,
                 instanceKeeper = instanceKeeper,
             )
@@ -196,13 +196,13 @@ object FeedTestDataBuilder {
             componentContext = componentContext,
             contentItemRepository = dependencies.contentItemRepository,
             feedListComponentFactory =
-                DefaultFeedListComponentFactory(
-                    storeFactory = DefaultStoreFactory(),
-                    getPagedContentUseCase = dependencies.getPagedContentUseCase,
-                    syncContentUseCase = dependencies.syncContentUseCase,
-                    connectivityRepository = dependencies.connectivityRepository,
-                    contentItemRepository = dependencies.contentItemRepository,
-                ),
+            DefaultFeedListComponentFactory(
+                storeFactory = DefaultStoreFactory(),
+                getPagedContentUseCase = dependencies.getPagedContentUseCase,
+                syncContentUseCase = dependencies.syncContentUseCase,
+                connectivityRepository = dependencies.connectivityRepository,
+                contentItemRepository = dependencies.contentItemRepository,
+            ),
             getContentItemUseCase = dependencies.getContentItemUseCase,
             analyticsService = dependencies.analyticsService,
             recommendForUserUseCase = dependencies.recommendForUserUseCase,
@@ -225,10 +225,7 @@ object NavigationTestScenarios {
             .hasEmptyBackStack()
     }
 
-    fun verifyNavigationToArticle(
-        component: FeedRootComponent,
-        itemId: String,
-    ) {
+    fun verifyNavigationToArticle(component: FeedRootComponent, itemId: String) {
         FeedComponentSubjects.assertThat(component.childStack.value)
             .hasActiveConfiguration(FeedRootComponent.Config.ArticleScreenConfig(itemId))
             .hasActiveChildOfType(FeedRootComponent.Child.ArticleScreen::class.java)
@@ -281,10 +278,7 @@ object MockFactories {
 /**
  * Assertion helpers
  */
-fun assertBottomBarState(
-    bottomBar: BottomBarComponent,
-    expectedState: BottomBarState,
-) {
+fun assertBottomBarState(bottomBar: BottomBarComponent, expectedState: BottomBarState) {
     when (bottomBar) {
         is BottomBarComponentImpl -> {
             assertThat(bottomBar.state).isEqualTo(expectedState)

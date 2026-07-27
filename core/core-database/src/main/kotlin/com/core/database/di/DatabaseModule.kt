@@ -18,9 +18,7 @@ import javax.inject.Singleton
 object DatabaseModule {
     @Singleton
     @Provides
-    fun provideDatabase(
-        @ApplicationContext context: Context,
-    ): AppDatabase {
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
         val dbName = "app_database"
 
         val db =
@@ -30,6 +28,7 @@ object DatabaseModule {
                 dbName,
             )
                 .setDriver(BundledSQLiteDriver())
+                .addMigrations(AppDatabase.MIGRATION_1_2)
                 .build()
 
         runBlocking {

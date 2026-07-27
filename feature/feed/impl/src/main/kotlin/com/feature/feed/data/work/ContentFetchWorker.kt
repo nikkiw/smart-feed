@@ -11,23 +11,22 @@ import dagger.assisted.AssistedInject
 
 @HiltWorker
 class ContentFetchWorker
-    @AssistedInject
-    constructor(
-        @Assisted appContext: Context,
-        @Assisted workerParams: WorkerParameters,
-        private val syncContentUseCase: SyncContentUseCase,
-    ) : CoroutineWorker(appContext, workerParams) {
-        companion object {
-            const val KEY_ERROR_MESSAGE = "key_error_message"
-        }
-
-        @Suppress("TooGenericExceptionCaught")
-        override suspend fun doWork(): Result =
-            try {
-                syncContentUseCase().getOrThrow()
-                Result.success()
-            } catch (e: Exception) {
-                val data = workDataOf(KEY_ERROR_MESSAGE to (e.message ?: "Unknown error"))
-                Result.failure(data)
-            }
+@AssistedInject
+constructor(
+    @Assisted appContext: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val syncContentUseCase: SyncContentUseCase,
+) : CoroutineWorker(appContext, workerParams) {
+    companion object {
+        const val KEY_ERROR_MESSAGE = "key_error_message"
     }
+
+    @Suppress("TooGenericExceptionCaught")
+    override suspend fun doWork(): Result = try {
+        syncContentUseCase().getOrThrow()
+        Result.success()
+    } catch (e: Exception) {
+        val data = workDataOf(KEY_ERROR_MESSAGE to (e.message ?: "Unknown error"))
+        Result.failure(data)
+    }
+}

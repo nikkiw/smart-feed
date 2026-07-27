@@ -29,29 +29,29 @@ import javax.inject.Inject
  * @see RecommendForArticleUseCase for interface definition
  */
 class RecommendForArticleUseCaseImpl
-    @Inject
-    constructor(
-        private val recommendationRepository: RecommendationRepository,
-        private val contentItemRepository: ContentItemRepository,
-    ) : RecommendForArticleUseCase {
-        /**
-         * Retrieves a list of recommended content items related to the specified article.
-         *
-         * 1. Fetches raw recommendations via [RecommendationRepository.recommendForArticle].
-         * 2. For each recommended article ID, fetches the actual content item.
-         * 3. Converts each content item into a preview using [toContentItemPreview].
-         *
-         * @param articleId The ID of the article for which to get recommendations.
-         * @return A [Flow] emitting recommended content items whenever local data changes.
-         */
-        override fun invoke(articleId: ContentId): Flow<List<ContentItemPreview>> =
-            recommendationRepository.recommendForArticle(articleId)
-                .map { recommendations ->
-                    recommendations.mapNotNull { recommendation ->
-                        contentItemRepository
-                            .getContentById(recommendation.articleId)
-                            .getOrNull()
-                            ?.toContentItemPreview()
-                    }
+@Inject
+constructor(
+    private val recommendationRepository: RecommendationRepository,
+    private val contentItemRepository: ContentItemRepository,
+) : RecommendForArticleUseCase {
+    /**
+     * Retrieves a list of recommended content items related to the specified article.
+     *
+     * 1. Fetches raw recommendations via [RecommendationRepository.recommendForArticle].
+     * 2. For each recommended article ID, fetches the actual content item.
+     * 3. Converts each content item into a preview using [toContentItemPreview].
+     *
+     * @param articleId The ID of the article for which to get recommendations.
+     * @return A [Flow] emitting recommended content items whenever local data changes.
+     */
+    override fun invoke(articleId: ContentId): Flow<List<ContentItemPreview>> =
+        recommendationRepository.recommendForArticle(articleId)
+            .map { recommendations ->
+                recommendations.mapNotNull { recommendation ->
+                    contentItemRepository
+                        .getContentById(recommendation.articleId)
+                        .getOrNull()
+                        ?.toContentItemPreview()
                 }
-    }
+            }
+}

@@ -15,7 +15,13 @@ interface ArticleEmbeddingDao {
      * @return A list of [ArticleEmbedding] containing article IDs and their embedding vectors.
      */
     @Transaction
-    @Query("SELECT contentId AS articleId, unitEmbedding FROM article_attributes")
+    @Query(
+        """
+        SELECT a.contentId AS articleId, a.unitEmbedding, c.languageCode
+        FROM article_attributes a
+        JOIN content c ON c.id = a.contentId
+        """,
+    )
     suspend fun allEmbeddings(): List<ArticleEmbedding>
 
     /**
@@ -25,6 +31,14 @@ interface ArticleEmbeddingDao {
      * @return The [ArticleEmbedding] for the given article ID, or null if not found.
      */
     @Transaction
-    @Query("SELECT contentId AS articleId, unitEmbedding FROM article_attributes WHERE contentId = :articleId LIMIT 1")
+    @Query(
+        """
+        SELECT a.contentId AS articleId, a.unitEmbedding, c.languageCode
+        FROM article_attributes a
+        JOIN content c ON c.id = a.contentId
+        WHERE a.contentId = :articleId
+        LIMIT 1
+        """,
+    )
     suspend fun getEmbeddings(articleId: String): ArticleEmbedding?
 }

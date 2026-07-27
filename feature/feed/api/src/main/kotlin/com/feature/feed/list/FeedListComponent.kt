@@ -3,7 +3,6 @@ package com.feature.feed.list
 import androidx.paging.PagingData
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
-import com.core.content.model.ContentId
 import com.feature.feed.domain.model.ContentItemPreview
 import com.feature.feed.domain.repository.Query
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +22,8 @@ interface FeedListComponent {
      */
     val model: Value<Model>
 
+    val initialScrollPosition: ScrollPosition
+
     /**
      * One-shot user-facing effects from the feed slice.
      */
@@ -40,7 +41,9 @@ interface FeedListComponent {
     /**
      *The event when the user clicked on an item in the list
      */
-    fun onListItemClick(itemId: ContentId)
+    fun onListItemClick(item: ContentItemPreview)
+
+    fun onScrollPositionChanged(itemIndex: Int, itemOffsetPx: Int)
 
     fun updateQuery(query: Query)
 
@@ -48,7 +51,7 @@ interface FeedListComponent {
         operator fun invoke(
             componentContext: ComponentContext,
             initialQuery: Query,
-            onItemClick: (ContentId) -> Unit,
+            onItemClick: (ContentItemPreview) -> Unit,
         ): FeedListComponent
     }
 
@@ -56,6 +59,11 @@ interface FeedListComponent {
         val isOnline: Boolean,
         val hasLocalContent: Boolean,
         val refreshState: RefreshState = RefreshState.Idle,
+    )
+
+    data class ScrollPosition(
+        val itemIndex: Int = 0,
+        val itemOffsetPx: Int = 0,
     )
 
     sealed interface RefreshState {

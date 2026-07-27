@@ -34,10 +34,7 @@ class DevNetworkDataSource : NetworkDataSource {
     // Here we generate 150 to be obviously greater than 100
     val dummyData: List<ContentUpdate> by lazy { generateDummyUpdates(150) }
 
-    override suspend fun getUpdates(
-        since: String,
-        limit: Int,
-    ): Result<UpdatesResponse> {
+    override suspend fun getUpdates(since: String, limit: Int): Result<UpdatesResponse> {
         val filtered =
             dummyData.filter { it.updatedAt > since }
                 .sortedBy { it.updatedAt }
@@ -56,18 +53,15 @@ class DevNetworkDataSource : NetworkDataSource {
             UpdatesResponse(
                 data = slice,
                 meta =
-                    UpdatesMeta(
-                        nextSince = nextSince,
-                        hasMore = hasMore,
-                    ),
+                UpdatesMeta(
+                    nextSince = nextSince,
+                    hasMore = hasMore,
+                ),
             )
         return Result.success(response)
     }
 
-    override suspend fun getContentById(
-        type: String,
-        id: String,
-    ): Result<ContentUpdate> {
+    override suspend fun getContentById(type: String, id: String): Result<ContentUpdate> {
         val found = dummyData.find { it.id == id && it.type == type }
         return if (found != null) {
             Result.success(found)
@@ -117,21 +111,22 @@ class DevNetworkDataSource : NetworkDataSource {
                         title = "Article title №$i",
                         shortDescription = "Article Summary №$i",
                         content = "Content of article №$i. This can be any text.Short content of the article.",
+                        languageCode = "en",
                         embeddings =
-                            Embeddings(
-                                typeName = "test",
-                                size = 20,
-                                data = List(20) { Random.nextDouble(-1.0, 1.0) },
-                            ),
+                        Embeddings(
+                            typeName = "test",
+                            size = 20,
+                            data = List(20) { Random.nextDouble(-1.0, 1.0) },
+                        ),
                     )
                 } else {
                     ContentAttributes.Quiz(
                         questions =
-                            listOf(
-                                "Question 1 for the quiz №$i?",
-                                "Question 2 for the quiz №$i?",
-                                "Question 3 for the quiz №$i?",
-                            ),
+                        listOf(
+                            "Question 1 for the quiz №$i?",
+                            "Question 2 for the quiz №$i?",
+                            "Question 3 for the quiz №$i?",
+                        ),
                     )
                 }
 

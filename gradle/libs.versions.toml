@@ -13,13 +13,14 @@ concurrentFutures = "1.2.0"
 
 # Lifecycle and Architecture
 androidxLifecycle = "2.9.1"
+androidxActivity = "1.11.0"
 
 # UI
 androidxComposeBom = "2025.08.00"
 material = "1.12.0"
-swiperefreshlayout = "1.1.0"
-markwon = "4.6.2"
 nikkiwAndroidUiComponents = "v0.0.1"
+coil = "3.5.0"
+mikepenzMarkdown = "0.43.0"
 
 # Core Library Desugaring
 desugarJdkLibs = "2.1.5"
@@ -45,9 +46,6 @@ hiltCompilerAndroidx="1.2.0"
 # Networking
 retrofit = "2.11.0"
 okhttp = "4.12.0"
-
-# Image
-glide = "4.16.0"
 
 # Works
 workVersion = "2.10.1"
@@ -98,20 +96,26 @@ concurrent-futures-ktx = { group = "androidx.concurrent", name = "concurrent-fut
 # Lifecycle and Architecture
 androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "androidxLifecycle" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 
 # UI
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-material = { group = "androidx.compose.material", name = "material" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
-markwon-core = { group = "io.noties.markwon", name = "core", version.ref = "markwon" }
 nikkiw-android-ui-components = { group = "com.github.nikkiw", name="android-ui-components", version.ref="nikkiwAndroidUiComponents"}
+markdown-renderer = { group = "com.mikepenz", name = "multiplatform-markdown-renderer", version.ref = "mikepenzMarkdown" }
+markdown-renderer-m3 = { group = "com.mikepenz", name = "multiplatform-markdown-renderer-m3", version.ref = "mikepenzMarkdown" }
+markdown-renderer-coil3 = { group = "com.mikepenz", name = "multiplatform-markdown-renderer-coil3", version.ref = "mikepenzMarkdown" }
 
 # Core Library Desugaring
 desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
@@ -122,6 +126,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 # Decompose
 decompose = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decompose" }
+decompose-extensions-compose = { group = "com.arkivanov.decompose", name = "extensions-compose", version.ref = "decompose" }
 mvikotlin-main = { group = "com.arkivanov.mvikotlin", name = "mvikotlin-main", version.ref = "mvikotlin" }
 mvikotlin-core = { group = "com.arkivanov.mvikotlin", name = "mvikotlin", version.ref = "mvikotlin" }
 mvikotlin-extensions-coroutines = { group = "com.arkivanov.mvikotlin", name = "mvikotlin-extensions-coroutines", version.ref = "mvikotlin" }
@@ -144,6 +149,7 @@ room-common = { group = "androidx.room", name = "room-common", version.ref = "ro
 room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "room" }
 room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 androidx-pagging-ktx = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "pagging" }
+androidx-pagging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "pagging" }
 androidx-pagging-testing = { group = "androidx.paging", name = "paging-testing", version.ref = "pagging" }
 
 # Networks
@@ -152,12 +158,8 @@ retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 
-# Image
-glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
-glide-ksp = { group = "com.github.bumptech.glide", name = "ksp", version.ref = "glide" }
-#glide-cronet = { group = "com.github.bumptech.glide", name = "cronet-integration", version.ref = "glide" }
-glide-okhttp = { group = "com.github.bumptech.glide", name = "okhttp3-integration", version.ref = "glide" }
-glide-recyclerview = { group = "com.github.bumptech.glide", name = "recyclerview-integration", version.ref = "glide" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 
 # Works
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workVersion" }
@@ -241,5 +243,4 @@ smart-feed-android-feature = { id = "smart.feed.android.feature" }
 
 
 [bundles]
-decompose-libs = ["decompose", "decompose-extensions-android", "essenty-lifecycle-coroutines"]
-glide = ["glide", "glide-okhttp", "glide-recyclerview"]
+decompose-libs = ["decompose", "essenty-lifecycle-coroutines"]

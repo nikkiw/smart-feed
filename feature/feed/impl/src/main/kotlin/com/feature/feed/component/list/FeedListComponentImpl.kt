@@ -5,6 +5,8 @@ import androidx.paging.cachedIn
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
@@ -12,7 +14,6 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.bind
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.states
-import com.core.content.model.ContentId
 import com.core.observers.ConnectivityRepository
 import com.feature.feed.component.list.store.FeedIntent
 import com.feature.feed.component.list.store.FeedLabel
@@ -44,9 +45,13 @@ class FeedListComponentImpl(
     private val connectivityRepository: ConnectivityRepository,
     contentItemRepository: ContentItemRepository,
     initialQuery: Query,
-    private val onItemClick: (ContentId) -> Unit,
+    private val onItemClick: (ContentItemPreview) -> Unit,
 ) : FeedListComponent, ComponentContext by componentContext {
     private val componentScope = coroutineScope()
+    private val stateHolder =
+        instanceKeeper.getOrCreate(STATE_HOLDER_KEY) {
+            StateHolder()
+        }
 
     private val _model =
         MutableValue(
@@ -56,6 +61,12 @@ class FeedListComponentImpl(
             ),
         )
     override val model: Value<FeedListComponent.Model> = _model
+    override val initialScrollPosition: FeedListComponent.ScrollPosition
+        get() =
+            FeedListComponent.ScrollPosition(
+                itemIndex = stateHolder.scrollItemIndex,
+                itemOffsetPx = stateHolder.scrollItemOffsetPx,
+            )
 
     private val effectChannel = Channel<FeedListComponent.Effect>(Channel.BUFFERED)
     override val effects: Flow<FeedListComponent.Effect> = effectChannel.receiveAsFlow()
@@ -91,18 +102,18 @@ class FeedListComponentImpl(
                 isOnline = state.isOnline,
                 hasLocalContent = state.hasLocalContent,
                 refreshState =
-                    when (val refreshState = state.refreshState) {
-                        FeedState.RefreshState.Idle -> FeedListComponent.RefreshState.Idle
-                        is FeedState.RefreshState.Refreshing -> FeedListComponent.RefreshState.Refreshing
-                        is FeedState.RefreshState.Failed ->
-                            FeedListComponent.RefreshState.Failed(refreshState.message)
-                    },
+                when (val refreshState = state.refreshState) {
+                    FeedState.RefreshState.Idle -> FeedListComponent.RefreshState.Idle
+                    is FeedState.RefreshState.Refreshing -> FeedListComponent.RefreshState.Refreshing
+                    is FeedState.RefreshState.Failed ->
+                        FeedListComponent.RefreshState.Failed(refreshState.message)
+                },
             )
     }
 
     private fun handleLabel(label: FeedLabel) {
         when (label) {
-            is FeedLabel.OpenArticle -> onItemClick(label.contentId)
+            is FeedLabel.OpenArticle -> onItemClick(label.preview)
             FeedLabel.OpenInternetSettings ->
                 effectChannel.trySend(FeedListComponent.Effect.OpenInternetSettings)
         }
@@ -120,11 +131,27 @@ class FeedListComponentImpl(
         feedStore.accept(FeedIntent.EnableInternetClicked)
     }
 
-    override fun onListItemClick(itemId: ContentId) {
-        feedStore.accept(FeedIntent.ArticleClicked(itemId))
+    override fun onListItemClick(item: ContentItemPreview) {
+        feedStore.accept(FeedIntent.ArticleClicked(item))
+    }
+
+    override fun onScrollPositionChanged(itemIndex: Int, itemOffsetPx: Int) {
+        if (stateHolder.scrollItemIndex == itemIndex && stateHolder.scrollItemOffsetPx == itemOffsetPx) return
+
+        stateHolder.scrollItemIndex = itemIndex
+        stateHolder.scrollItemOffsetPx = itemOffsetPx
     }
 
     override fun updateQuery(query: Query) {
         feedStore.accept(FeedIntent.QueryChanged(query))
+    }
+
+    private class StateHolder(
+        var scrollItemIndex: Int = 0,
+        var scrollItemOffsetPx: Int = 0,
+    ) : InstanceKeeper.Instance
+
+    private companion object {
+        const val STATE_HOLDER_KEY = "FeedListUiStateHolder"
     }
 }

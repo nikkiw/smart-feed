@@ -17,9 +17,5 @@ interface AnalyticsService {
      * @param readPercentage Approximate percentage of the content that was read, ranging from 0.0 to 1.0,
      *   where 0.0 means none and 1.0 means the full content was read.
      */
-    fun trackEventReadContent(
-        contentId: ContentId,
-        readingTimeMillis: Long,
-        readPercentage: Float,
-    )
+    fun trackEventReadContent(contentId: ContentId, readingTimeMillis: Long, readPercentage: Float)
 }

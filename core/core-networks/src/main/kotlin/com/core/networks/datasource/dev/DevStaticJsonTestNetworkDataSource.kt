@@ -36,10 +36,7 @@ class DevStaticJsonTestNetworkDataSource(
             .create()
     }
 
-    override suspend fun getUpdates(
-        since: String,
-        limit: Int,
-    ): Result<UpdatesResponse> {
+    override suspend fun getUpdates(since: String, limit: Int): Result<UpdatesResponse> {
         if (!isInternetAvailable()) return offlineFailure()
 
         return runCatching {
@@ -72,20 +69,17 @@ class DevStaticJsonTestNetworkDataSource(
                 UpdatesResponse(
                     data = limitedData,
                     meta =
-                        UpdatesMeta(
-                            nextSince = nextSince,
-                            hasMore = hasMore,
-                        ),
+                    UpdatesMeta(
+                        nextSince = nextSince,
+                        hasMore = hasMore,
+                    ),
                 )
 
             filteredResponse
         }
     }
 
-    override suspend fun getContentById(
-        type: String,
-        id: String,
-    ): Result<ContentUpdate> {
+    override suspend fun getContentById(type: String, id: String): Result<ContentUpdate> {
         if (!isInternetAvailable()) return offlineFailure()
 
         return runCatching {
@@ -124,10 +118,7 @@ class DevStaticJsonTestNetworkDataSource(
         }
     }
 
-    private fun isAfterTimestamp(
-        timestamp1: String,
-        timestamp2: String,
-    ): Boolean {
+    private fun isAfterTimestamp(timestamp1: String, timestamp2: String): Boolean {
         return if (timestamp2.isEmpty()) {
             true
         } else {

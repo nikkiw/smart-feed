@@ -5,6 +5,7 @@ import androidx.paging.PagingSource
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.core.common.time.DateTimeConvertors
+import com.core.content.model.ContentLanguage
 import com.core.content.model.ContentType
 import com.core.content.model.Tags
 import com.feature.feed.domain.repository.ContentItemsSortedType
@@ -38,263 +39,310 @@ class ContentDaoTest {
     }
 
     @Test
-    fun testPagingSource_queryByTypeAndTag_andSortedByNameAsc() =
-        runTest {
-            // Prepare data
-            val entity1 =
-                ContentEntity(
-                    id = "id1",
-                    type = ContentType.ARTICLE.toString(),
-                    action = "created",
-                    updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
-                    mainImageUrl = "url1",
-                    tags = listOf("news", "science"),
-                )
-            val entity2 =
-                ContentEntity(
-                    id = "id2",
-                    type = ContentType.ARTICLE.toString(),
-                    action = "created",
-                    updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-02T10:00:00"),
-                    mainImageUrl = "url2",
-                    tags = listOf("news", "tech"),
-                )
+    fun testPagingSource_queryByTypeAndTag_andSortedByNameAsc() = runTest {
+        // Prepare data
+        val entity1 =
+            ContentEntity(
+                id = "id1",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
+                mainImageUrl = "url1",
+                tags = listOf("news", "science"),
+            )
+        val entity2 =
+            ContentEntity(
+                id = "id2",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-02T10:00:00"),
+                mainImageUrl = "url2",
+                tags = listOf("news", "tech"),
+            )
 
-            val attr1 =
-                ArticleAttributesEntity(
-                    contentId = "id1",
-                    title = "Alpha Title",
-                    content = "Alpha Content",
-                    shortDescription = "Short desc",
-                    unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
-                )
-            val attr2 =
-                ArticleAttributesEntity(
-                    contentId = "id2",
-                    title = "Beta Title",
-                    content = "Beta Content",
-                    shortDescription = "Short desc",
-                    unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
-                )
-            db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
-            db.contentDao().insertContentUpdateWithDetails(entity2, attr2)
+        val attr1 =
+            ArticleAttributesEntity(
+                contentId = "id1",
+                title = "Alpha Title",
+                content = "Alpha Content",
+                shortDescription = "Short desc",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            )
+        val attr2 =
+            ArticleAttributesEntity(
+                contentId = "id2",
+                title = "Beta Title",
+                content = "Beta Content",
+                shortDescription = "Short desc",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            )
+        db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
+        db.contentDao().insertContentUpdateWithDetails(entity2, attr2)
 
-            val tags = db.contentTagsDao().allTags().first()
-            val expectedTags = listOf("news", "tech", "science")
-            assertEquals(expectedTags.toSet(), tags.toSet())
+        val tags = db.contentTagsDao().allTags().first()
+        val expectedTags = listOf("news", "tech", "science")
+        assertEquals(expectedTags.toSet(), tags.toSet())
 
-            // Query by type ARTICLE and tag "news", sort by name ASC
-            val query =
-                Query(
-                    types = listOf(ContentType.ARTICLE),
-                    tags = Tags(listOf("news")),
-                    sortedBy = ContentItemsSortedType.ByNameAsc,
-                )
+        // Query by type ARTICLE and tag "news", sort by name ASC
+        val query =
+            Query(
+                types = listOf(ContentType.ARTICLE),
+                tags = Tags(listOf("news")),
+                sortedBy = ContentItemsSortedType.ByNameAsc,
+            )
 
-            val pagingSource = contentItemPagingSource(query, db.contentDao())
-            val loadResult =
-                pagingSource.load(
-                    PagingSource.LoadParams.Refresh(
-                        key = null,
-                        loadSize = 10,
-                        placeholdersEnabled = false,
-                    ),
-                )
+        val pagingSource = contentItemPagingSource(query, db.contentDao())
+        val loadResult =
+            pagingSource.load(
+                PagingSource.LoadParams.Refresh(
+                    key = null,
+                    loadSize = 10,
+                    placeholdersEnabled = false,
+                ),
+            )
 
-            // We expect 2 results in sorted order by title ("Alpha Title", "Beta Title")
-            val expectedOrder = listOf("id1", "id2")
-            val actualOrder =
-                when (loadResult) {
-                    is PagingSource.LoadResult.Page -> loadResult.data.map { it.contentUpdate.id }
-                    else -> emptyList()
-                }
-            assertEquals(expectedOrder, actualOrder)
-        }
-
-    @Test
-    fun testPagingSource_queryByTagOnly_andSortedByDateDesc() =
-        runTest {
-            val entity1 =
-                ContentEntity(
-                    id = "id1",
-                    type = ContentType.ARTICLE.toString(),
-                    action = "created",
-                    updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
-                    mainImageUrl = "url1",
-                    tags = listOf("news", "science"),
-                )
-            val entity2 =
-                ContentEntity(
-                    id = "id2",
-                    type = ContentType.ARTICLE.toString(),
-                    action = "created",
-                    updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-02T10:00:00"),
-                    mainImageUrl = "url2",
-                    tags = listOf("news", "tech"),
-                )
-
-            val attr1 =
-                ArticleAttributesEntity(
-                    contentId = "id1",
-                    title = "Alpha Title",
-                    content = "Alpha Content",
-                    shortDescription = "Short desc",
-                    unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
-                )
-            val attr2 =
-                ArticleAttributesEntity(
-                    contentId = "id2",
-                    title = "Beta Title",
-                    content = "Beta Content",
-                    shortDescription = "Short desc",
-                    unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
-                )
-
-            db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
-            db.contentDao().insertContentUpdateWithDetails(entity2, attr2)
-
-            // Query by tag "tech", sort by date descending (newest first)
-            val query =
-                Query(
-                    types = emptyList(),
-                    tags = Tags(listOf("tech")),
-                    sortedBy = ContentItemsSortedType.ByDateNewestFirst,
-                )
-
-            val pagingSource = contentItemPagingSource(query, db.contentDao())
-            val loadResult =
-                pagingSource.load(
-                    PagingSource.LoadParams.Refresh(
-                        key = null,
-                        loadSize = 10,
-                        placeholdersEnabled = false,
-                    ),
-                )
-
-            // Only entity2 has "tech" tag, it should be the only result
-            val expectedOrder = listOf("id2")
-            val actualOrder =
-                when (loadResult) {
-                    is PagingSource.LoadResult.Page -> loadResult.data.map { it.contentUpdate.id }
-                    else -> emptyList()
-                }
-            assertEquals(expectedOrder, actualOrder)
-        }
+        // We expect 2 results in sorted order by title ("Alpha Title", "Beta Title")
+        val expectedOrder = listOf("id1", "id2")
+        val actualOrder =
+            when (loadResult) {
+                is PagingSource.LoadResult.Page -> loadResult.data.map { it.contentUpdate.id }
+                else -> emptyList()
+            }
+        assertEquals(expectedOrder, actualOrder)
+    }
 
     @Test
-    fun testFlowContent_check_embeddings_convertors() =
-        runTest {
-            // Prepare data
-            val entity1 =
-                ContentEntity(
-                    id = "id1",
-                    type = ContentType.ARTICLE.toString(),
-                    action = "created",
-                    updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
-                    mainImageUrl = "url1",
-                    tags = listOf("news", "science"),
-                )
+    fun testPagingSource_queryByTagOnly_andSortedByDateDesc() = runTest {
+        val entity1 =
+            ContentEntity(
+                id = "id1",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
+                mainImageUrl = "url1",
+                tags = listOf("news", "science"),
+            )
+        val entity2 =
+            ContentEntity(
+                id = "id2",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-02T10:00:00"),
+                mainImageUrl = "url2",
+                tags = listOf("news", "tech"),
+            )
 
-            val attr1 =
-                ArticleAttributesEntity(
-                    contentId = "id1",
-                    title = "Alpha Title",
-                    shortDescription = "Short desc",
-                    content = "Alpha Content",
-                    unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
-                )
-            db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
+        val attr1 =
+            ArticleAttributesEntity(
+                contentId = "id1",
+                title = "Alpha Title",
+                content = "Alpha Content",
+                shortDescription = "Short desc",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            )
+        val attr2 =
+            ArticleAttributesEntity(
+                contentId = "id2",
+                title = "Beta Title",
+                content = "Beta Content",
+                shortDescription = "Short desc",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            )
 
-            // Query by type ARTICLE and tag "news", sort by name ASC
-            val query =
-                Query(
-                    types = listOf(ContentType.ARTICLE),
-                    tags = Tags(),
-                    sortedBy = ContentItemsSortedType.ByNameAsc,
-                )
+        db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
+        db.contentDao().insertContentUpdateWithDetails(entity2, attr2)
 
-            // We expect 2 results in sorted order by title ("Alpha Title", "Beta Title")
-            val expectedEmbeddings = attr1.unitEmbedding.toList()
-            val actualEmbeddings =
-                db.contentDao().getContentById(entity1.id).article?.unitEmbedding?.toList()
-            assertEquals(expectedEmbeddings, actualEmbeddings)
-        }
+        // Query by tag "tech", sort by date descending (newest first)
+        val query =
+            Query(
+                types = emptyList(),
+                tags = Tags(listOf("tech")),
+                sortedBy = ContentItemsSortedType.ByDateNewestFirst,
+            )
+
+        val pagingSource = contentItemPagingSource(query, db.contentDao())
+        val loadResult =
+            pagingSource.load(
+                PagingSource.LoadParams.Refresh(
+                    key = null,
+                    loadSize = 10,
+                    placeholdersEnabled = false,
+                ),
+            )
+
+        // Only entity2 has "tech" tag, it should be the only result
+        val expectedOrder = listOf("id2")
+        val actualOrder =
+            when (loadResult) {
+                is PagingSource.LoadResult.Page -> loadResult.data.map { it.contentUpdate.id }
+                else -> emptyList()
+            }
+        assertEquals(expectedOrder, actualOrder)
+    }
 
     @Test
-    fun test_is_not_empty() =
-        runTest {
-            // Prepare data
-            val entity1 =
-                ContentEntity(
-                    id = "id1",
-                    type = ContentType.ARTICLE.toString(),
-                    action = "created",
-                    updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
-                    mainImageUrl = "url1",
-                    tags = listOf("news", "science"),
-                )
+    fun testFlowContent_check_embeddings_convertors() = runTest {
+        // Prepare data
+        val entity1 =
+            ContentEntity(
+                id = "id1",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
+                mainImageUrl = "url1",
+                tags = listOf("news", "science"),
+            )
 
-            val attr1 =
-                ArticleAttributesEntity(
-                    contentId = "id1",
-                    title = "Alpha Title",
-                    shortDescription = "Short desc",
-                    content = "Alpha Content",
-                    unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
-                )
-            db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
+        val attr1 =
+            ArticleAttributesEntity(
+                contentId = "id1",
+                title = "Alpha Title",
+                shortDescription = "Short desc",
+                content = "Alpha Content",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            )
+        db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
 
-            val isNotEmpty = db.contentDao().isNotEmpty()
+        // Query by type ARTICLE and tag "news", sort by name ASC
+        val query =
+            Query(
+                types = listOf(ContentType.ARTICLE),
+                tags = Tags(),
+                sortedBy = ContentItemsSortedType.ByNameAsc,
+            )
 
-            assertTrue(isNotEmpty)
-        }
+        // We expect 2 results in sorted order by title ("Alpha Title", "Beta Title")
+        val expectedEmbeddings = attr1.unitEmbedding.toList()
+        val actualEmbeddings =
+            db.contentDao().getContentById(entity1.id).article?.unitEmbedding?.toList()
+        assertEquals(expectedEmbeddings, actualEmbeddings)
+    }
 
     @Test
-    fun test_get_recent_content() =
-        runTest {
-            // Prepare data
-            val entity1 =
-                ContentEntity(
-                    id = "id1",
-                    type = ContentType.ARTICLE.toString(),
-                    action = "created",
-                    updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
-                    mainImageUrl = "url1",
-                    tags = listOf("news", "science"),
-                )
+    fun test_is_not_empty() = runTest {
+        // Prepare data
+        val entity1 =
+            ContentEntity(
+                id = "id1",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
+                mainImageUrl = "url1",
+                tags = listOf("news", "science"),
+            )
 
-            val attr1 =
-                ArticleAttributesEntity(
-                    contentId = entity1.id,
-                    title = "Alpha Title",
-                    shortDescription = "Short desc",
-                    content = "Alpha Content",
-                    unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
-                )
-            db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
+        val attr1 =
+            ArticleAttributesEntity(
+                contentId = "id1",
+                title = "Alpha Title",
+                shortDescription = "Short desc",
+                content = "Alpha Content",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            )
+        db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
 
-            val entity2 =
-                ContentEntity(
-                    id = "id2",
-                    type = ContentType.ARTICLE.toString(),
-                    action = "created",
-                    updatedAt = DateTimeConvertors.parseIsoToLongMs("2025-01-01T10:00:00"),
-                    mainImageUrl = "url1",
-                    tags = listOf("news", "science"),
-                )
+        val isNotEmpty = db.contentDao().isNotEmpty()
 
-            val attr2 =
-                ArticleAttributesEntity(
-                    contentId = entity2.id,
-                    title = "Alpha Title",
-                    shortDescription = "Short desc",
-                    content = "Alpha Content",
-                    unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
-                )
-            db.contentDao().insertContentUpdateWithDetails(entity2, attr2)
+        assertTrue(isNotEmpty)
+    }
 
-            val actualIds = db.contentDao().getRecentContent(1).map { it.contentUpdate.id }
-            val exceptedIds = listOf(entity2.id)
-            assertEquals(exceptedIds, actualIds)
-        }
+    @Test
+    fun test_get_recent_content() = runTest {
+        // Prepare data
+        val entity1 =
+            ContentEntity(
+                id = "id1",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2024-01-01T10:00:00"),
+                mainImageUrl = "url1",
+                tags = listOf("news", "science"),
+            )
+
+        val attr1 =
+            ArticleAttributesEntity(
+                contentId = entity1.id,
+                title = "Alpha Title",
+                shortDescription = "Short desc",
+                content = "Alpha Content",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            )
+        db.contentDao().insertContentUpdateWithDetails(entity1, attr1)
+
+        val entity2 =
+            ContentEntity(
+                id = "id2",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2025-01-01T10:00:00"),
+                mainImageUrl = "url1",
+                tags = listOf("news", "science"),
+            )
+
+        val attr2 =
+            ArticleAttributesEntity(
+                contentId = entity2.id,
+                title = "Alpha Title",
+                shortDescription = "Short desc",
+                content = "Alpha Content",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            )
+        db.contentDao().insertContentUpdateWithDetails(entity2, attr2)
+
+        val actualIds = db.contentDao().getRecentContent(1).map { it.contentUpdate.id }
+        val exceptedIds = listOf(entity2.id)
+        assertEquals(exceptedIds, actualIds)
+    }
+
+    @Test
+    fun test_get_recent_content_by_language() = runTest {
+        val englishEntity =
+            ContentEntity(
+                id = "en-1",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2025-01-01T10:00:00"),
+                mainImageUrl = "url-en",
+                languageCode = ContentLanguage.ENGLISH.code,
+                tags = listOf("news"),
+            )
+        val russianEntity =
+            ContentEntity(
+                id = "ru-1",
+                type = ContentType.ARTICLE.toString(),
+                action = "created",
+                updatedAt = DateTimeConvertors.parseIsoToLongMs("2025-01-02T10:00:00"),
+                mainImageUrl = "url-ru",
+                languageCode = ContentLanguage.RUSSIAN.code,
+                tags = listOf("news"),
+            )
+
+        db.contentDao().insertContentUpdateWithDetails(
+            englishEntity,
+            ArticleAttributesEntity(
+                contentId = englishEntity.id,
+                title = "English article",
+                shortDescription = "Short desc",
+                content = "English content body",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            ),
+        )
+        db.contentDao().insertContentUpdateWithDetails(
+            russianEntity,
+            ArticleAttributesEntity(
+                contentId = russianEntity.id,
+                title = "Русская статья",
+                shortDescription = "Короткое описание",
+                content = "Русский текст статьи",
+                unitEmbedding = FloatArray(10) { Random.nextDouble(-1.0, 1.0).toFloat() },
+            ),
+        )
+
+        val actualIds =
+            db.contentDao()
+                .getRecentContentByLanguage(limit = 5, languageCode = ContentLanguage.ENGLISH.code)
+                .map { it.contentUpdate.id }
+
+        assertEquals(listOf(englishEntity.id), actualIds)
+    }
 }
