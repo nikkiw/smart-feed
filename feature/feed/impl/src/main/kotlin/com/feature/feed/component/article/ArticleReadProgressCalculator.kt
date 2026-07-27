@@ -25,7 +25,7 @@ internal object ArticleReadProgressCalculator {
                                     bodyItemOffset + bodyItemSize,
                                     snapshot.viewportEndOffset,
                                 ) - maxOf(bodyItemOffset, snapshot.viewportStartOffset)
-                            ).coerceAtLeast(0)
+                                ).coerceAtLeast(0)
                         if (bodyItemSize == 0) {
                             0f
                         } else {
@@ -39,7 +39,7 @@ internal object ArticleReadProgressCalculator {
                 (
                     ARTICLE_READ_PROGRESS_BEFORE_BODY +
                         (ARTICLE_READ_PROGRESS_AFTER_BODY - ARTICLE_READ_PROGRESS_BEFORE_BODY) * bodyProgress
-                ).coerceIn(0f, ARTICLE_READ_PROGRESS_AFTER_BODY)
+                    ).coerceIn(0f, ARTICLE_READ_PROGRESS_AFTER_BODY)
             }
 
             snapshot.firstVisibleItemIndex <= 0 -> 0f
@@ -52,12 +52,12 @@ internal object ArticleReadProgressCalculator {
                     (
                         (snapshot.lastVisibleItemIndex - RELATED_CONTENT_START_INDEX).toFloat() /
                             relatedItemsDenominator.toFloat()
-                    ).coerceIn(0f, 1f)
+                        ).coerceIn(0f, 1f)
 
                 (
                     ARTICLE_READ_PROGRESS_AFTER_BODY +
                         (1f - ARTICLE_READ_PROGRESS_AFTER_BODY) * relatedProgress
-                ).coerceIn(ARTICLE_READ_PROGRESS_AFTER_BODY, 1f)
+                    ).coerceIn(ARTICLE_READ_PROGRESS_AFTER_BODY, 1f)
             }
         }
     }

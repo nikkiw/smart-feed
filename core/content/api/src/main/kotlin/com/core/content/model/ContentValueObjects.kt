@@ -73,12 +73,7 @@ value class ContentLanguage(val code: String) {
             return if (normalized.isNullOrEmpty()) UNDETERMINED else ContentLanguage(normalized)
         }
 
-        fun resolve(
-            explicitCode: String?,
-            title: String,
-            shortDescription: String,
-            content: String,
-        ): ContentLanguage {
+        fun resolve(explicitCode: String?, title: String, shortDescription: String, content: String): ContentLanguage {
             val explicitLanguage = from(explicitCode)
             return if (explicitLanguage != UNDETERMINED) {
                 explicitLanguage

@@ -33,8 +33,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Instant
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 class RecommenderImplTest {

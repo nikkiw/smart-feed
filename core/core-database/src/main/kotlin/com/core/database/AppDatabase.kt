@@ -5,10 +5,10 @@ import android.util.Log
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
 import androidx.room.execSQL
-import androidx.sqlite.SQLiteConnection
+import androidx.room.migration.Migration
 import androidx.room.useWriterConnection
+import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.core.analytics.local.EventLogDao
 import com.core.analytics.local.entity.EventLog

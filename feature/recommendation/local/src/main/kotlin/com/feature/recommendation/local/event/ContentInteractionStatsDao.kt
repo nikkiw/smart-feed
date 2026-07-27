@@ -40,10 +40,7 @@ interface ContentInteractionStatsDao {
         LIMIT :limit
         """,
     )
-    suspend fun getTopReadLanguageCodes(
-        limit: Int,
-        unknownLanguage: String = "und",
-    ): List<String>
+    suspend fun getTopReadLanguageCodes(limit: Int, unknownLanguage: String = "und"): List<String>
 
     /**
      * Retrieves the interaction statistics for a specific article identified by its ID.

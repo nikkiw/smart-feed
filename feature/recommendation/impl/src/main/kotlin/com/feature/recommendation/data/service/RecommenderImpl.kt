@@ -21,8 +21,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 import java.util.Locale
+import javax.inject.Inject
 
 typealias ArticleEmbeddings = Pair<String, FloatArray>
 
@@ -335,7 +335,9 @@ constructor(
         return recommendations
     }
 
-    private suspend fun loadRecentContentForLanguage(preferredLanguage: String?): List<com.feature.feed.local.content.entity.ContentPreviewWithDetails> {
+    private suspend fun loadRecentContentForLanguage(
+        preferredLanguage: String?,
+    ): List<com.feature.feed.local.content.entity.ContentPreviewWithDetails> {
         val normalizedLanguage = ContentLanguage.from(preferredLanguage)
         return withContext(ioDispatcher) {
             if (normalizedLanguage == ContentLanguage.UNDETERMINED) {
