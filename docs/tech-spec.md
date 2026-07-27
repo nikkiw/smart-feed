@@ -4,7 +4,7 @@
 
 **Project Name:** smart-feed
 **Description:** A demo Android application featuring an article feed with an on-device recommendation system.
-**Technology Stack:** Kotlin, Coroutines, Room, WorkManager, Hilt, Retrofit, Decompose for lifecycle-aware component navigation, and MVIKotlin 4.2.0 for stateful Feed components. The current UI uses XML/ViewBinding and RecyclerView; Compose is planned as a parallel rendering path for measured comparison.
+**Technology Stack:** Kotlin, Coroutines, Room, WorkManager, Hilt, Retrofit, Decompose for lifecycle-aware component navigation, MVIKotlin 4.2.0 for stateful Feed components, and Jetpack Compose Material 3 as the production UI runtime. The historical XML/ViewBinding + RecyclerView baseline remains documented only for migration and performance comparison purposes.
 
 ## 2. Objectives
 
@@ -36,8 +36,8 @@
    * Bottom navigation: Feed | Recommendations.
    * Pull-to-refresh and infinite scroll.
    * Periodic content updates.
-   * Current rendering is XML/ViewBinding with RecyclerView. A Compose `ArticleCard` is planned
-     as a parallel implementation for performance comparison before broader migration.
+   * Current rendering is Compose-only in production, with Material 3 screens backed by Decompose components.
+   * The earlier XML/ViewBinding + RecyclerView implementation remains relevant only as a documented benchmark baseline.
 
 5. **Testing and CI**
 
@@ -83,7 +83,7 @@ The full API description is available in [content_delta_sync_spec.md](content_de
 2. **FeedScreen**
 
    * FilterSortScreen allows sorting and filtering by tags.
-   * Vertical RecyclerView with multiple card types.
+   * Vertical Compose feed list with multiple content states and card variations.
 
 3. **ArticleDetailScreen**
 

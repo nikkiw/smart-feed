@@ -4,7 +4,7 @@
 
 **Название проекта:** smart-feed
 **Описание:** Demo-приложение на Android с лентой статей и встроенной системой рекомендаций на устройстве.
-**Стек технологий:** Kotlin, Coroutines, Room, WorkManager, Hilt, Retrofit, Decompose для навигации и жизненного цикла компонентов, MVIKotlin 4.2.0 для сложного состояния Feed. Текущий UI использует XML/ViewBinding и RecyclerView; Compose планируется как параллельный путь рендеринга для сравнения по измеряемым метрикам.
+**Стек технологий:** Kotlin, Coroutines, Room, WorkManager, Hilt, Retrofit, Decompose для навигации и жизненного цикла компонентов, MVIKotlin 4.2.0 для сложного состояния Feed и Jetpack Compose Material 3 как production UI runtime. Исторический XML/ViewBinding + RecyclerView теперь сохраняется только как зафиксированный baseline для миграции и perf-сравнений.
 
 ## 2. Цели
 
@@ -36,8 +36,8 @@
     * Bottom: Feed | Recommendations.
     * Pull-to-refresh и бесконечная прокрутка.
     * Периодическое обновление контента
-    * Текущий рендеринг выполнен через XML/ViewBinding и RecyclerView. Compose-карточка статьи
-      планируется как параллельная реализация для сравнения производительности перед дальнейшей миграцией.
+    * Текущий production-рендеринг выполнен полностью на Compose.
+    * Историческая XML/ViewBinding + RecyclerView реализация сохраняется только как baseline для сравнения производительности.
 
 5. **Тестирование и CI**
     
@@ -83,7 +83,7 @@ smart-feed/
 2. **FeedScreen**
 
     * FilterSortScreen для выбора сортировки feed, и фильтрация по тегам.
-    * Вертикальный RecyclerView с карточками разных типов.
+    * Вертикальный Compose-список с несколькими состояниями и карточками контента.
 
 3. **ArticleDetailScreen**
 

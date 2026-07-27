@@ -171,7 +171,7 @@ graph TD
 ```
 
 ### Component Responsibilities
-* **`FeedRootComponent`**: Manages the `ChildStack` navigation between Feed, Details, and Recommendations. Handles shared-element transition registration via `TransitionRegistry`.
+* **`FeedRootComponent`**: Manages the `ChildStack` navigation between Feed, Details, and Recommendations. The Compose renderer layers shared transitions on top of this navigation state.
 * **`FeedMasterComponent`**: Orchestrates filter/sort state and coordinates feed list loading.
 * **`FeedListComponent`**: Encapsulates Paging 3 data loading, loading/error/empty state tracking, and swipe-to-refresh.
 * **`ArticleItemComponent`**: Renders Markdown content (Markwon), tracks read-percentage analytics, and loads contextual article recommendations.
@@ -180,13 +180,13 @@ graph TD
 Complex Feed components (`FeedListComponent`, `RecommendationListComponent`, `ArticleItemComponent`,
 and `ArticleRecommendationsComponent`) retain MVIKotlin stores and expose only component models
 and effects to the UI layer. `FeedRootComponent`, `FeedMasterComponent`, `FilterSortComponent`,
-and `BottomBarComponent` remain lightweight Decompose coordinators. The current rendering layer is
-XML/ViewBinding with RecyclerView; Compose is intentionally not part of the production path yet.
+and `BottomBarComponent` remain lightweight Decompose coordinators. The current production
+rendering layer is Jetpack Compose.
 
-The planned migration starts with a parallel Compose `ArticleCard` implementation using the same
-component contract and data model. XML remains available as a control path while startup time,
-scrolling smoothness, frame timing, memory, and recomposition behavior are measured on the same
-dataset. A broader XML-to-Compose migration is considered only after that comparison.
+The project reached this state through an incremental migration that started with a parallel
+Compose `ArticleCard` implementation measured against the XML baseline. Those comparison artifacts
+remain useful as historical evidence and as a benchmark reference, but they no longer describe the
+active production UI path.
 
 ---
 

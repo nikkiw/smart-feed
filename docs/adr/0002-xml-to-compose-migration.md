@@ -9,7 +9,7 @@ However, a full rewrite ("Big Bang") introduces significant risks:
 2. **Feature Freeze**: Migrating all layouts at once halts product feature delivery.
 3. **Architecture Instability**: Navigation and side-effects handling must be fully refactored simultaneously.
 
-**Current status (2026-07-25):** The "Compose Island" approach has been implemented (`ComposeArticleCard` inside a RecyclerView). Performance parity has been achieved and verified via Android Macrobenchmark using **Baseline Profiles**. The XML and Compose paths coexist and can be swapped dynamically.
+**Current status (2026-07-27):** The repository has completed the migration to a Compose-only production UI path. The earlier "Compose Island" approach remains part of the historical migration story and benchmark evidence, but it is no longer the active runtime architecture.
 
 ## Decision
 
@@ -27,6 +27,15 @@ Instead of replacing entire screens, we will migrate individual UI components st
    and interaction script. Record cold/warm startup, frame timing/jank while scrolling, memory,
    and (for Compose) recomposition counts before deciding whether to continue the migration.
 
+## Outcome
+
+The incremental strategy succeeded as a migration path:
+
+- the XML baseline and Compose-islands phase provided the evidence needed to continue;
+- the production runtime was later simplified to a single Compose-only path rendered from one root composition;
+- Decompose remained the navigation and lifecycle owner throughout the migration;
+- the final demo/portfolio acceptance keeps the measured `P99` tail regression documented as a known limitation on the weakest benchmarked device rather than as a release blocker.
+
 ## Consequences
 
 ### Positive
@@ -35,7 +44,9 @@ Instead of replacing entire screens, we will migrate individual UI components st
 - **Coexistence**: XML Views and Jetpack Compose Composable layouts will coexist gracefully under the same Decompose lifecycle management.
 - **Evidence-based migration**: the XML path provides a baseline, so a broader migration is based
   on measured behavior rather than assumptions about performance.
+- **Clean end-state**: once the evidence was sufficient, the temporary dual-renderer complexity could be removed and the production UI simplified to Compose-only rendering.
 
 ### Negative / Trade-offs
 - **Bridge Overhead**: Creating `ComposeView` inside RecyclerView lists introduces small memory and layout overhead, which must be mitigated by properly disposing of Composition lifecycles on ViewHolder recycle.
 - **Tooling complexity**: Gradle modules must enable Compose compiler features and compile options, which adds configuration logic to build scripts.
+- **Historical complexity**: after the migration completes, historical ADR text can become misleading unless it is explicitly updated with the final outcome.

@@ -34,7 +34,7 @@ The project is structured under **Clean Architecture** guidelines with **Feature
 3. **Decompose Navigation**: Pure Kotlin component tree controlling lifecycle, state preservation, and back-stack handling — navigation and state ownership are decoupled from Android UI implementations. See [ADR 0001](docs/adr/0001-why-decompose.md).
 4. **Executable Architecture Guards (Konsist)**: A dedicated `:architecture-tests` JVM module enforces module boundary rules on every CI build — preventing domain leakage, platform imports in API modules, and naming violations.
 5. **Consolidated Gradle Build-Logic**: Modern composite `build-logic` eliminating old `buildSrc`. Convention plugins handle per-module Detekt profiles, Spotless formatting, and toolchain configuration.
-6. **Incremental UI Modernization**: The Feed UI integrates a Compose card ("Island") beside the XML implementation. Rendering and scrolling performance have been evaluated and optimized using **Baseline Profiles** (Macrobenchmark) to ensure smooth 60fps scrolling before a full Compose migration. See [ADR 0002](docs/adr/0002-xml-to-compose-migration.md) and [Performance Results](docs/performance/xml-vs-compose-results.md).
+6. **Compose-Only UI Runtime**: The production UI path is now fully Jetpack Compose while retaining Decompose as the navigation/state backbone. The earlier XML-to-Compose island phase remains documented as the migration path and benchmark baseline. See [ADR 0002](docs/adr/0002-xml-to-compose-migration.md) and [Performance Results](docs/performance/xml-vs-compose-results.md).
 
 For a complete breakdown, see the [Architecture Documentation](docs/architecture.md).
 
@@ -46,12 +46,12 @@ For a complete breakdown, see the [Architecture Documentation](docs/architecture
 |------------------|---------------------------------------------------------------------------------------------------|
 | **Language**     | Kotlin **2.3.21**, JVM 17 target                                                                  |
 | **Build**        | Android Gradle Plugin **9.2.1**, Gradle **9.4.1**, KSP **2.3.9**, composite `build-logic`        |
-| **Navigation**   | [Decompose](https://github.com/arkivanov/Decompose) **3.3.0** with Android ViewContext extensions |
+| **Navigation**   | [Decompose](https://github.com/arkivanov/Decompose) **3.3.0** with Compose rendering (`extensions-compose`) |
 | **State**        | MVIKotlin **4.2.0** for complex Feed components; simple coordinators remain Decompose components |
 | **Database**     | Room **2.7.1** with float-array embedding converters, per-feature entity/DAO modules (`:local`), Paging 3 (`PagingData`, `GetPagedContentUseCase`) owned by `:feature:feed:impl` |
 | **Background**   | WorkManager with Hilt worker scheduling                                                           |
 | **DI**           | Dagger Hilt **2.60** (assisted factories, interface binds, per-feature Hilt modules)              |
-| **Images**       | Glide behind a pure Kotlin `ImageLoader` contract (`:core:image:api`)                             |
+| **Images**       | Coil 3 for Compose UI plus a pure Kotlin `ImageLoader` contract (`:core:image:api`) for shared/background image work |
 | **Static Lint**  | Detekt **2.0.0-alpha.5** (layered profiles), Spotless **6.25.0** / Ktlint                        |
 | **Arch Testing** | [Konsist](https://github.com/LemonAppDev/konsist) **0.17.3** — executable architecture guards    |
 | **Networking**   | Retrofit + OkHttp, Ktor local mock server for dev flavour                                         |

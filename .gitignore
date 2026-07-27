@@ -53,3 +53,10 @@ changes_for_llm.txt
 /scripts/.venv/**
 docs/plans/
 .artifacts/
+.agents/
+query_desc.sql
+query_desc2.sql
+query_frames.sql
+query_sched.sql
+query_thread_state.sql
+trace_processor
