@@ -6,11 +6,17 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Shape
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 internal val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?> { null }
@@ -60,6 +66,22 @@ internal fun Modifier.smartFeedSharedBounds(
                     clipInOverlayDuringTransition = OverlayClip(clipShape),
                 )
             }
+        }
+    }
+}
+
+@Composable
+internal fun rememberSharedTransitionNavigation(contentId: String, onNavigate: () -> Unit): () -> Unit {
+    val sharedTransitionContentId = LocalSharedTransitionContentId.current
+    val latestOnNavigate by rememberUpdatedState(onNavigate)
+    val coroutineScope = rememberCoroutineScope()
+
+    return {
+        sharedTransitionContentId?.value = contentId
+        coroutineScope.launch {
+            // Let the source card recompose with shared bounds before navigation swaps the destination.
+            withFrameNanos { }
+            latestOnNavigate()
         }
     }
 }

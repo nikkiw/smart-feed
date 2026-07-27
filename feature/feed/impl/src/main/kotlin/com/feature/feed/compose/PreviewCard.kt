@@ -36,7 +36,11 @@ import com.feature.feed.domain.model.ContentItemPreview
 internal fun PreviewCard(preview: ContentItemPreview, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val spacing = SmartFeedThemeTokens.spacing
     val formattedUpdatedAt = rememberFormattedUpdatedAt(preview.updatedAt)
-    val sharedTransitionContentId = LocalSharedTransitionContentId.current
+    val navigateWithTransition =
+        rememberSharedTransitionNavigation(
+            contentId = preview.id.value,
+            onNavigate = onClick,
+        )
 
     Card(
         modifier =
@@ -48,10 +52,7 @@ internal fun PreviewCard(preview: ContentItemPreview, onClick: () -> Unit, modif
             )
             .fillMaxWidth()
             .testTag(SmartFeedUiTags.PREVIEW_CARD)
-            .clickable {
-                sharedTransitionContentId?.value = preview.id.value
-                onClick()
-            },
+            .clickable(onClick = navigateWithTransition),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = spacing.xSmall),

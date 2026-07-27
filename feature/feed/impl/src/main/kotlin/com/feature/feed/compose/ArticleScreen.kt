@@ -81,7 +81,12 @@ internal fun ArticleScreen(
     var topBarVisible by remember { mutableStateOf(true) }
     val loadedArticle =
         ((model.contentState as? ArticleItemComponent.ContentState.Content)?.contentItem as? ContentItem.Article)
-    val previewSnapshot = model.routePreview ?: routePreview
+    val previewSnapshot =
+        rememberArticlePreviewSnapshot(
+            itemId = component.itemId.value,
+            routePreview = routePreview,
+            modelPreview = model.routePreview,
+        )
 
     LaunchedEffect(model.contentState) {
         if (previewSnapshot == null) {
@@ -176,6 +181,23 @@ internal fun ArticleScreen(
             )
         }
     }
+}
+
+@Composable
+private fun rememberArticlePreviewSnapshot(
+    itemId: String,
+    routePreview: ArticleRoutePreview?,
+    modelPreview: ArticleRoutePreview?,
+): ArticleRoutePreview? {
+    var previewSnapshot by remember(itemId) { mutableStateOf(routePreview ?: modelPreview) }
+
+    LaunchedEffect(itemId, routePreview, modelPreview) {
+        if (previewSnapshot == null) {
+            previewSnapshot = routePreview ?: modelPreview
+        }
+    }
+
+    return previewSnapshot
 }
 
 @Composable
@@ -463,8 +485,12 @@ private fun ArticleBodyLoadingPlaceholder() {
 @Composable
 private fun RelatedPreviewRowCard(preview: ContentItemPreview, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val spacing = SmartFeedThemeTokens.spacing
-    val sharedTransitionContentId = LocalSharedTransitionContentId.current
     val model = preview.toRelatedPreviewModel()
+    val navigateWithTransition =
+        rememberSharedTransitionNavigation(
+            contentId = model.id,
+            onNavigate = onClick,
+        )
 
     Card(
         modifier =
@@ -476,10 +502,7 @@ private fun RelatedPreviewRowCard(preview: ContentItemPreview, onClick: () -> Un
                 clipShape = MaterialTheme.shapes.medium,
             )
             .testTag("related_preview_row"),
-        onClick = {
-            sharedTransitionContentId?.value = model.id
-            onClick()
-        },
+        onClick = navigateWithTransition,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = spacing.xSmall),
     ) {
